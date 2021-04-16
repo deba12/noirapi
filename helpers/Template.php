@@ -2,6 +2,7 @@
 
 namespace noirapi\helpers;
 
+use core\Exceptions\FileNotFoundException;
 use Latte;
 
 class Template {
@@ -10,15 +11,11 @@ class Template {
     private $latte;
     private const latte_ext = '.latte';
 
-    public function __construct(string $template = null) {
+    public function __construct() {
 
         $this->latte = new Latte\Engine;
         $this->latte->setAutoRefresh(true);
         $this->latte->setTempDirectory(ROOT . '/temp');
-
-        if($template !== null) {
-            $this->setTemplate($template);
-        }
 
     }
 
@@ -31,10 +28,21 @@ class Template {
     }
 
     /**
-     * @param string $name
+     * @param string $template
+     * @return $this
+     * @throws \core\Exceptions\FileNotFoundException
      */
-    public function setTemplate(string $name): void {
-        $this->template = $name;
+    public function setTemplate(string $template): Template {
+
+        $file = PATH_TEMPLATES . DIRECTORY_SEPARATOR . $template . self::latte_ext;
+
+        if(is_readable($file)) {
+            $this->template = $file;
+            return $this;
+        }
+
+        throw new FileNotFoundException('Unable to find template: ' . $file);
+
     }
 
 }
