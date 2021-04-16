@@ -21,8 +21,6 @@ if(file_exists(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php')) {
     require_once(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 }
 
-define('BASE_SCHEME', isset($_SERVER['HTTPS']) ? 'https://': 'http://');
-
 //directory paths
 const PATH_VIEWS = APPROOT . '/views' . DIRECTORY_SEPARATOR;
 const PATH_TEMPLATES = APPROOT . '/templates' . DIRECTORY_SEPARATOR;
@@ -69,6 +67,7 @@ if(PHP_SAPI === 'cli') {
 $loader->register();
 
 if($_SERVER['PHP_SELF'] === '/index.php') {
+    define('BASE_SCHEME', isset($_SERVER['HTTPS']) ? 'https://': 'http://');
     /** @noinspection PhpUnhandledExceptionInspection */
     new Route($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE);
 }
