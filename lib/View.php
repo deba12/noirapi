@@ -10,18 +10,18 @@ use stdClass;
 
 class View {
 
-	/** @var stdClass */
-	public  $request;
-	/** @var string */
-	private $template;
-	/** @var Engine */
-	public  $latte;
-	/** @var string */
-	private $layout;
-	/** @var response */
-	private $response;
+    /** @var stdClass */
+    public  $request;
     /** @var string */
-	private const latte_ext = '.latte';
+    private $template;
+    /** @var Engine */
+    public  $latte;
+    /** @var string */
+    private $layout;
+    /** @var response */
+    private $response;
+    /** @var string */
+    private const latte_ext = '.latte';
 
     /**
      * View constructor.
@@ -31,26 +31,26 @@ class View {
      */
     public function __construct(stdClass $request, Response $response) {
 
-		$this->request = $request;
+        $this->request = $request;
 
-		$this->latte = new Engine;
-		$this->latte->setTempDirectory(ROOT . '/temp');
+        $this->latte = new Engine;
+        $this->latte->setTempDirectory(ROOT . '/temp');
 
-		//disable regenerate of template files
-		$this->latte->setAutoRefresh(true);
+        //disable regenerate of template files
+        $this->latte->setAutoRefresh(true);
 
-		$this->response = $response;
+        $this->response = $response;
 
-		if(defined('DEFAULT_LAYOUT')) {
-			$this->setLayout(DEFAULT_LAYOUT)
-				->showHeader()
-				->showFooter();
-		} else {
-			$this->hideHeader()
-				->hideFooter();
-		}
+        if(defined('DEFAULT_LAYOUT')) {
+            $this->setLayout(DEFAULT_LAYOUT)
+                ->showHeader()
+                ->showFooter();
+        } else {
+            $this->hideHeader()
+                ->hideFooter();
+        }
 
-	}
+    }
 
     /**
      * @param array $params
@@ -59,31 +59,31 @@ class View {
      */
     public function display(array $params = []): response {
 
-		if($this->template === null) {
-			$this->setTemplate($this->request->function);
-		}
+        if($this->template === null) {
+            $this->setTemplate($this->request->function);
+        }
 
-		$layout = $this->layout ?? $this->template;
+        $layout = $this->layout ?? $this->template;
 
-		if(isset($_SERVER['HTTP_X_PJAX'])) {
-			$layout = $params['view'];
-		}
+        if(isset($_SERVER['HTTP_X_PJAX'])) {
+            $layout = $params['view'];
+        }
 
-		if(isset($_SESSION['message'])) {
-			$params['message'] = $_SESSION['message'];
-			unset($_SESSION['message']);
-		}
+        if(isset($_SESSION['message'])) {
+            $params['message'] = $_SESSION['message'];
+            unset($_SESSION['message']);
+        }
 
-		$params['view'] = $this->template;
+        $params['view'] = $this->template;
 
-		if(isset($_SESSION['message'])) {
-			$params['message'] = $_SESSION['message'];
-			unset($_SESSION['message']);
-		}
+        if(isset($_SESSION['message'])) {
+            $params['message'] = $_SESSION['message'];
+            unset($_SESSION['message']);
+        }
 
-		return $this->response->setBody($this->latte->renderToString($layout, array_merge((array)$this->request, $params)));
+        return $this->response->setBody($this->latte->renderToString($layout, array_merge((array)$this->request, $params)));
 
-	}
+    }
 
     /**
      * @param string|null $layout
@@ -94,18 +94,18 @@ class View {
      */
     public function print(?string $layout, string $view, array $params = []): string {
 
-		if($layout !== null) {
-			$this->setLayout($layout);
-			$this->setTemplate($view);
-			$params['view'] = $this->template;
-			return $this->latte->renderToString($this->layout, $params);
-		}
+        if($layout !== null) {
+            $this->setLayout($layout);
+            $this->setTemplate($view);
+            $params['view'] = $this->template;
+            return $this->latte->renderToString($this->layout, $params);
+        }
 
-		$this->setTemplate($view);
+        $this->setTemplate($view);
 
-		return $this->latte->renderToString($this->template, $params);
+        return $this->latte->renderToString($this->template, $params);
 
-	}
+    }
 
     /**
      * @param string $template
@@ -114,22 +114,22 @@ class View {
      * @noinspection PhpUnused
      * @throws \core\Exceptions\FileNotFoundException
      */
-	public function setTemplate(string $template, string $controller = null): view {
+    public function setTemplate(string $template, string $controller = null): view {
 
-		if($controller === null) {
-			$controller = $this->request->controller;
-		}
+        if($controller === null) {
+            $controller = $this->request->controller;
+        }
 
-		$file = PATH_VIEWS . $controller . DIRECTORY_SEPARATOR . $template . self::latte_ext;
+        $file = PATH_VIEWS . $controller . DIRECTORY_SEPARATOR . $template . self::latte_ext;
 
-		if(is_readable($file)) {
-			$this->template = $file;
-			return $this;
-		}
+        if(is_readable($file)) {
+            $this->template = $file;
+            return $this;
+        }
 
-		throw new FileNotFoundException('Unable to find template: ' . $file);
+        throw new FileNotFoundException('Unable to find template: ' . $file);
 
-	}
+    }
 
     /**
      * @param string|null $layout
@@ -137,57 +137,57 @@ class View {
      * @throws \core\Exceptions\FileNotFoundException
      * @noinspection PhpUnused
      */
-	public function setLayout(?string $layout = null): view {
+    public function setLayout(?string $layout = null): view {
 
-		if($layout === null) {
-			$this->layout = null;
-			return $this;
-		}
+        if($layout === null) {
+            $this->layout = null;
+            return $this;
+        }
 
-		$file = PATH_LAYOUTS . $layout . self::latte_ext;
+        $file = PATH_LAYOUTS . $layout . self::latte_ext;
 
-		if(is_readable($file)) {
-			$this->layout = $file;
-			return $this;
-		}
+        if(is_readable($file)) {
+            $this->layout = $file;
+            return $this;
+        }
 
-		throw new FileNotFoundException('Unable to find layout: ' . $file);
+        throw new FileNotFoundException('Unable to find layout: ' . $file);
 
-	}
+    }
 
-	/**
-	 * @return $this
-	 * @noinspection PhpUnused
-	 */
-	public function hideHeader(): view {
-		$this->request->header = false;
-		return $this;
-	}
+    /**
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function hideHeader(): view {
+        $this->request->header = false;
+        return $this;
+    }
 
-	/**
-	 * @return $this
-	 */
-	public function showHeader(): view {
-		$this->request->header = true;
-		return $this;
-	}
+    /**
+     * @return $this
+     */
+    public function showHeader(): view {
+        $this->request->header = true;
+        return $this;
+    }
 
-	/**
-	 * @return $this
-	 * @noinspection PhpUnused
-	 */
-	public function hideFooter(): view {
-		$this->request->footer = false;
-		return $this;
-	}
+    /**
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function hideFooter(): view {
+        $this->request->footer = false;
+        return $this;
+    }
 
-	/**
-	 * @return $this
-	 */
-	public function showFooter(): view {
-		$this->request->footer = true;
-		return $this;
-	}
+    /**
+     * @return $this
+     */
+    public function showFooter(): view {
+        $this->request->footer = true;
+        return $this;
+    }
 
     public function message(string $text, string $type, ?array $post): self {
 

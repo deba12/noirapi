@@ -6,29 +6,35 @@ use Latte;
 
 class Template {
 
-	private $template;
-	private $latte;
-	private const latte_ext = '.latte';
+    private $template;
+    private $latte;
+    private const latte_ext = '.latte';
 
-	public function __construct(string $template = null) {
+    public function __construct(string $template = null) {
 
-		$this->latte = new Latte\Engine;
-		new \noirapi\Latte($this->latte, []);
-		$this->latte->setAutoRefresh(true);
-		$this->latte->setTempDirectory(DOCROOT . '/temp');
+        $this->latte = new Latte\Engine;
+        $this->latte->setAutoRefresh(true);
+        $this->latte->setTempDirectory(ROOT . '/temp');
 
-		if($template !== null) {
-			$this->setTemplate($template);
-		}
+        if($template !== null) {
+            $this->setTemplate($template);
+        }
 
-	}
+    }
 
-	public function print(array $params = []): string {
-		return $this->latte->renderToString(PATH_TEMPLATES . DIRECTORY_SEPARATOR . $this->template . self::latte_ext, $params);
-	}
+    /**
+     * @param array $params
+     * @return string
+     */
+    public function print(array $params = []): string {
+        return $this->latte->renderToString(PATH_TEMPLATES . DIRECTORY_SEPARATOR . $this->template . self::latte_ext, $params);
+    }
 
-	public function setTemplate(string $name): void {
-		$this->template = $name;
-	}
+    /**
+     * @param string $name
+     */
+    public function setTemplate(string $name): void {
+        $this->template = $name;
+    }
 
 }
