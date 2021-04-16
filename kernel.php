@@ -39,7 +39,7 @@ if(isset($_SERVER['SERVER_NAME'])) {
 }
 
 if(empty($conf) || !is_readable($conf)) {
-    throw new NotConfiguredException("Unable to locate config");
+    throw new RuntimeException("Unable to locate config");
 }
 /** @noinspection PhpIncludeInspection */
 require_once($conf);
