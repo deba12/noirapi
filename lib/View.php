@@ -36,7 +36,7 @@ class View {
         $this->latte = new Engine;
         $this->latte->setTempDirectory(ROOT . '/temp');
 
-        //disable regenerate of template files
+        //enable regeneration of the template files
         $this->latte->setAutoRefresh(true);
 
         $this->response = $response;
