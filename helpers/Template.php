@@ -16,6 +16,7 @@ class Template {
         $this->latte = new Latte\Engine;
         $this->latte->setAutoRefresh(true);
         $this->latte->setTempDirectory(ROOT . '/temp');
+        $this->latte->addFilter(null, '\\noirapi\\helpers\\Filters::init');
 
     }
 
