@@ -24,7 +24,7 @@ class Template {
      * @return string
      */
     public function print(array $params = []): string {
-        return $this->latte->renderToString(PATH_TEMPLATES . DIRECTORY_SEPARATOR . $this->template . self::latte_ext, $params);
+        return $this->latte->renderToString($this->template, $params);
     }
 
     /**
