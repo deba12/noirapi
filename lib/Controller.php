@@ -85,4 +85,16 @@ class Controller {
 
     }
 
+    /**
+     * @return string
+     */
+    public function referer(): string {
+
+        if(isset($this->request->server['HTTP_REFERER'])) {
+            return $_SERVER['HTTP_REFERER'];
+        }
+        return '/';
+
+    }
+
 }
