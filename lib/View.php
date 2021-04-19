@@ -25,9 +25,9 @@ class View {
 
     /**
      * View constructor.
-     * @param \stdClass $request
-     * @param \noirapi\lib\Response $response
-     * @throws \core\Exceptions\FileNotFoundException
+     * @param stdClass $request
+     * @param response $response
+     * @throws FileNotFoundException
      */
     public function __construct(stdClass $request, Response $response) {
 
@@ -56,8 +56,8 @@ class View {
 
     /**
      * @param array $params
-     * @return \noirapi\lib\response
-     * @throws \core\Exceptions\FileNotFoundException
+     * @return response
+     * @throws FileNotFoundException
      */
     public function display(array $params = []): response {
 
@@ -92,7 +92,7 @@ class View {
      * @param string $view
      * @param array $params
      * @return string
-     * @throws \core\Exceptions\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function print(?string $layout, string $view, array $params = []): string {
 
@@ -114,7 +114,7 @@ class View {
      * @param string|null $controller
      * @return view
      * @noinspection PhpUnused
-     * @throws \core\Exceptions\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function setTemplate(string $template, string $controller = null): view {
 
@@ -136,7 +136,7 @@ class View {
     /**
      * @param string|null $layout
      * @return view
-     * @throws \core\Exceptions\FileNotFoundException
+     * @throws FileNotFoundException
      * @noinspection PhpUnused
      */
     public function setLayout(?string $layout = null): view {
