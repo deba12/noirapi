@@ -67,4 +67,22 @@ class Controller {
         return $this->response->withStatus($status)->withLocation($location);
     }
 
+    public function message(string $text, string $type, $post = array()): self {
+
+        if (isset($_SESSION['message'])) {
+            unset($_SESSION['message']);
+        }
+
+        if (!empty($text) && !empty($type)) {
+            $_SESSION['message'] = array('text' => $text, 'type' => $type);
+        }
+
+        if (isset($post) && is_array($post)) {
+            $_SESSION['message']['post'] = $post;
+        }
+
+        return $this;
+
+    }
+
 }

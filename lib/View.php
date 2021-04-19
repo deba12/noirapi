@@ -191,24 +191,6 @@ class View {
         return $this;
     }
 
-    public function message(string $text, string $type, ?array $post): self {
-
-        if (isset($_SESSION['message'])) {
-            unset($_SESSION['message']);
-        }
-
-        if (!empty($text) && !empty($type)) {
-            $_SESSION['message'] = array('text' => $text, 'type' => $type);
-        }
-
-        if (!empty($post)) {
-            $_SESSION['message']['post'] = $post;
-        }
-
-        return $this;
-
-    }
-
     /**
      * @param $param
      * @param $page
