@@ -68,13 +68,13 @@ class Route {
                     $response = call_user_func_array([new $request->route[1][0]($request, $server), $request->route[1][1]], $request->route[2]);
 
                     if($response === null) {
-                        $response = new response();
+                        $response = new Response();
                         $response->withStatus(500)
                             ->setBody('Internal server error');
                     }
 
                 } catch (LoginException $exception) {
-                    $response = new response();
+                    $response = new Response();
 
                     if($exception->getCode() === 403) {
                         $response->withStatus(403)
@@ -156,7 +156,7 @@ class Route {
             /** @noinspection PhpUndefinedClassInspection */
             $response = (new app\controllers\error())->$function();
         } else {
-            $response = new response();
+            $response = new Response();
             /** @noinspection UnusedFunctionResultInspection */
             $response->setBody($defaultText);
         }

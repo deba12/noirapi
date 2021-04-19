@@ -165,12 +165,12 @@ class Users {
      * @param string $password
      * @param string|null $ip
      * @return $this
-     * @throws usersException
+     * @throws UsersException
      */
     public function newUserWithEmail(string $email, string $password, ?string $ip = null): users {
 
         if($this->checkEmail($email) !== null) {
-            throw new usersException('Email already exists');
+            throw new UsersException('Email already exists');
         }
 
         $hash = call_user_func($this->hash, $password);
