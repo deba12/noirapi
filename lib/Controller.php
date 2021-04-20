@@ -103,7 +103,7 @@ class Controller {
             if($url['scheme'] === 'http' || $url['scheme'] === 'https') {
 
                 /** @noinspection BypassedUrlValidationInspection */
-                if(filter_var($url['host'] . $url['path'] . '?' . $url['query'], FILTER_VALIDATE_URL)) {
+                if(filter_var($url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . $url['query'], FILTER_VALIDATE_URL)) {
 
                     if(empty($url['query'])) {
                         return $url['scheme'] . '://' . $url['host'] . $url['path'];
