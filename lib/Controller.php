@@ -90,9 +90,35 @@ class Controller {
      */
     public function referer(): string {
 
-        if(isset($this->request->server['HTTP_REFERER'])) {
-            return $_SERVER['HTTP_REFERER'];
+        if(isset($this->server['HTTP_REFERER'])) {
+
+            $url = str_replace('@', '', $this->server['HTTP_REFERER']);
+            $url = filter_var($url, FILTER_SANITIZE_URL);
+            $url = parse_url(preg_replace('/\s+/', '', $url));
+
+            if(!$url) {
+                return '/';
+            }
+
+            if($url['scheme'] === 'http' || $url['scheme'] === 'https') {
+
+                /** @noinspection BypassedUrlValidationInspection */
+                if(filter_var($url['host'] . $url['path'] . '?' . $url['query'], FILTER_VALIDATE_URL)) {
+
+                    if(empty($url['query'])) {
+                        return $url['scheme'] . '://' . $url['host'] . $url['path'];
+                    }
+
+                    return $url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . $url['query'];
+
+                }
+
+            }
+
+            return '/';
+
         }
+
         return '/';
 
     }
