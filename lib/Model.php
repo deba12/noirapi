@@ -94,4 +94,30 @@ class Model {
 
     }
 
+    /**
+     * @param string $text
+     * @return bool
+     */
+    public function shouldRetry(string $text): bool {
+
+        $errors = [
+            'server has gone away',
+            'no connection to the server',
+            'Lost connection',
+            'is dead or not enabled',
+            'Error while sending',
+            'decryption failed or bad record mac',
+            'SSL connection has been closed unexpectedly',
+        ];
+
+        foreach($errors as $error) {
+            if(str_contains($text, $error)) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
 }
