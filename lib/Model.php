@@ -11,31 +11,23 @@ use PDO;
 
 class Model {
 
-    public $driver;
+    public $driver = 'mysql';
     public $db;
     private static $pdo;
 
     public function __construct() {
 
-        $config = 'mysql';
+        if(empty(self::$pdo[$this->driver])) {
 
-        if(!isset($this->driver)) {
-            $this->driver = 'mysql:';
+            self::$pdo[$this->driver] = new PDO($this->driver . ':' . DB[$this->driver]['dsn'], DB[$this->driver]['user'] ?? null, DB[$this->driver]['pass'] ?? null);
+            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+
         }
 
-        if(strpos($this->driver, 'dblib') > 0) {
-            $config = 'mssql';
-        }
-
-        if(empty(self::$pdo[$config])) {
-            self::$pdo[$config] = new PDO('mysql:host=' . DB[$config]['host'] . ';dbname=' . DB[$config]['db'], DB[$config]['user'], DB[$config]['pass']);
-            self::$pdo[$config]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-            self::$pdo[$config]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            self::$pdo[$config]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            self::$pdo[$config]->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
-        }
-
-        $this->db = new Database(Connection::fromPDO(self::$pdo[$config]));
+        $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
 
     }
 
