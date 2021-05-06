@@ -46,24 +46,28 @@ class Model {
         return $this->db->getConnection()->getPDO()->inTransaction();
     }
 
-    /** @noinspection RepetitiveMethodCallsInspection */
     public function begin(): void {
-        $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
+        if($this->driver === 'mysql') {
+            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
+        }
         $this->db->getConnection()->getPDO()->beginTransaction();
     }
 
-    /** @noinspection RepetitiveMethodCallsInspection */
     public function commit(): void {
         $this->db->getConnection()->getPDO()->commit();
-        $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+        if($this->driver === 'mysql') {
+            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+        }
     }
 
-    /** @noinspection RepetitiveMethodCallsInspection
+    /**
      * @noinspection PhpUnused
      */
     public function rollback(): void {
         $this->db->getConnection()->getPDO()->rollBack();
-        $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+        if($this->driver === 'mysql') {
+            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+        }
     }
 
     /**
