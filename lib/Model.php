@@ -31,6 +31,10 @@ class Model {
 
     }
 
+    public function clear() {
+        unset(self::$pdo[$this->driver]);
+    }
+
     /**
      * @return string
      */
