@@ -68,6 +68,7 @@ $loader->register();
 
 if($_SERVER['PHP_SELF'] === '/index.php') {
     define('BASE_SCHEME', isset($_SERVER['HTTPS']) ? 'https://': 'http://');
+    define('BASE_DOMAIN', $_SERVER['SERVER_NAME']);
     /** @noinspection PhpUnhandledExceptionInspection */
     new Route($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE);
 }
