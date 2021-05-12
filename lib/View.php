@@ -6,6 +6,7 @@ namespace noirapi\lib;
 
 use core\Exceptions\FileNotFoundException;
 use Latte\Engine;
+use noirapi\helpers\Macros;
 use stdClass;
 
 class View {
@@ -40,6 +41,7 @@ class View {
         $this->latte->setAutoRefresh(true);
         $this->latte->addFilter(null, '\\noirapi\\helpers\\Filters::init');
 
+        new Macros($this->latte);
 
         $this->response = $response;
 
