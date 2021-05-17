@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpUnused
+<?php
+/**
+ * @noinspection PhpUnused
  * @noinspection UnknownInspectionInspection
  */
 
@@ -123,8 +125,8 @@ class Users {
      * @param string $password
      * @param string|null $email
      * @param string|null $ip
-     * @return \noirapi\helpers\Users
-     * @throws \noirapi\Exceptions\UsersException
+     * @return Users
+     * @throws UsersException
      */
     public function newUserWithPassword(string $username, string $password, ?string $email = null, ?string $ip = null): self {
 
