@@ -1,12 +1,15 @@
-<?php declare(strict_types = 1);
+<?php
+/** @noinspection PhpMultipleClassDeclarationsInspection */
+declare(strict_types = 1);
 
 namespace noirapi\lib;
 
 use FastRoute\Dispatcher;
-    use JsonException;
-    use noirapi\Exceptions\LoginException;
-    use stdClass;
-    use function http_response_code;
+use JsonException;
+use noirapi\Exceptions\LoginException;
+use noirapi\Exceptions\RestException;
+use stdClass;
+use function http_response_code;
 
 class Route {
 
@@ -85,6 +88,11 @@ class Route {
                             ->withLocation($exception->getMessage());
                     }
 
+                } catch (RestException $exception) {
+                    $response = new Response();
+                    $response->withLocation($exception->getCode())
+                        ->setContentType(Response::TYPE_JSON)
+                        ->setBody($exception->getMessage());
                 }
 
                 break;
@@ -157,7 +165,6 @@ class Route {
             $response = (new app\controllers\error())->$function();
         } else {
             $response = new Response();
-            /** @noinspection UnusedFunctionResultInspection */
             $response->setBody($defaultText);
         }
 
