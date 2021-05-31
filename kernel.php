@@ -6,7 +6,6 @@
  */
 declare(strict_types = 1);
 
-use noirapi\Exceptions\NotConfiguredException;
 use noirapi\lib\Route;
 use Tracy\Debugger;
 
