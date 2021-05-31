@@ -44,6 +44,8 @@ if(empty($conf) || !is_readable($conf)) {
 require_once($conf);
 
 if(defined('DEV') && DEV === 1) {
+    //we are missing dome debug events in Tracy that's why we start session so early
+    session_start();
 	Debugger::enable(Debugger::DEVELOPMENT, ROOT . '/logs/');
 }else {
 	Debugger::enable(Debugger::PRODUCTION, ROOT . '/logs/');
