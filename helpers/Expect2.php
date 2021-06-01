@@ -12,7 +12,7 @@ use noirapi\helpers\Schema\Ip;
 use noirapi\helpers\Schema\DateTime;
 use noirapi\helpers\Schema\Date;
 use noirapi\helpers\Schema\Domain;
-use noirapi\helpers\Schema\Port;
+use noirapi\helpers\Schema\Numeric;
 use RuntimeException;
 
 final class Expect2 {
@@ -35,8 +35,8 @@ final class Expect2 {
         return new Domain();
     }
 
-    public static function port(): Port {
-        return new Port();
+    public static function numeric(): Numeric {
+        return new Numeric();
     }
 
     /**
