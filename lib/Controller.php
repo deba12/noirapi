@@ -67,6 +67,31 @@ class Controller {
         return $this->response->withStatus($status)->withLocation($location);
     }
 
+    /**
+     * @return Response
+     */
+    public function ok(): Response {
+        return $this->response->withStatus(200);
+    }
+
+    /**
+     * @return Response
+     * @noinspection PhpUnused
+     * @noinspection UnknownInspectionInspection
+     */
+    public function notFound(): Response {
+        return $this->response->withStatus(404);
+    }
+
+    /**
+     * @return Response
+     * @noinspection PhpUnused
+     * @noinspection UnknownInspectionInspection
+     */
+    public function internalServerError(): Response {
+        return $this->response->withStatus(500);
+    }
+
     public function message(string $text, string $type, $post = array()): self {
 
         if (isset($_SESSION['message'])) {
