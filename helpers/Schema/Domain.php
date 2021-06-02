@@ -25,7 +25,7 @@ class Domain implements Schema {
      * @param bool $required
      * @return $this
      */
-    public function required(bool $required): Domain {
+    public function required(bool $required = true): Domain {
         $this->required = $required;
         return $this;
     }
@@ -34,7 +34,7 @@ class Domain implements Schema {
      * @param bool $wildcard
      * @return $this
      */
-    public function wildcard(bool $wildcard): Domain {
+    public function wildcard(bool $wildcard = true): Domain {
         $this->wildcard = $wildcard;
         return $this;
     }
