@@ -97,8 +97,8 @@ class Response {
             return $this->body;
         }
 
-        if(($this->contentType === self::TYPE_CSV) && !is_string($this->body)) {
-            throw new RuntimeException('CSV Requires body to be string');
+        if(($this->contentType === self::TYPE_CSV) && is_array($this->body)) {
+            $this->body = $this->toCsv($this->body);
         }
 
         return $this->body;
@@ -227,6 +227,23 @@ class Response {
      */
     public function getCookies(): array {
         return $this->cookies;
+    }
+
+    private function toCsv($data) {
+
+        $fh = fopen('php://temp', 'rwb');
+        fputcsv($fh, array_keys(current($data)));
+
+        foreach ( $data as $row ) {
+            fputcsv($fh, $row);
+        }
+
+        rewind($fh);
+        $csv = stream_get_contents($fh);
+        fclose($fh);
+
+        return $csv;
+
     }
 
 }
