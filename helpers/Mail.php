@@ -48,14 +48,14 @@ class Mail {
     }
 
     /**
-     * @param string $from
+     * @param string|array $from
      * @param array $to
      * @param string $subject
      * @param string $charset
      * @return void
      * @noinspection UnusedFunctionResultInspection
      */
-    public function new(string $from, array $to, string $subject, string $charset = 'UTF-8'): void {
+    public function new($from, array $to, string $subject, string $charset = 'UTF-8'): void {
 
         $this->message->setSubject($subject)
             ->setFrom($from)
