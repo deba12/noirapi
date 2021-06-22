@@ -11,6 +11,7 @@ use Tracy\Debugger;
 
 mb_internal_encoding('UTF-8');
 error_reporting(E_ALL);
+ini_set('display_errors', "0");
 
 define('ROOT', dirname(__DIR__));
 const APPROOT = ROOT . '/app';
@@ -43,11 +44,13 @@ if(empty($conf) || !is_readable($conf)) {
 /** @noinspection PhpIncludeInspection */
 require_once($conf);
 
+Debugger::$strictMode = E_ALL;
+
 if(defined('DEV') && DEV === 1) {
     //we are missing dome debug events in Tracy that's why we start session so early
     session_start();
 	Debugger::enable(Debugger::DEVELOPMENT, ROOT . '/logs/');
-}else {
+} else {
 	Debugger::enable(Debugger::PRODUCTION, ROOT . '/logs/');
 }
 
