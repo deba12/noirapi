@@ -8,6 +8,7 @@ namespace noirapi\helpers;
 use Nette;
 use Nette\Schema\Elements\Type;
 use Nette\Schema\Schema;
+use noirapi\helpers\Schema\Ascii;
 use noirapi\helpers\Schema\Ip;
 use noirapi\helpers\Schema\DateTime;
 use noirapi\helpers\Schema\Date;
@@ -37,6 +38,10 @@ final class Expect2 {
 
     public static function numeric(): Numeric {
         return new Numeric();
+    }
+
+    public function Ascii(): Ascii {
+        return new Ascii();
     }
 
     /**
