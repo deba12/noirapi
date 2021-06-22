@@ -20,6 +20,7 @@ class Mail {
     private $message;
     private $template;
     private $mail;
+    public $message_id;
 
     public function __construct(array $smtp, string $template) {
 
@@ -105,7 +106,9 @@ class Mail {
      * @return int
      */
     public function send(): int {
-        return $this->mail->send($this->message);
+        $res = $this->mail->send($this->message);
+        $this->message_id = $this->message->getId();
+        return $res;
     }
 
 }
