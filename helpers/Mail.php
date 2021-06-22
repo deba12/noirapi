@@ -73,7 +73,7 @@ class Mail {
     public function setBody(array $params, string $type = 'text/html'): void {
 
         $latte = new Engine();
-        $latte->setTempDirectory(DOCROOT . '/temp');
+        $latte->setTempDirectory(ROOT . '/temp');
         $content = $latte->renderToString($this->template, $params);
 
         $this->message->setBody($content, $type);
