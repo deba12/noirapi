@@ -21,6 +21,7 @@ class Mail {
     private $template;
     private $mail;
     public $message_id;
+    private $bcc = [];
 
     public function __construct(array $smtp, string $template) {
 
@@ -54,15 +55,12 @@ class Mail {
      * @param string $subject
      * @param string $charset
      * @return void
-     * @noinspection UnusedFunctionResultInspection
      */
     public function new($from, array $to, string $subject, string $charset = 'UTF-8'): void {
-
         $this->message->setSubject($subject)
             ->setFrom($from)
             ->setTo($to)
             ->setCharset($charset);
-
     }
 
     /**
@@ -106,9 +104,26 @@ class Mail {
      * @return int
      */
     public function send(): int {
+
+        if(!empty($this->bcc)) {
+            $this->message->setBcc($this->bcc);
+        }
+
         $res = $this->mail->send($this->message);
         $this->message_id = $this->message->getId();
         return $res;
+    }
+
+    /**
+     * @param string $email
+     * @param string|null $name
+     */
+    public function addBcc(string $email, ?string $name = null): void {
+        if(empty($name)) {
+            $this->bcc[]  = $email;
+        } else {
+            $this->bcc[$email] = $name;
+        }
     }
 
 }
