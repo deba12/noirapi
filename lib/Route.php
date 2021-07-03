@@ -90,7 +90,7 @@ class Route {
 
                 } catch (RestException $exception) {
                     $response = new Response();
-                    $response->withLocation($exception->getCode())
+                    $response->withStatus($exception->getCode())
                         ->setContentType(Response::TYPE_JSON)
                         ->setBody($exception->getMessage());
                 }
