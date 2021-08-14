@@ -14,6 +14,7 @@ use noirapi\helpers\Schema\DateTime;
 use noirapi\helpers\Schema\Date;
 use noirapi\helpers\Schema\Domain;
 use noirapi\helpers\Schema\Numeric;
+use noirapi\helpers\Schema\Url;
 use RuntimeException;
 
 final class Expect2 {
@@ -42,6 +43,10 @@ final class Expect2 {
 
     public function Ascii(): Ascii {
         return new Ascii();
+    }
+
+    public static function Url(): Url {
+        return new Url();
     }
 
     /**
