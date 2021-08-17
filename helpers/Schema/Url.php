@@ -41,8 +41,21 @@ class Url implements Schema {
             return null;
         }
 
+        if(!$this->nullable && empty($value)) {
+            $context->addError("The option %path% requires valid url address", Message::PATTERN_MISMATCH);
+            return false;
+        }
+
         /** @noinspection BypassedUrlValidationInspection */
-        return filter_var($value, FILTER_VALIDATE_URL);
+        $ret = filter_var($value, FILTER_VALIDATE_URL);
+
+        if($ret === false) {
+            $context->addError("The option %path% requires valid url address", Message::PATTERN_MISMATCH);
+            return false;
+        }
+
+        return $ret;
+
     }
 
     public function merge($value, $base)
