@@ -105,6 +105,10 @@ class Response {
 
     }
 
+    public function getRawBody() {
+        return $this->body;
+    }
+
     /**
      * @param int $status
      * @return $this
