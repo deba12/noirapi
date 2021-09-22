@@ -31,7 +31,7 @@ class Template {
     /**
      * @param string $template
      * @return $this
-     * @throws \core\Exceptions\FileNotFoundException
+     * @throws FileNotFoundException
      */
     public function setTemplate(string $template): Template {
 
