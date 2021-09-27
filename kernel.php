@@ -44,6 +44,8 @@ if(empty($conf) || !is_readable($conf)) {
 /** @noinspection PhpIncludeInspection */
 require_once($conf);
 
+define('CONFIG', $_SERVER['SERVER_NAME'] ?? getenv('CONFIG'));
+
 Debugger::$strictMode = E_ALL;
 
 if(defined('DEV') && DEV === 1) {
