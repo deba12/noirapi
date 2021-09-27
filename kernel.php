@@ -41,10 +41,9 @@ if(isset($_SERVER['SERVER_NAME'])) {
 if(empty($conf) || !is_readable($conf)) {
     throw new RuntimeException("Unable to locate config");
 }
-/** @noinspection PhpIncludeInspection */
-require_once($conf);
 
 define('CONFIG', $_SERVER['SERVER_NAME'] ?? getenv('CONFIG'));
+require_once($conf);
 
 Debugger::$strictMode = E_ALL;
 
