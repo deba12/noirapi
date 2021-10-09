@@ -27,7 +27,7 @@ class Controller {
         $this->request = $request;
         $this->server = $server;
 
-        if(defined('DB')) {
+        if(defined('DB') && empty($this->model)) {
             $model = 'app\\models\\' . self::getClassName(get_class($this));
             if(class_exists($model)) {
                 $this->model = new $model($this->request);
@@ -35,7 +35,6 @@ class Controller {
                 $this->model = new Model();
             }
         }
-
 
         $this->response = new Response();
 
