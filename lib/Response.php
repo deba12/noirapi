@@ -193,7 +193,7 @@ class Response {
      * @return $this
      */
     public function downloadFile(string $filename): response {
-        $this->addHeader('Content-Disposition', 'attachment; filename=' . $filename . '.');
+        $this->addHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
         return $this;
     }
 
