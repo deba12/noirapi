@@ -87,9 +87,7 @@ class View {
             unset($_SESSION['message']);
         }
 
-        if(count($this->extra_params) > 0) {
-            $params = array_merge($params, $this->extra_params);
-        }
+        $params['extra_params'] = $this->extra_params;
 
         return $this->response->setBody($this->latte->renderToString($layout, array_merge((array)$this->request, $params)));
 
