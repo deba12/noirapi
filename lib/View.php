@@ -24,6 +24,8 @@ class View {
     /** @var string */
     private const latte_ext = '.latte';
 
+    private array $extra_params;
+
     /**
      * View constructor.
      * @param stdClass $request
@@ -83,6 +85,10 @@ class View {
         if(isset($_SESSION['message'])) {
             $params['message'] = $_SESSION['message'];
             unset($_SESSION['message']);
+        }
+
+        if(count($this->extra_params) > 0) {
+            $params = array_merge($params, $this->extra_params);
         }
 
         return $this->response->setBody($this->latte->renderToString($layout, array_merge((array)$this->request, $params)));
@@ -215,6 +221,10 @@ class View {
             return '?' . $param . '=' . $page;
         }
         return '?' . $param . '=' . $page;
+    }
+
+    public function setLayoutExtraParams(array $params) {
+        $this->extra_params = $params;
     }
 
 }
