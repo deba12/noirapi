@@ -14,17 +14,17 @@ class View {
     /** @var stdClass */
     public stdClass $request;
     /** @var string|null */
-    private ?string $template;
+    private ?string $template = null;
     /** @var Engine */
     public Engine $latte;
     /** @var string|null */
-    private ?string $layout;
+    private ?string $layout = null;
     /** @var response */
     private response $response;
     /** @var string */
     private const latte_ext = '.latte';
     /** @var array */
-    private array $extra_params;
+    private array $extra_params = [];
 
     /**
      * View constructor.
