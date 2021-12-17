@@ -12,18 +12,18 @@ use stdClass;
 class View {
 
     /** @var stdClass */
-    public  $request;
-    /** @var string */
-    private $template;
+    public stdClass $request;
+    /** @var string|null */
+    private ?string $template;
     /** @var Engine */
-    public  $latte;
-    /** @var string */
-    private $layout;
+    public Engine $latte;
+    /** @var string|null */
+    private ?string $layout;
     /** @var response */
-    private $response;
+    private response $response;
     /** @var string */
     private const latte_ext = '.latte';
-
+    /** @var array */
     private array $extra_params;
 
     /**
@@ -223,7 +223,12 @@ class View {
         return '?' . $param . '=' . $page;
     }
 
-    public function setLayoutExtraParams(array $params) {
+    /**
+     * @param array $params
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public function setLayoutExtraParams(array $params): void {
         $this->extra_params = $params;
     }
 
