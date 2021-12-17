@@ -7,15 +7,15 @@ use stdClass;
 class Controller {
 
     /** @var stdClass $request */
-    public $request;
+    public stdClass $request;
     /** @var array $server */
-    public $server;
+    public array $server;
     /** @var Model $model */
     public $model;
     /** @var Response $response */
-    public $response;
+    public Response $response;
     /** @var View $view */
-    public $view;
+    public View $view;
 
     /**
      * Controller constructor.
@@ -55,7 +55,6 @@ class Controller {
      * @return Response
      * @throws UnableToForwardException
      * @noinspection PhpUnused
-     * @noinspection UnknownInspectionInspection
      */
     public function forward(string $location, int $status = 302): Response {
 
@@ -76,7 +75,6 @@ class Controller {
     /**
      * @return Response
      * @noinspection PhpUnused
-     * @noinspection UnknownInspectionInspection
      */
     public function notFound(): Response {
         return $this->response->withStatus(404);
@@ -85,7 +83,6 @@ class Controller {
     /**
      * @return Response
      * @noinspection PhpUnused
-     * @noinspection UnknownInspectionInspection
      */
     public function internalServerError(): Response {
         return $this->response->withStatus(500);
