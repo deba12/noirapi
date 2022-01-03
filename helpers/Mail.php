@@ -1,5 +1,8 @@
 <?php
-/** @noinspection PhpUnused
+/**
+ * @noinspection TypoSafeNamingInspection
+ * @noinspection TransitiveDependenciesUsageInspection
+ * @noinspection PhpUnused
  * @noinspection UnknownInspectionInspection
  */
 declare(strict_types = 1);
@@ -8,122 +11,227 @@ namespace noirapi\helpers;
 
 use Latte\Engine;
 use RuntimeException;
-use Swift_Attachment;
-use Swift_Mailer;
-use Swift_Message;
-use Swift_NullTransport;
-use Swift_SendmailTransport;
-use Swift_SmtpTransport;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Transport;
+
+use Symfony\Component\Mime\Address;
+use Symfony\Component\Mime\Email;
 
 class Mail {
 
-    private $message;
-    private $template;
-    private $mail;
-    public $message_id;
-    private $bcc = [];
+    public string $message_id;
+    private Mailer $mailer;
+    private Email $message;
+    private string $body;
 
-    public function __construct(array $smtp, string $template) {
 
-        if($smtp['transport'] === 'smtp_ssl') {
-            $transport = (new Swift_SmtpTransport($smtp['host'], $smtp['port'], 'ssl'))
-                ->setUsername($smtp['user'])
-                ->setPassword($smtp['pass']);
-        } elseif($smtp['transport'] === 'sendmail') {
-            $transport = new Swift_SendmailTransport();
-        } elseif($smtp['transport'] === 'null') {
-            $transport = new Swift_NullTransport();
-        } else {
-            throw new RuntimeException('Unable to find transport: ' . $smtp['transport']);
-        }
-
-        $this->mail = new Swift_Mailer($transport);
-        $this->message = (new Swift_Message())->setCharset('UTF-8');
-
-        $template = APPROOT . '/templates/' . $template . '.latte';
-        if(file_exists($template)) {
-            $this->template = $template;
-        } else {
-            throw new RuntimeException('Unable to find template: ' . $template);
-        }
-
+    public function __construct(string $dsn) {
+        $this->mailer = new Mailer(Transport::fromDsn($dsn));
+        $this->message = new Email();
     }
 
     /**
      * @param string|array $from
-     * @param array $to
+     * @param array|string $to
      * @param string $subject
-     * @param string $charset
-     * @return void
+     * @return Mail
      */
-    public function new($from, array $to, string $subject, string $charset = 'UTF-8'): void {
-        $this->message->setSubject($subject)
-            ->setFrom($from)
-            ->setTo($to)
-            ->setCharset($charset);
+    public function new(string|array $from, array|string $to, string $subject): Mail {
+
+        if(is_string($to)) {
+
+            $this->message->to($to);
+
+        } else {
+
+            foreach($to as $address) {
+                $this->message->addTo($address);
+            }
+
+        }
+
+        if(is_string($from)) {
+            $this->message->from($from);
+        } else {
+            $this->message->from(new Address($from[0], $from[1]));
+        }
+
+        $this->message->subject($subject);
+        $this->message->priority(Email::PRIORITY_HIGHEST);
+
+        return $this;
+
     }
 
     /**
-     * @param array $params
-     * @param string $type
-     * @return void
-     * @noinspection UnusedFunctionResultInspection
+     * @param array $cc
+     * @return $this
      */
-    public function setBody(array $params, string $type = 'text/html'): void {
+    public function setCC(array $cc): Mail {
+
+        foreach($cc as $address) {
+            $this->message->addCc($address);
+        }
+
+        return $this;
+
+    }
+
+    /**
+     * @param array $bcc
+     * @return $this
+     */
+    public function setBCC(array $bcc): Mail {
+
+        foreach($bcc as $address) {
+            $this->message->addBcc($address);
+        }
+
+        return $this;
+
+    }
+
+    /**
+     * @param string $template
+     * @param array $params
+     * @return Mail
+     */
+    public function setTemplate(string $template, array $params): Mail {
+
+        $file = ROOT  . "/app/templates/$template.latte";
+        if(!is_readable($file)){
+            throw new RuntimeException('Unable to load template: ' . $file);
+        }
 
         $latte = new Engine();
         $latte->setTempDirectory(ROOT . '/temp');
-        $content = $latte->renderToString($this->template, $params);
+        $this->body = $latte->renderToString($template, $params);
 
-        $this->message->setBody($content, $type);
+        return $this;
 
-        $this->message->addPart(strip_tags($content), 'text/plain');
+    }
+
+    /**
+     * @param string $body
+     * @return $this
+     */
+    public function setBody(string $body): Mail {
+
+        $this->body = $body;
+
+        return $this;
+
+    }
+
+    /**
+     * @param string $key
+     * @param string $value
+     * @return Mail
+     */
+    public function addHeader(string $key, string $value): Mail {
+
+        $this->message->getHeaders()->addTextHeader($key, $value);
+
+        return $this;
+
+    }
+
+    /**
+     * @param string $data
+     * @param string $filename
+     * @param string|null $mime_type
+     * @return Mail
+     */
+    public function attach(string $data, string $filename, ?string $mime_type = null): Mail {
+
+        $this->message->attach($data, $filename, $mime_type);
+
+        return $this;
 
     }
 
     /**
      * @param string $file
      * @param string $name
-     * @noinspection UnusedFunctionResultInspection
+     * @param string|null $mime_type
+     * @return Mail
      */
-    public function attachFile(string $file, string $name): void {
-        $this->message->attach(Swift_Attachment::fromPath($file)->setFilename($name));
+    public function attachFile(string $file, string $name, ?string $mime_type = null): Mail {
+
+        if(!is_readable($file)) {
+            throw new RuntimeException("Unable to open $file");
+        }
+
+        $this->message->attachFromPath($file, $name, $mime_type);
+
+        return $this;
+
     }
 
     /**
      * @param string $data
      * @param string $filename
-     * @param string $mime_type
-     * @noinspection UnusedFunctionResultInspection
+     * @param string|null $mime_type
+     * @return Mail
      */
-    public function attach(string $data, string $filename, string $mime_type): void {
-        $this->message->attach(new Swift_Attachment($data, $filename, $mime_type));
+    public function embed(string $data, string $filename, ?string $mime_type = null): Mail {
+
+        $this->message->embed($data, $filename, $mime_type);
+
+        return $this;
+
     }
 
     /**
-     * @return int
+     * @param string $file
+     * @param string $name
+     * @param string|null $mime_type
+     * @return Mail
      */
-    public function send(): int {
+    public function embedFile(string $file, string $name, ?string $mime_type = null): Mail {
 
-        if(!empty($this->bcc)) {
-            $this->message->setBcc($this->bcc);
+        if(!is_readable($file)) {
+            throw new RuntimeException("Unable to open $file");
         }
 
-        $res = $this->mail->send($this->message);
-        $this->message_id = $this->message->getId();
-        return $res;
+        $this->message->embedFromPath($file, $name, $mime_type);
+
+        return $this;
+
     }
 
     /**
-     * @param string $email
-     * @param string|null $name
+     * @param string $error
+     * @return bool
+     * @noinspection PhpUnusedParameterInspection
      */
-    public function addBcc(string $email, ?string $name = null): void {
-        if(empty($name)) {
-            $this->bcc[]  = $email;
-        } else {
-            $this->bcc[$email] = $name;
+    public function send(string $error): bool {
+
+        $this->message->html($this->body);
+        $this->message->text(strip_tags($this->body));
+
+        try {
+            $this->mailer->send($this->message);
+        } catch (TransportExceptionInterface $e) {
+            /** @noinspection PhpUnusedLocalVariableInspection */
+            $error = $e->getMessage();
+            return false;
         }
+
+        return true;
+
+    }
+
+    /**
+     * @return $this
+     */
+    public function noResponders(): Mail {
+
+        $this->addHeader('X-Auto-Response-Suppress', 'OOF, DR, RN, NRN, AutoReply');
+
+        return $this;
+
     }
 
 }
