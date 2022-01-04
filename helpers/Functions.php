@@ -1,4 +1,6 @@
 <?php
+/** @noinspection PhpUnused */
+declare(strict_types=1);
 
 namespace noirapi\helpers;
 
@@ -20,6 +22,14 @@ class Functions {
         }
 
         return $res;
+    }
+
+    /**
+     * @param string $cmd
+     * @return void
+     */
+    public static function backgroundTask(string $cmd): void {
+        proc_close(proc_open( "$cmd &", [], $pipes ));
     }
 
 }
