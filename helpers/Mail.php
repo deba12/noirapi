@@ -202,11 +202,11 @@ class Mail {
     }
 
     /**
-     * @param string $error
+     * @param string|null $error
      * @return bool
      * @noinspection PhpUnusedParameterInspection
      */
-    public function send(string $error): bool {
+    public function send(?string $error = null): bool {
 
         $this->message->html($this->body);
         $this->message->text(strip_tags($this->body));
