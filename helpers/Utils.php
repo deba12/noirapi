@@ -6,7 +6,7 @@ namespace noirapi\helpers;
 
 use Exception;
 
-class Functions {
+class Utils {
 
     /**
      * @param int $len
