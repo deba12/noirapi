@@ -6,6 +6,8 @@
  */
 declare(strict_types = 1);
 
+use noirapi\Config;
+use noirapi\Exceptions\ConfigException;
 use noirapi\lib\Route;
 use Tracy\Debugger;
 
@@ -21,59 +23,45 @@ if(file_exists(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php')) {
     require_once(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 }
 
-//directory paths
-const PATH_VIEWS = APPROOT . '/views' . DIRECTORY_SEPARATOR;
-const PATH_TEMPLATES = APPROOT . '/templates' . DIRECTORY_SEPARATOR;
-const PATH_LAYOUTS = APPROOT . '/layouts' . DIRECTORY_SEPARATOR;
+const PATH_VIEWS = APPROOT . '/views/';
+const PATH_TEMPLATES = APPROOT . '/templates/';
+const PATH_LAYOUTS = APPROOT . '/layouts/';
+const PATH_TEMP = ROOT . '/temp/';
+const PATH_LOGS = ROOT . '/logs/';
 
-//default extension used ? by default .php
-const DEFAULT_EXTENSION = '.php';
+$config = getenv('CONFIG');
 
-if(isset($_SERVER['SERVER_NAME'])) {
-    $conf = APPROOT . '/config/' . $_SERVER['SERVER_NAME'] . DEFAULT_EXTENSION;
-} else {
-    $env = getenv('CONFIG');
-    if(is_string($env)) {
-        $conf = APPROOT . '/config/' . $env . DEFAULT_EXTENSION;
-    }
+if(empty($config)) {
+    $config = $_SERVER['SERVER_NAME'];
 }
 
-if(empty($conf) || !is_readable($conf)) {
-    throw new RuntimeException("Unable to locate config");
+if(empty($config)) {
+    throw new RuntimeException('CONFIG environment must be set');
 }
 
-define('CONFIG', $_SERVER['SERVER_NAME'] ?? getenv('CONFIG'));
-require_once($conf);
+Config::init($config);
 
 Debugger::$strictMode = E_ALL;
 
-if(defined('DEV') && DEV === 1) {
+try {
+    $dev = Config::get('dev');
+} catch (ConfigException $e) {
+    $dev = false;
+}
+
+if($dev === true) {
     //we are missing dome debug events in Tracy that's why we start session so early
-    session_start();
-	Debugger::enable(Debugger::DEVELOPMENT, ROOT . '/logs/');
+    if(session_status() !== PHP_SESSION_ACTIVE) {
+        session_start();
+    }
+	Debugger::enable(Debugger::DEVELOPMENT, PATH_LOGS);
 } else {
-	Debugger::enable(Debugger::PRODUCTION, ROOT . '/logs/');
+	Debugger::enable(Debugger::PRODUCTION, PATH_LOGS);
 }
-
-$loader = new Nette\Loaders\RobotLoader;
-$loader->addDirectory(__DIR__ . DIRECTORY_SEPARATOR . '.');
-
-//application controllers
-if(file_exists(APPROOT)) {
-	$loader->addDirectory(APPROOT);
-}
-
-$loader->setTempDirectory(ROOT . DIRECTORY_SEPARATOR . 'temp');
-
-if(PHP_SAPI === 'cli') {
-	$loader->setAutoRefresh(false);
-}
-
-$loader->register();
 
 if($_SERVER['PHP_SELF'] === '/index.php') {
-    define('BASE_SCHEME', isset($_SERVER['HTTPS']) ? 'https://': 'http://');
-    define('BASE_DOMAIN', $_SERVER['SERVER_NAME']);
+    Config::set('https', isset($_SERVER['HTTPS']));
+    Config::set('domain', $_SERVER[ 'SERVER_NAME' ]);
     /** @noinspection PhpUnhandledExceptionInspection */
     new Route($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE);
 }
