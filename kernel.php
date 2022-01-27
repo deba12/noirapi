@@ -45,7 +45,7 @@ Debugger::$strictMode = E_ALL;
 
 try {
     $dev = Config::get('dev');
-} catch (ConfigException $e) {
+} /** @noinspection PhpRedundantCatchClauseInspection */ catch (ConfigException $e) {
     $dev = false;
 }
 

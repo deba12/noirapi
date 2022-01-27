@@ -6,9 +6,9 @@ namespace noirapi\lib;
 
 use FastRoute\Dispatcher;
 use JsonException;
+use noirapi\Config;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\RestException;
-use stdClass;
 use function http_response_code;
 
 class Route {
@@ -25,15 +25,7 @@ class Route {
      */
     public function __construct(array $server, array $get, array $post, array $files, array $cookies) {
 
-        $request = new stdClass();
-        $request->headers   = $this->requestHeaders($server);
-        $request->method    = $server['REQUEST_METHOD'];
-        $request->uri       = $server['REQUEST_URI'];
-        $request->get       = $get;
-        $request->post      = $post;
-        $request->files     = $files;
-        $request->cookies   = $cookies;
-
+        $request = Request::fromGlobals($server, $get, $post, $files, $cookies);
         $route = new \app\Route();
 
         $pos = strpos($request->uri, '?');
@@ -109,13 +101,14 @@ class Route {
         }
 
         foreach($response->getCookies() as $cookie) {
+            $domain = Config::get('domain');
             setcookie(
                 $cookie['key'],
                 $cookie['value'],
                 [
                     'expires'   => $cookie['expire'],
                     'path'      => '/',
-                    'domain'    => defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : BASE_DOMAIN,
+                    'domain'    => $domain,
                     'secure'    => $cookie['secure'],
                     'httponly'  => $cookie['httponly'],
                     'samesite'  => $cookie['samesite'],
@@ -132,26 +125,6 @@ class Route {
 
         //force calling destructor
         $response = null;
-
-    }
-
-    /**
-     * @param array $server
-     * @return stdClass
-     */
-    private function requestHeaders(array $server): stdClass {
-
-        $headers = new stdClass();
-
-        foreach ($server as $name => $value) {
-            if (str_starts_with($name, 'HTTP_')) {
-                //get Header key w/o HTTP_
-                $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
-                $headers->{$key} = $value;
-            }
-        }
-
-        return $headers;
 
     }
 

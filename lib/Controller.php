@@ -5,12 +5,11 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 use core\Exceptions\UnableToForwardException;
 use noirapi\Config;
-use stdClass;
 
 class Controller {
 
-    /** @var stdClass $request */
-    public stdClass $request;
+    /** @var Request $request */
+    public Request $request;
     /** @var array $server */
     public array $server;
     public $model;
@@ -21,10 +20,10 @@ class Controller {
 
     /**
      * Controller constructor.
-     * @param stdClass $request
+     * @param Request $request
      * @param array $server
      */
-    public function __construct(stdClass $request, array $server) {
+    public function __construct(Request $request, array $server) {
 
         $this->request = $request;
         $this->server = $server;

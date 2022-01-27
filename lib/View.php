@@ -8,32 +8,37 @@ use Latte\Engine;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
-use stdClass;
 
 class View {
 
-    /** @var stdClass */
-    public stdClass $request;
+    /** @var Request */
+    public Request $request;
+
     /** @var string|null */
     private ?string $template = null;
+
     /** @var Engine */
     public Engine $latte;
+
     /** @var string|null */
     private ?string $layout = null;
+
     /** @var response */
     private response $response;
+
     /** @var string */
     private const latte_ext = '.latte';
+
     /** @var array */
     private array $extra_params = [];
 
     /**
      * View constructor.
-     * @param stdClass $request
+     * @param Request $request
      * @param response $response
      * @throws FileNotFoundException
      */
-    public function __construct(stdClass $request, Response $response) {
+    public function __construct(Request $request, Response $response) {
 
         $this->request = $request;
 
@@ -52,14 +57,7 @@ class View {
 
         if($layout) {
 
-            $this->setLayout($layout)
-                ->showHeader()
-                ->showFooter();
-
-        } else {
-
-            $this->hideHeader()
-                ->hideFooter();
+            $this->setLayout($layout);
 
         }
 
@@ -168,40 +166,6 @@ class View {
 
         throw new FileNotFoundException('Unable to find layout: ' . $file);
 
-    }
-
-    /**
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function hideHeader(): view {
-        $this->request->header = false;
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function showHeader(): view {
-        $this->request->header = true;
-        return $this;
-    }
-
-    /**
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function hideFooter(): view {
-        $this->request->footer = false;
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function showFooter(): view {
-        $this->request->footer = true;
-        return $this;
     }
 
     /**
