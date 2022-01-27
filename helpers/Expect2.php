@@ -5,6 +5,8 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
+use DateTimeZone;
+use JetBrains\PhpStorm\Pure;
 use Nette;
 use Nette\Schema\Elements\Type;
 use Nette\Schema\Schema;
@@ -21,30 +23,35 @@ final class Expect2 {
 
     use Nette\SmartObject;
 
-    public static function date($format = 'Y-m-d', ?\DateTimeZone $timeZone = null): Date {
+    public static function date($format = 'Y-m-d', ?DateTimeZone $timeZone = null): Date {
         return new Date($format, $timeZone);
     }
 
-    public static function dateTime($format = 'Y-m-d H:i:s', ?\DateTimeZone $timeZone = null): DateTime {
+    public static function dateTime($format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null): DateTime {
         return new DateTime($format, $timeZone);
     }
 
+    #[Pure]
     public static function Ip(): Ip {
         return new Ip();
     }
 
+    #[Pure]
     public static function Domain(): Domain {
         return new Domain();
     }
 
-    public static function numeric(): Numeric {
+    #[Pure]
+    public static function Numeric(): Numeric {
         return new Numeric();
     }
 
+    #[Pure]
     public function Ascii(): Ascii {
         return new Ascii();
     }
 
+    #[Pure]
     public static function Url(): Url {
         return new Url();
     }
