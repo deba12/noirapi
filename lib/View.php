@@ -4,8 +4,9 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use core\Exceptions\FileNotFoundException;
 use Latte\Engine;
+use noirapi\Config;
+use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
 use stdClass;
 
@@ -47,13 +48,19 @@ class View {
 
         $this->response = $response;
 
-        if(defined('DEFAULT_LAYOUT')) {
-            $this->setLayout(DEFAULT_LAYOUT)
+        $layout = Config::get('layout');
+
+        if($layout) {
+
+            $this->setLayout($layout)
                 ->showHeader()
                 ->showFooter();
+
         } else {
+
             $this->hideHeader()
                 ->hideFooter();
+
         }
 
     }
