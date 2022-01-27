@@ -1,7 +1,10 @@
-<?php declare(strict_types = 1);
+<?php
+/** @noinspection PhpMissingFieldTypeInspection */
+declare(strict_types = 1);
 
 namespace noirapi\lib;
 use core\Exceptions\UnableToForwardException;
+use noirapi\Config;
 use stdClass;
 
 class Controller {
@@ -10,7 +13,6 @@ class Controller {
     public stdClass $request;
     /** @var array $server */
     public array $server;
-    /** @var Model $model */
     public $model;
     /** @var Response $response */
     public Response $response;
@@ -27,10 +29,12 @@ class Controller {
         $this->request = $request;
         $this->server = $server;
 
-        if(defined('DB') && empty($this->model)) {
+        $db = Config::get('db');
+
+        if($db && empty($this->model)) {
             $model = 'app\\models\\' . self::getClassName(get_class($this));
             if(class_exists($model)) {
-                $this->model = new $model($this->request);
+                $this->model = new $model();
             } else {
                 $this->model = new Model();
             }
@@ -108,6 +112,7 @@ class Controller {
 
     /**
      * @return string
+     * @noinspection PhpUnused
      */
     public function referer(): string {
 
