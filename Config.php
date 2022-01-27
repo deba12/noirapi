@@ -53,12 +53,11 @@ class Config {
     /**
      * @param string $option
      * @return mixed
-     * @throws ConfigException
      */
     public static function get(string $option): mixed {
 
         if(empty(self::$options[$option])) {
-            throw new ConfigException('Setting not found');
+            return false;
         }
 
         return self::$options[$option];
