@@ -13,11 +13,14 @@ class Filters {
      * @return mixed
      * @throws FilterNotFoundException
      */
-    public static function init($filter, $value) {
+    public static function init($filter, $value): mixed {
 
+        /** @noinspection PhpUndefinedNamespaceInspection */
+        /** @noinspection PhpUndefinedClassInspection */
         if(class_exists(\app\lib\Filters::class) && method_exists(\app\lib\Filters::class, $filter)) {
             $args = func_get_args();
             array_shift($args);
+            /** @noinspection PhpUndefinedNamespaceInspection */
             return call_user_func_array([\app\lib\Filters::class, $filter], $args);
         }
 
@@ -60,9 +63,9 @@ class Filters {
     /**
      * @param $date
      * @param $format
-     * @return false|string
+     * @return string
      */
-    public static function date_format($date, $format) {
+    public static function date_format($date, $format): string {
         return date($format, strtotime($date));
     }
 

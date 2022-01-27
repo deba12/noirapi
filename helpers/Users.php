@@ -13,17 +13,17 @@ use noirapi\lib\Model;
 class Users {
 
     /** @var model */
-    private $model;
+    private Model $model;
     /** @var bool */
-    private $status;
+    private bool $status;
     /** @var callable  */
     private $hash;
     /** @var string  */
-    private $secret;
+    private string $secret;
     /** @var string  */
-    private $table = 'users';
+    private string $table = 'users';
     /** @var int */
-    private $lastId;
+    private int $lastId;
 
     public function __construct(Model $model, string $secret = null) {
 
@@ -318,7 +318,7 @@ class Users {
 
     /**
      * @param string $password
-     * @return false|string|null
+     * @return string
      * @noinspection PhpUnusedPrivateMethodInspection
      */
     private function PasswordHashSha1(string $password): string {
@@ -327,10 +327,10 @@ class Users {
 
     /**
      * @param string $password
-     * @return false|string|null
+     * @return string
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function PasswordHash(string $password) {
+    private function PasswordHash(string $password): string {
         return password_hash($password,  PASSWORD_BCRYPT);
     }
 

@@ -7,8 +7,8 @@ use Latte;
 
 class Template {
 
-    private $template;
-    private $latte;
+    private string $template;
+    private Latte\Engine $latte;
     private const latte_ext = '.latte';
 
     public function __construct() {

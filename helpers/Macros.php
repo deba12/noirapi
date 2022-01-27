@@ -17,8 +17,10 @@ class Macros {
         $compiler = new MacroSet($latte->getCompiler());
         $compiler->addMacro('pager', [$this, 'pager']);
 
+        /** @noinspection PhpUndefinedNamespaceInspection */
+        /** @noinspection PhpUndefinedClassInspection */
         if(class_exists(\app\lib\Macros::class)) {
-            /** @noinspection PhpExpressionResultUnusedInspection */
+            /** @noinspection PhpUndefinedNamespaceInspection */
             new \app\lib\Macros($latte);
         }
 

@@ -6,14 +6,17 @@ use Nette\Schema\ValidationException;
 
 class SchemaHelper {
 
-    public static $messages;
+    public static array $messages;
 
-    public static function set(array $messages) {
+    /**
+     * @param array $messages
+     * @return void
+     */
+    public static function set(array $messages): void {
         self::$messages = $messages;
     }
 
     /**
-     * @param array $messages
      * @param ValidationException $exceptions
      * @return string
      */
