@@ -18,6 +18,7 @@ class Request {
     public string $controller;
     public string $function;
     public array $route;
+    public string $role;
 
     public function requestHeaders(array $server): void {
 
