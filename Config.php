@@ -1,9 +1,11 @@
 <?php
+declare(strict_types=1);
 
 namespace noirapi;
 
 use Nette\Neon\Neon;
 use noirapi\Exceptions\ConfigException;
+use function is_array;
 
 class Config {
 
@@ -42,7 +44,7 @@ class Config {
 
         } else {
 
-            throw new ConfigException('Unable to load neon file:' . $file);
+            throw new ConfigException('Config file not found:' . $file);
 
         }
 
