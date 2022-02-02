@@ -32,7 +32,7 @@ const PATH_LOGS = ROOT . '/logs/';
 $config = getenv('CONFIG');
 
 if(empty($config)) {
-    $config = $_SERVER['SERVER_NAME'];
+    $config = $_SERVER['SERVER_NAME'] ?? null;
 }
 
 if(empty($config)) {
