@@ -1,8 +1,10 @@
 <?php
+declare(strict_types = 1);
 
 namespace noirapi\lib;
 
 use Nette\SmartObject;
+use function is_string;
 
 class Request {
 
@@ -20,7 +22,48 @@ class Request {
     public array $route;
     public string $role;
 
-    public function requestHeaders(array $server): void {
+
+
+    /**
+     * @param array $server
+     * @param array $get
+     * @param array $post
+     * @param array $files
+     * @param array $cookies
+     * @return static
+     */
+    public static function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): static {
+
+        $static = new static();
+
+        $static->globalsRequestHeaders($server);
+        $static->method    = $server['REQUEST_METHOD'];
+        $static->uri       = $server['REQUEST_URI'];
+        $static->get       = $get;
+        $static->post      = $post;
+        $static->files     = $files;
+        $static->cookies   = $cookies;
+
+        return $static;
+
+    }
+
+    public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): static {
+
+        $static = new static();
+        $static->headers = self::swooleUpperCase($server['headers']);
+        $static->method = $server['request_method'];
+        $static->uri = $server['request_uri'];
+        $static->get = $get;
+        $static->post = $post;
+        $static->files = $files;
+        $static->cookies = $cookies;
+
+        return $static;
+
+    }
+
+    private function globalsRequestHeaders(array $server): void {
 
         foreach ($server as $name => $value) {
 
@@ -35,26 +78,20 @@ class Request {
     }
 
     /**
-     * @param array $server
-     * @param array $get
-     * @param array $post
-     * @param array $files
-     * @param array $cookies
-     * @return static
+     * @param array $headers
+     * @return array
      */
-    public static function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): static {
+    public static function swooleUpperCase(array $headers): array {
 
-        $static = new static();
+        $res = [];
+        array_walk($headers, static function($value, $key) use(&$res) {
+            if(is_string($key)) {
+                $key = str_replace('-', '_', strtoupper($key));
+            }
+            $res[$key] = $value;
+        });
 
-        $static->requestHeaders($server);
-        $static->method    = $server['REQUEST_METHOD'];
-        $static->uri       = $server['REQUEST_URI'];
-        $static->get       = $get;
-        $static->post      = $post;
-        $static->files     = $files;
-        $static->cookies   = $cookies;
-
-        return $static;
+        return $res;
 
     }
 
