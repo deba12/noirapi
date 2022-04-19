@@ -25,7 +25,7 @@ class Model {
 
         $db = Config::get('db');
         if(empty($db[$this->driver])) {
-            throw new RuntimeException('Model: unable to find config for: ' . $this->driver);
+            throw new ConfigException('Model: unable to find config for: ' . $this->driver);
         }
 
         if(empty(self::$pdo[$this->driver])) {
@@ -67,6 +67,7 @@ class Model {
 
     /**
      * @return void
+     * @noinspection PhpUnused
      */
     public function begin(): void {
         if($this->driver === 'mysql') {
