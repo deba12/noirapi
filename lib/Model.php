@@ -30,6 +30,11 @@ class Model {
 
         if(empty(self::$pdo[$this->driver])) {
 
+            // look around for relative path in sqlite connection
+            if($this->driver === 'sqlite' && strpos($db[$this->driver]['dsn'], '/') !== 1) {
+                $db[$this->driver]['dsn'] = ROOT .  '/' . $db[$this->driver]['dsn'];
+            }
+
             self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
             self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
             self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
