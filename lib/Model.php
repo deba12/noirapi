@@ -22,34 +22,42 @@ class Model {
     /**
      * @throws ConfigException
      */
-    public function __construct() {
+    public function __construct(array $params = []) {
 
         $db = Config::get('db');
-        if(empty($db[$this->driver])) {
+        if (empty($db[$this->driver])) {
             throw new ConfigException('Model: unable to find config for: ' . $this->driver);
         }
 
-        if(empty(self::$pdo[$this->driver])) {
+        if(empty($params)) {
 
-            // look around for relative path in sqlite connection
-            if($this->driver === 'sqlite' && strpos($db[$this->driver]['dsn'], '/') !== 1) {
-                $db[$this->driver]['dsn'] = ROOT .  '/' . $db[$this->driver]['dsn'];
+            if(empty(self::$pdo[$this->driver])) {
+
+                if(!empty($this->dsn)) {
+                    self::$pdo[ $this->driver ] = new PDO($this->dsn . ':' . $db[ $this->driver ][ 'dsn' ], $db[ $this->driver ][ 'user' ] ?? null, $db[ $this->driver ][ 'pass' ] ?? null);
+                } else {
+                    self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
+                }
+                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+
             }
 
-            if(!empty($this->dsn)) {
-                self::$pdo[$this->driver] = new PDO($this->dsn . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
-            } else {
-                self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
-            }
+            $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
 
-            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+        } else {
+
+            $pdo = new PDO($this->driver . ':' . $params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
+            $pdo ->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+            $pdo ->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $pdo ->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo ->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+
+            $this->db = new Database(Connection::fromPDO($pdo));
 
         }
-
-        $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
 
     }
 
@@ -136,6 +144,7 @@ class Model {
      * @param string $table
      * @return void
      * @noinspection UnusedFunctionResultInspection
+     * @noinspection PhpUnused
      */
     public function lock(string $table): void {
         $this->db->getConnection()->query("LOCK TABLES $table WRITE");
@@ -144,6 +153,7 @@ class Model {
     /**
      * @return void
      * @noinspection UnusedFunctionResultInspection
+     * @noinspection PhpUnused
      */
     public function unlock(): void {
         $this->db->getConnection()->query('UNLOCK TABLES');
