@@ -45,10 +45,6 @@ class Model {
 
     }
 
-    public function clear() {
-        unset(self::$pdo[$this->driver]);
-    }
-
     /**
      * @return string
      */
@@ -111,6 +107,7 @@ class Model {
     /**
      * @param string $text
      * @return bool
+     * @noinspection PhpUnused
      */
     public function shouldRetry(string $text): bool {
 
