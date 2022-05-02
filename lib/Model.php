@@ -15,19 +15,33 @@ class Model {
     public $db;
     private static $pdo;
 
-    public function __construct() {
+    public function __construct(array $params = []) {
 
-        if(empty(self::$pdo[$this->driver])) {
+        if(empty($params)) {
 
-            self::$pdo[$this->driver] = new PDO($this->driver . ':' . DB[$this->driver]['dsn'], DB[$this->driver]['user'] ?? null, DB[$this->driver]['pass'] ?? null);
-            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            self::$pdo[$this->driver]->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+            if(empty(self::$pdo[$this->driver])) {
+
+                self::$pdo[$this->driver] = new PDO($this->driver . ':' . DB[$this->driver]['dsn'], DB[$this->driver]['user'] ?? null, DB[$this->driver]['pass'] ?? null);
+                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+
+            }
+
+            $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
+
+        } else {
+
+            $pdo = new PDO($this->driver . ':' . $params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
+            $pdo ->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+            $pdo ->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $pdo ->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo ->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+
+            $this->db = new Database(Connection::fromPDO($pdo));
 
         }
-
-        $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
 
     }
 
