@@ -138,7 +138,7 @@ class Model {
      * @noinspection UnusedFunctionResultInspection
      */
     public function lock(string $table): void {
-        $this->db->getConnection()->query('LOCK TABLES ?', [$table]);
+        $this->db->getConnection()->query('LOCK TABLES ? WRITE', [$table]);
     }
 
     /**
