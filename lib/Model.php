@@ -100,7 +100,7 @@ class Model {
      * @noinspection UnusedFunctionResultInspection
      */
     public function lock(string $table): void {
-        $this->db->getConnection()->query('LOCK TABLES ' . $this->db->getConnection()->getPDO()->quote($table)  . ' WRITE', [$table]);
+        $this->db->getConnection()->query("LOCK TABLES $table WRITE");
     }
 
     /**
