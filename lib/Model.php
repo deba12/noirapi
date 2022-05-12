@@ -133,6 +133,23 @@ class Model {
     }
 
     /**
+     * @param string $table
+     * @return void
+     * @noinspection UnusedFunctionResultInspection
+     */
+    public function lock(string $table): void {
+        $this->db->getConnection()->query('LOCK TABLES ?', [$table]);
+    }
+
+    /**
+     * @return void
+     * @noinspection UnusedFunctionResultInspection
+     */
+    public function unlock(): void {
+        $this->db->getConnection()->query('UNLOCK TABLES');
+    }
+
+    /**
      * @param string $text
      * @return bool
      * @noinspection PhpUnused
