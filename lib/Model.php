@@ -15,6 +15,7 @@ use RuntimeException;
 class Model {
 
     public string $driver = 'mysql';
+    public string $dsn;
     public Database $db;
     private static $pdo;
 
@@ -35,7 +36,12 @@ class Model {
                 $db[$this->driver]['dsn'] = ROOT .  '/' . $db[$this->driver]['dsn'];
             }
 
-            self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
+            if(!empty($this->dsn)) {
+                self::$pdo[$this->driver] = new PDO($this->dsn . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
+            } else {
+                self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
+            }
+
             self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
             self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             self::$pdo[$this->driver]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
