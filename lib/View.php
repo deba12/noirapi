@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use Latte\Engine;
+use Latte\Essential\CoreExtension;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
@@ -47,11 +48,12 @@ class View {
 
         //enable regeneration of the template files
         $this->latte->setAutoRefresh(true);
-        $this->latte->addFilter(null, '\\noirapi\\helpers\\Filters::init');
-
-        new Macros($this->latte);
+        $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
         $this->response = $response;
+
+        $this->latte->addExtension(new Macros());
+        $this->latte->addExtension(new \app\lib\Macros());
 
         $layout = Config::get('layout');
 
