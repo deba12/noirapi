@@ -2,6 +2,7 @@
 declare(strict_types = 1);
 
 use noirapi\Config;
+use SixtyEightPublishers\TracyGitVersion\Bridge\Tracy\GitVersionPanel;
 use Tracy\Debugger;
 
 mb_internal_encoding('UTF-8');
@@ -36,6 +37,10 @@ if(empty($config)) {
 Config::init($config);
 
 Debugger::$strictMode = E_ALL;
+
+if(class_exists(GitVersionPanel::class)) {
+    Debugger::getBar()->addPanel(GitVersionPanel::createDefault());
+}
 
 $dev = Config::get('dev');
 
