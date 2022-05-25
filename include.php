@@ -32,7 +32,6 @@ if(empty($config)) {
     throw new RuntimeException('CONFIG environment must be set');
 }
 
-
 /** @noinspection PhpUnhandledExceptionInspection */
 Config::init($config);
 

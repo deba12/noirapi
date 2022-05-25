@@ -53,7 +53,7 @@ class Route {
      */
     public function serve(): array|string {
 
-        $route = new \app\Route();
+        $route = new \app\Route(Config::get('dev') ?? true);
 
         $pos = strpos($this->request->uri, '?');
 

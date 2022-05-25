@@ -59,7 +59,7 @@ class Config {
     public static function get(string $option): mixed {
 
         if(empty(self::$options[$option])) {
-            return false;
+            return null;
         }
 
         return self::$options[$option];
