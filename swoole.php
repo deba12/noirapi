@@ -14,6 +14,14 @@ $listen_ip = Config::get('listen_ip') ?? '127.0.0.1';
 $listen_port = Config::get('listen_port') ?? 9400;
 
 $server = new Swoole\HTTP\Server($listen_ip, $listen_port);
+$static_files = Config::get('static_files');
+
+if($static_files === true){
+    $server->set([
+        'document_root' => ROOT . '/htdocs',
+        'enable_static_handler' => true,
+    ]);
+}
 
 $server->on('start', function (Swoole\Http\Server $server) use($listen_ip, $listen_port) {
     /** @noinspection HttpUrlsUsage */
