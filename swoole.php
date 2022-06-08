@@ -10,10 +10,14 @@ if(!extension_loaded('swoole')) {
 
 include(__DIR__ . '/include.php');
 
-$server = new Swoole\HTTP\Server('127.0.0.1', 9501);
+$listen_ip = Config::get('listen_ip') ?? '127.0.0.1';
+$listen_port = Config::get('listen_port') ?? 9400;
 
-$server->on('start', function (Swoole\Http\Server $server) {
-    echo "Swoole http server is started at http://127.0.0.1:9501\n";
+$server = new Swoole\HTTP\Server($listen_ip, $listen_port);
+
+$server->on('start', function (Swoole\Http\Server $server) use($listen_ip, $listen_port) {
+    /** @noinspection HttpUrlsUsage */
+    echo "Swoole http server is started at http://$listen_ip:$listen_port\n";
 });
 
 $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) {
