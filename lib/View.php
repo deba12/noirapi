@@ -53,7 +53,9 @@ class View {
         $this->response = $response;
 
         $this->latte->addExtension(new Macros());
-        $this->latte->addExtension(new \app\lib\Macros());
+        if(class_exists(\app\lib\Macros::class)) {
+            $this->latte->addExtension(new \app\lib\Macros());
+        }
 
         $layout = Config::get('layout');
 
