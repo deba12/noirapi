@@ -12,6 +12,8 @@ class Filters {
      * @param $value
      * @return mixed
      * @throws FilterNotFoundException
+     * @noinspection PhpUndefinedNamespaceInspection
+     * @noinspection PhpUndefinedClassInspection
      */
     public static function init($filter, $value) {
 

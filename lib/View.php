@@ -38,7 +38,7 @@ class View {
         $this->latte->setTempDirectory(ROOT . '/temp');
 
         //enable regeneration of the template files
-        $this->latte->setAutoRefresh(true);
+        $this->latte->setAutoRefresh();
         $this->latte->addFilter(null, '\\noirapi\\helpers\\Filters::init');
 
         new Macros($this->latte);
