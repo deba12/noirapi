@@ -21,7 +21,7 @@ class Users {
     /** @var string  */
     private $secret;
     /** @var string  */
-    private $table = 'users';
+    private $table;
     /** @var int */
     private $lastId;
 
@@ -36,6 +36,12 @@ class Users {
             $this->secret = SECRET;
         } else {
             $this->secret = '';
+        }
+
+        if(!empty($model->table)) {
+            $this->table = $model->table;
+        } else {
+            $this->table = 'users';
         }
 
     }
