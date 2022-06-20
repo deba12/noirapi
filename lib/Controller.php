@@ -30,7 +30,7 @@ class Controller {
         if(defined('DB') && empty($this->model)) {
             $model = 'app\\models\\' . self::getClassName(get_class($this));
             if(class_exists($model)) {
-                $this->model = new $model($this->request);
+                $this->model = new $model();
             } else {
                 $this->model = new Model();
             }
