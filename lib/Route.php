@@ -8,6 +8,7 @@ use FastRoute\Dispatcher;
 use JsonException;
 use noirapi\Config;
 use noirapi\Exceptions\LoginException;
+use noirapi\Exceptions\MessageException;
 use noirapi\Exceptions\RestException;
 use RuntimeException;
 use function call_user_func_array;
@@ -120,6 +121,11 @@ class Route {
                     $response = new Response();
                     $response->withStatus($exception->getCode())
                         ->setContentType(Response::TYPE_JSON)
+                        ->setBody($exception->getMessage());
+                } /** @noinspection PhpRedundantCatchClauseInspection */
+                catch (MessageException $exception) {
+                    $response = new Response();
+                    $response->withStatus($exception->getCode())
                         ->setBody($exception->getMessage());
                 }
 
