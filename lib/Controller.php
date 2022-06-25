@@ -18,8 +18,8 @@ class Controller {
     public Response $response;
     /** @var View $view */
     public View $view;
-    /** @var Server $swoole */
-    public Server $swoole;
+    /** @var Server|null $swoole */
+    public ?Server $swoole;
 
     /**
      * Controller constructor.

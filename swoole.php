@@ -23,18 +23,18 @@ if($static_files === true){
     ]);
 }
 
-$route = new Route();
-
-$server->on('start', function (Swoole\Http\Server $server) use($listen_ip, $listen_port, $route) {
+$server->on('start', function (Swoole\Http\Server $server) use($listen_ip, $listen_port) {
     /** @noinspection HttpUrlsUsage */
     echo "Swoole http server is started at http://$listen_ip:$listen_port\n";
-    $route->setSwoole($server);
 });
 
-$server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) use($route) {
+$server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) use($server) {
+
+    $route = new Route();
 
     $request->server['headers'] = $request->header;
     $route->fromSwoole($request->server, $request->get ?? [], $request->post ?? [], $request->files ?? [], $request->cookie ?? []);
+    $route->setSwoole($server);
     $res = $route->serve();
 
     $response->setStatusCode($res['status']);
