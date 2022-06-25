@@ -10,7 +10,7 @@ use noirapi\Config;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
 use noirapi\Exceptions\RestException;
-use RuntimeException;
+use Swoole\Http\Server;
 use function call_user_func_array;
 use function http_response_code;
 
@@ -23,30 +23,44 @@ class Route {
     private Request $request;
     private array $server;
 
+    public Server $swoole_server;
+
     /**
-     * route constructor.
      * @param array $server
      * @param array $get
      * @param array $post
      * @param array $files
      * @param array $cookies
-     * @param string $type
-     * @noinspection PhpRedundantCatchClauseInspection
+     * @return void
      */
-    public function __construct(array $server, array $get, array $post, array $files, array $cookies, string $type) {
+    public function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): void {
+        $this->request = Request::fromGlobals($server, $get, $post, $files, $cookies);
+        $this->server = $server;
 
-        if($type === self::type_globals) {
-            $this->request = Request::fromGlobals($server, $get, $post, $files, $cookies);
-            $this->server = $server;
-        } elseif($type === self::type_swoole) {
-            $this->request = Request::fromSwoole($server, $get, $post, $files, $cookies);
-            $this->server = Request::swooleUpperCase($server);
-        } else {
-            throw new RuntimeException('Unable to use request type: ' . $type);
-        }
+        $this->type = self::type_globals;
+    }
 
-        $this->type = $type;
+    /**
+     * @param array $server
+     * @param array $get
+     * @param array $post
+     * @param array $files
+     * @param array $cookies
+     * @return void
+     */
+    public function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): void {
+        $this->request = Request::fromSwoole($server, $get, $post, $files, $cookies);
+        $this->server = Request::swooleUpperCase($server);
 
+        $this->type = self::type_swoole;
+    }
+
+    /**
+     * @param Server $server
+     * @return void
+     */
+    public function setSwoole(Server $server): void {
+        $this->swoole_server = $server;
     }
 
     /**
@@ -54,7 +68,7 @@ class Route {
      */
     public function serve(): array|string {
 
-        $route = new \app\Route(Config::get('dev') ?? true);
+        $route = new \app\Route(Config::get('dev') ?? false);
 
         $pos = strpos($this->request->uri, '?');
 
@@ -90,7 +104,7 @@ class Route {
 
                     $response = call_user_func_array(
                         [
-                            new $this->request->route[1][0]($this->request, $this->server),
+                            new $this->request->route[1][0]($this->request, $this->server, $this->swoole_server),
                             $this->request->route[1][1]
                         ],
                         $this->request->route[2]

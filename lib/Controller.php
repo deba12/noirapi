@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 use core\Exceptions\UnableToForwardException;
 use noirapi\Config;
+use Swoole\Server;
 
 class Controller {
 
@@ -17,16 +18,20 @@ class Controller {
     public Response $response;
     /** @var View $view */
     public View $view;
+    /** @var Server $swoole */
+    public Server $swoole;
 
     /**
      * Controller constructor.
      * @param Request $request
      * @param array $server
+     * @param Server|null $swoole
      */
-    public function __construct(Request $request, array $server) {
+    public function __construct(Request $request, array $server, ?Server $swoole = null) {
 
         $this->request = $request;
         $this->server = $server;
+        $this->swoole = $swoole;
 
         $db = Config::get('db');
 
