@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 use noirapi\Config;
 use noirapi\lib\Route;
+use Swoole\Http\Server;
 
 if(!extension_loaded('swoole')) {
     throw new RuntimeException('Swoole extension is mandatory');
@@ -15,6 +16,10 @@ $listen_port = Config::get('listen_port') ?? 9400;
 
 $server = new Swoole\HTTP\Server($listen_ip, $listen_port);
 $static_files = Config::get('static_files');
+$server->set([
+    'worker_num' => Config::get('swoole_workers') ?? 1,
+    'task_worker_num' => Config::get('swoole_workers') ?? 1,
+]);
 
 if($static_files === true){
     $server->set([
@@ -59,6 +64,20 @@ $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Respo
     }
 
     $response->end($res['body']);
+
+});
+
+$server->on('Task', static function(Server $server, $task_id, $reactorId, $data) {
+
+    if(isset($data[ 'class' ], $data[ 'params' ])) {
+        echo "Begin task: \t" . $task_id . "\t" . $data['class'] . "\n";
+        $class = new $data['class'];
+        $res = $class($data['params']);
+        $server->finish($res);
+        echo "End task: \t" . $task_id . "\t" . $data['class'] . "\n";
+    } else {
+        echo 'No class found in task' . PHP_EOL;
+    }
 
 });
 
