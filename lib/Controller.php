@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 use core\Exceptions\UnableToForwardException;
 use noirapi\Config;
-use Swoole\Server;
+use Swoole\Http\Server;
 
 class Controller {
 
