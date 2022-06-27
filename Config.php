@@ -77,4 +77,11 @@ class Config {
 
     }
 
+    /**
+     * @return array
+     */
+    public static function getAll(): array {
+        return self::$options;
+    }
+
 }
