@@ -53,10 +53,8 @@ class View {
 
         $this->latte->addExtension(new Macros());
         /** @noinspection PhpUndefinedClassInspection */
-        /** @noinspection PhpUndefinedNamespaceInspection */
         if(class_exists(\app\lib\Macros::class)) {
             /** @noinspection PhpParamsInspection */
-            /** @noinspection PhpUndefinedNamespaceInspection */
             $this->latte->addExtension(new \app\lib\Macros());
         }
 
