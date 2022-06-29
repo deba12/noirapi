@@ -23,16 +23,18 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @noinspection PhpUnused
-     * @noinspection PhpUnusedParameterInspection
      */
     public function pager(Tag $tag): Node {
 
+        $subject = $tag->parser->parseUnquotedStringOrExpression();
+
         return new AuxiliaryNode(
-            fn(PrintContext $context) => $context->format('
+            fn (PrintContext $context) => $context->format('
                 $latte = new Latte\Engine;
-				$latte->setTempDirectory(dirname(__DIR__) . \'/temp\');
-				echo %modify(($latte->render(dirname(__DIR__) . \'/noirapi/templates/pager.latte\', [%node.args])))'
-            )
+                $latte->setTempDirectory(dirname(__DIR__) . \'/temp\');
+                $latte->addExtension(new Latte\Essential\RawPhpExtension);
+                echo $latte->renderToString(dirname(__DIR__) . \'/noirapi/templates/pager.latte\', [%node]);',
+            $subject)
         );
 
     }
