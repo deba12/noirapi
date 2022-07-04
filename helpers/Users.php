@@ -260,6 +260,10 @@ class Users {
 
     }
 
+    public function getHashedPassword(string $password): string {
+        return call_user_func($this->hash, $password);
+    }
+
     /**
      * @param string $password
      * @param string|null $hash
