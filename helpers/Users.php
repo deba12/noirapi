@@ -104,7 +104,7 @@ class Users {
      */
     public function newUserWithPassword(string $username, string $password, ?string $email = null, ?string $ip = null):? int {
 
-        if(!$this->checkEmail($email) || !$this->checkUser($username)) {
+        if($this->emailExists($email) || $this->userExists($username)) {
             return null;
         }
 
@@ -135,7 +135,7 @@ class Users {
      */
     public function newUserWithEmail(string $email, string $password, ?string $ip = null):? int {
 
-        if(!$this->checkEmail($email)) {
+        if($this->emailExists($email)) {
             return null;
         }
 
@@ -184,13 +184,11 @@ class Users {
      * @param string $email
      * @return bool
      */
-    public function checkEmail(string $email): bool {
+    public function emailExists(string $email): bool {
 
-        $res = $this->model->db->from($this->table)
+        return $this->model->db->from($this->table)
             ->where('email')->is($email)
-            ->count();
-
-        return $res > 0;
+            ->count() > 0;
 
     }
 
@@ -198,13 +196,11 @@ class Users {
      * @param string $username
      * @return bool
      */
-    public function checkUser(string $username): bool {
+    public function userExists(string $username): bool {
 
-        $res = $this->model->db->from($this->table)
+        return $this->model->db->from($this->table)
             ->where('username')->is($username)
-            ->count();
-
-        return $res > 0;
+            ->count() > 0;
 
     }
 
