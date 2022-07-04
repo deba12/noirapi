@@ -6,7 +6,6 @@
 
 namespace noirapi\helpers;
 
-use Exception;
 use noirapi\lib\Model;
 
 class Users {
@@ -210,12 +209,11 @@ class Users {
     }
 
     /**
-     * @param int $id
+     * @param int|string $id
      * @param string $password
      * @return bool
-     * @throws Exception
      */
-    public function changePassword(int $id, string $password): bool {
+    public function changePassword(int|string $id, string $password): bool {
 
         $hash = call_user_func($this->hash, $password);
 
