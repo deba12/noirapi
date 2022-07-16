@@ -283,7 +283,7 @@ class Users {
      * @noinspection PhpSameParameterValueInspection
      * @noinspection PhpUnusedPrivateMethodInspection
      */
-    private function PasswordHash(string $password, ?string $hash = null): bool|string {
+    public function PasswordHash(string $password, ?string $hash = null): bool|string {
 
         if($hash === null) {
             return password_hash($password,  PASSWORD_BCRYPT);
