@@ -38,6 +38,7 @@ Config::init($config);
 
 Debugger::$strictMode = E_ALL;
 
+/** @noinspection PhpUndefinedClassInspection */
 if(class_exists(GitVersionPanel::class)) {
     Debugger::getBar()->addPanel(GitVersionPanel::createDefault());
 }
