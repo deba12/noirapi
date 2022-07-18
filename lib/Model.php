@@ -17,7 +17,7 @@ class Model {
     public string $driver = 'mysql';
     public string $dsn;
     public Database $db;
-    private static $pdo;
+    private static array $pdo;
 
     /**
      * @throws ConfigException
@@ -34,9 +34,18 @@ class Model {
             if(empty(self::$pdo[$this->driver])) {
 
                 if(!empty($this->dsn)) {
-                    self::$pdo[ $this->driver ] = new PDO($this->dsn . ':' . $db[ $this->driver ][ 'dsn' ], $db[ $this->driver ][ 'user' ] ?? null, $db[ $this->driver ][ 'pass' ] ?? null);
+                    if(class_exists(\Filisko\PDOplus\PDO::class)) {
+                        self::$pdo[$this->driver] = new \Filisko\PDOplus\PDO($this->dsn . ':' . $db[ $this->driver ][ 'dsn' ], $db[ $this->driver ][ 'user' ] ?? null, $db[ $this->driver ][ 'pass' ] ?? null);
+                    } else {
+                        self::$pdo[$this->driver] = new PDO($this->dsn . ':' . $db[ $this->driver ][ 'dsn' ], $db[ $this->driver ][ 'user' ] ?? null, $db[ $this->driver ][ 'pass' ] ?? null);
+                    }
                 } else {
-                    self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
+                    /** @noinspection NestedPositiveIfStatementsInspection */
+                    if(class_exists(\Filisko\PDOplus\PDO::class)) {
+                        self::$pdo[$this->driver] = new \Filisko\PDOplus\PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
+                    } else {
+                        self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
+                    }
                 }
                 self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
                 self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
@@ -49,16 +58,25 @@ class Model {
 
         } else {
 
-            $pdo = new PDO($this->driver . ':' . $params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
-            $pdo ->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-            $pdo ->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            $pdo ->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $pdo ->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+            if(class_exists(\Filisko\PDOplus\PDO::class)) {
+                $pdo = new \Filisko\PDOplus\PDO($params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
+            } else {
+                $pdo = new PDO($params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
+            }
+
+            $pdo->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
+            $pdo->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+            $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
 
             $this->db = new Database(Connection::fromPDO($pdo));
 
         }
 
+    }
+
+    public static function tracyGetPdo(): array {
+        return self::$pdo;
     }
 
     /**
