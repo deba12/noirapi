@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace noirapi\lib;
 
+use noirapi\Tracy\PDOBarPanel;
 use Tracy\Debugger;
 
 class TracyExtras {
@@ -15,14 +16,11 @@ class TracyExtras {
             Debugger::getBar()->addPanel(GitVersionPanel::createDefault());
         }
 
-        if(class_exists(\Filisko\PDOplus\PDO::class) && class_exists(\Filisko\PDOplus\Tracy\BarPanel::class)) {
-            foreach(\noirapi\lib\Model::tracyGetPdo() as $driver => $pdo) {
-                $panel = new \Filisko\PDOplus\Tracy\BarPanel($pdo);
-                $panel->title = $driver;
-                Debugger::getBar()->addPanel($panel);
-            }
+        foreach(\noirapi\lib\Model::tracyGetPdo() as $driver => $pdo) {
+            $panel = new PDOBarPanel($pdo);
+            $panel->title = $driver;
+            Debugger::getBar()->addPanel($panel);
         }
-
 
     }
 
