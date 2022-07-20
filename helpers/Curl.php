@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
+use JsonException;
+
 class Curl extends \Curl\Curl {
 
     private static array $requests = [];
@@ -15,18 +17,30 @@ class Curl extends \Curl\Curl {
 
         $info = $this->getInfo();
         $method = $this->getOpt(CURLOPT_CUSTOMREQUEST);
-        $this->addLog(($method ?? 'POST') . ' ' . $this->getUrl(), $info['http_code'] . ' ' . $info['content_type'], microtime(true) - $start);
+        $this->addLog(
+            url: ($method ?? 'POST') . ' ' . $this->getUrl(),
+            info: $info['http_code'] . ' ' . $info['content_type'],
+            time: microtime(true) - $start,
+            request: $this->getOpt(CURLOPT_POSTFIELDS) ?? 'none',
+            response: is_object($this->response) ? $this->response : substr((string)$this->response, 0 ,128));
 
         return $res;
 
     }
 
-    public function addLog(string $request, $info, float $time): void {
+    public function addLog(string $url, $info, float $time, array|string $request, object|string $response = null): void {
+
+        try {
+            $request = json_decode($request, true, 512, JSON_THROW_ON_ERROR);
+        } catch (JsonException) {
+        }
 
         self::$requests[] = [
+            'url'       => $url,
             'request'   => $request,
             'info'      => $info,
-            'time'      => $time * 1000
+            'time'      => $time * 1000,
+            'response'  => $response,
         ];
 
     }

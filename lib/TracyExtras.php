@@ -1,10 +1,12 @@
-<?php /** @noinspection PhpUnnecessaryFullyQualifiedNameInspection */
-/** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php
+/**
+ * @noinspection PhpUnnecessaryFullyQualifiedNameInspection
+ * @noinspection PhpFullyQualifiedNameUsageInspection
+ */
 declare(strict_types=1);
 
 namespace noirapi\lib;
 
-use noirapi\helpers\Curl;
 use noirapi\Tracy\CurlBarPanel;
 use noirapi\Tracy\PDOBarPanel;
 use Tracy\Debugger;
@@ -22,8 +24,8 @@ class TracyExtras {
         }
 
         foreach(\noirapi\lib\Model::tracyGetPdo() as $driver => $pdo) {
-            if(!isset(self::$panels[ $driver ])) {
-                self::$panels[ $driver ] = true;
+            if(!isset(self::$panels[$driver])) {
+                self::$panels[$driver] = true;
 
                 $panel = new PDOBarPanel($pdo);
                 $panel->title = $driver;
@@ -31,8 +33,8 @@ class TracyExtras {
             }
         }
 
-        if(!isset(self::$panels[ 'curl' ])) {
-            self::$panels[ 'curl' ] = true;
+        if(!isset(self::$panels['curl'])) {
+            self::$panels['curl'] = true;
 
             $panel = new CurlBarPanel();
             $panel->title = 'Curl';
