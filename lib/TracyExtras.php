@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace noirapi\lib;
 
+use noirapi\helpers\Curl;
+use noirapi\Tracy\CurlBarPanel;
 use noirapi\Tracy\PDOBarPanel;
 use Tracy\Debugger;
 
@@ -21,6 +23,8 @@ class TracyExtras {
             $panel->title = $driver;
             Debugger::getBar()->addPanel($panel);
         }
+
+        Debugger::getBar()->addPanel(new CurlBarPanel());
 
     }
 
