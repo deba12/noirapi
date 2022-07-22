@@ -108,7 +108,7 @@ class Mail {
 
         $latte = new Engine();
         $latte->setTempDirectory(ROOT . '/temp');
-        $this->body = $latte->renderToString($template, $params);
+        $this->body = $latte->renderToString($file, $params);
 
         return $this;
 
