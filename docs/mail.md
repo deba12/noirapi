@@ -9,8 +9,10 @@ no transport: null://null
 In config.neon you should place the following:
 ```neon
 mail:
-  dsn: sendmail://default
-  from: "Account Name <account@domain.com>"
+    dsn: "sendmail://default"
+    from:
+         name: "Account Name"
+         email: "<account@domain.com>"
 ```
 
 compose email
