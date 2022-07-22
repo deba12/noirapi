@@ -24,11 +24,13 @@ class Mail {
     private Mailer $mailer;
     private Email $message;
     private string $body;
-
+    private string $error;
 
     public function __construct(string $dsn) {
+
         $this->mailer = new Mailer(Transport::fromDsn($dsn));
         $this->message = new Email();
+
     }
 
     /**
@@ -202,11 +204,9 @@ class Mail {
     }
 
     /**
-     * @param string|null $error
      * @return bool
-     * @noinspection PhpUnusedParameterInspection
      */
-    public function send(?string $error = null): bool {
+    public function send(): bool {
 
         $this->message->html($this->body);
         $this->message->text(strip_tags($this->body));
@@ -214,8 +214,7 @@ class Mail {
         try {
             $this->mailer->send($this->message);
         } catch (TransportExceptionInterface $e) {
-            /** @noinspection PhpUnusedLocalVariableInspection */
-            $error = $e->getMessage();
+            $this->error = $e->getMessage();
             return false;
         }
 
@@ -232,6 +231,13 @@ class Mail {
 
         return $this;
 
+    }
+
+    /**
+     * @return string
+     */
+    public function getError(): string {
+        return $this->error;
     }
 
 }
