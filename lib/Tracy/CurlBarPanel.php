@@ -129,8 +129,8 @@ class CurlBarPanel implements IBarPanel {
                 $html .= gettype($request['response']);
                 $html .= '</td>';
                 $html .= '<td>';
-                $html .= '<a href="#" onclick="toggle(\'tracy-curl-response\');">Response...</a>' . PHP_EOL;
-                $html .= '<pre id="tracy-curl-response" style="display:none">';
+                $html .= '<a href="#" onclick="toggle(\'tracy-curl-response-' . $this->rnd . '\');">Response...</a>' . PHP_EOL;
+                $html .= '<pre id="tracy-curl-response-' . $this->rnd . '" style="display:none">';
                 if(is_object($request['response'])) {
                     $html .= print_r($request[ 'response' ], true);
                 } else {
