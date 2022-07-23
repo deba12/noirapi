@@ -127,7 +127,7 @@ class CurlBarPanel implements IBarPanel {
                 if(is_object($request['response'])) {
                     $html .= print_r($request[ 'response' ], true);
                 } else {
-                    echo $request['response'];
+                    $html .= $request['response'];
                 }
                 $html .= '</pre>';
                 $html .= '</td>';
