@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
+use Exception;
 use noirapi\helpers\Curl;
 use Tracy\IBarPanel;
 
@@ -40,8 +41,14 @@ class CurlBarPanel implements IBarPanel {
     /** @var string|Curl */
     private string|Curl $curl;
 
+    public int $rnd;
+
+    /**
+     * @throws Exception
+     */
     public function __construct() {
         $this->curl = Curl::class;
+        $this->rnd = random_int(0, 1000);
     }
 
     /**
@@ -105,8 +112,8 @@ class CurlBarPanel implements IBarPanel {
                     $html .= gettype($request['request']);
                     $html .= '</td>';
                     $html .= '<td>';
-                    $html .= '<a href="#" onclick="toggle(\'tracy-curl-request\');">Request...</a>' . PHP_EOL;
-                    $html .= '<pre id="tracy-curl-request" style="display:none">';
+                    $html .= '<a href="#" onclick="toggle(\'tracy-curl-request-' . $this->rnd . '\');">Request...</a>' . PHP_EOL;
+                    $html .= '<pre id="tracy-curl-request-' . $this->rnd . '" style="display:none">';
                     if(is_array($request['request'])) {
                         $html .= print_r($request[ 'request' ], true);
                     } else {
