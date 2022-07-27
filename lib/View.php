@@ -206,4 +206,8 @@ class View {
         $this->extra_params = $params;
     }
 
+    public function addLayoutExtraParam(string $key, string|array $value): void {
+        $this->extra_params[$key] = $value;
+    }
+
 }
