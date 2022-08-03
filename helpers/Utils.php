@@ -6,7 +6,7 @@ namespace noirapi\helpers;
 
 use Exception;
 
-class Functions {
+class Utils {
 
     /**
      * @param int $len
@@ -30,6 +30,16 @@ class Functions {
      */
     public static function backgroundTask(string $cmd): void {
         proc_close(proc_open( "$cmd &", [], $pipes ));
+    }
+
+    public static function returnNull($object) {
+
+        if(empty($object)) {
+            return null;
+        }
+
+        return $object;
+
     }
 
 }

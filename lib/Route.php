@@ -6,12 +6,22 @@ namespace noirapi\lib;
 
 use FastRoute\Dispatcher;
 use JsonException;
+use noirapi\Config;
 use noirapi\Exceptions\LoginException;
+use noirapi\Exceptions\MessageException;
 use noirapi\Exceptions\RestException;
-use stdClass;
+use RuntimeException;
+use function call_user_func_array;
 use function http_response_code;
 
 class Route {
+
+    public const type_swoole = 'swoole';
+    public const type_globals = 'globals';
+
+    private string $type;
+    private Request $request;
+    private array $server;
 
     /**
      * route constructor.
@@ -20,35 +30,45 @@ class Route {
      * @param array $post
      * @param array $files
      * @param array $cookies
-     * @throws JsonException
+     * @param string $type
      * @noinspection PhpRedundantCatchClauseInspection
      */
-    public function __construct(array $server, array $get, array $post, array $files, array $cookies) {
+    public function __construct(array $server, array $get, array $post, array $files, array $cookies, string $type) {
 
-        $request = new stdClass();
-        $request->headers   = $this->requestHeaders($server);
-        $request->method    = $server['REQUEST_METHOD'];
-        $request->uri       = $server['REQUEST_URI'];
-        $request->get       = $get;
-        $request->post      = $post;
-        $request->files     = $files;
-        $request->cookies   = $cookies;
+        if($type === self::type_globals) {
+            $this->request = Request::fromGlobals($server, $get, $post, $files, $cookies);
+            $this->server = $server;
+        } elseif($type === self::type_swoole) {
+            $this->request = Request::fromSwoole($server, $get, $post, $files, $cookies);
+            $this->server = Request::swooleUpperCase($server);
+        } else {
+            throw new RuntimeException('Unable to use request type: ' . $type);
+        }
 
-        $route = new \app\Route();
+        $this->type = $type;
 
-        $pos = strpos($request->uri, '?');
+    }
+
+    /**
+     * @throws JsonException
+     */
+    public function serve(): array|string {
+
+        $route = new \app\Route(Config::get('dev') ?? true);
+
+        $pos = strpos($this->request->uri, '?');
 
         if($pos !== false) {
-            $uri = substr($request->uri, 0, $pos);
+            $uri = substr($this->request->uri, 0, $pos);
         } else {
-            $uri = $request->uri;
+            $uri = $this->request->uri;
         }
 
         $uri = rawurldecode($uri);
 
-        $request->route = $route->process($request->method, $uri);
+        $this->request->route = $route->process($this->request->method, $uri);
 
-        switch ($request->route[0]) {
+        switch ($this->request->route[0]) {
 
             case Dispatcher::NOT_FOUND:
 
@@ -62,13 +82,19 @@ class Route {
 
             case Dispatcher::FOUND:
 
-                $request->controller = $this->findController($request->route[1][0]);
-                $request->function = $request->route[1][1];
+                $this->request->controller = $this->findController($this->request->route[1][0]);
+                $this->request->function = $this->request->route[1][1];
 
                 /** @var $response response */
                 try{
 
-                    $response = call_user_func_array([new $request->route[1][0]($request, $server), $request->route[1][1]], $request->route[2]);
+                    $response = call_user_func_array(
+                        [
+                            new $this->request->route[1][0]($this->request, $this->server),
+                            $this->request->route[1][1]
+                        ],
+                        $this->request->route[2]
+                    );
 
                     if($response === null) {
                         $response = new Response();
@@ -76,22 +102,30 @@ class Route {
                             ->setBody('Internal server error');
                     }
 
-                } catch (LoginException $exception) {
+                } /** @noinspection PhpRedundantCatchClauseInspection */
+                catch (LoginException $exception) {
+
                     $response = new Response();
 
                     if($exception->getCode() === 403) {
                         $response->withStatus(403)
-                            ->setContentType(response::TYPE_JSON)
+                            ->setContentType(Response::TYPE_JSON)
                             ->setBody(['forward' => $exception->getMessage()]);
                     } else {
                         $response->withStatus($exception->getCode())
                             ->withLocation($exception->getMessage());
                     }
 
-                } catch (RestException $exception) {
+                } /** @noinspection PhpRedundantCatchClauseInspection */
+                catch (RestException $exception) {
                     $response = new Response();
                     $response->withStatus($exception->getCode())
                         ->setContentType(Response::TYPE_JSON)
+                        ->setBody($exception->getMessage());
+                } /** @noinspection PhpRedundantCatchClauseInspection */
+                catch (MessageException $exception) {
+                    $response = new Response();
+                    $response->withStatus($exception->getCode())
                         ->setBody($exception->getMessage());
                 }
 
@@ -103,59 +137,51 @@ class Route {
 
         }
 
-        http_response_code($response->getStatus());
-        foreach($response->getHeaders() as $key => $value) {
-            header(ucfirst($key) . ': ' . $value);
-        }
+        if($this->type === self::type_globals) {
 
-        foreach($response->getCookies() as $cookie) {
-            setcookie(
-                $cookie['key'],
-                $cookie['value'],
-                [
-                    'expires'   => $cookie['expire'],
-                    'path'      => '/',
-                    'domain'    => defined('COOKIE_DOMAIN') ? COOKIE_DOMAIN : BASE_DOMAIN,
-                    'secure'    => $cookie['secure'],
-                    'httponly'  => $cookie['httponly'],
-                    'samesite'  => $cookie['samesite'],
-                ]);
+            http_response_code($response->getStatus());
+            foreach($response->getHeaders() as $key => $value) {
+                header(ucfirst($key) . ': ' . $value);
+            }
 
-        }
+            foreach($response->getCookies() as $cookie) {
+                $domain = Config::get('domain');
+                setcookie(
+                    $cookie['key'],
+                    $cookie['value'],
+                    [
+                        'expires'   => $cookie['expire'],
+                        'path'      => '/',
+                        'domain'    => $domain,
+                        'secure'    => $cookie['secure'],
+                        'httponly'  => $cookie['httponly'],
+                        'samesite'  => $cookie['samesite'],
+                    ]);
 
-        $body = $response->getBody();
-        if(is_callable($body)) {
-            $body();
-        } else {
-            echo $body;
+            }
+
+            $res = $response->getBody();
+
+        } elseif($this->type === self::type_swoole) {
+
+            $res = [
+                'status'    => $response->getStatus(),
+                'body'      => $response->getBody(),
+                'cookies'   => $response->getCookies(),
+                'headers'   => $response->getHeaders(),
+            ];
+
         }
 
         //force calling destructor
         $response = null;
 
-    }
-
-    /**
-     * @param array $server
-     * @return stdClass
-     */
-    private function requestHeaders(array $server): stdClass {
-
-        $headers = new stdClass();
-
-        foreach ($server as $name => $value) {
-            if (str_starts_with($name, 'HTTP_')) {
-                //get Header key w/o HTTP_
-                $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
-                $headers->{$key} = $value;
-            }
-        }
-
-        return $headers;
+        /** @noinspection PhpUndefinedVariableInspection */
+        return $res;
 
     }
 
-    public static function handleErrors(int $error, string $defaultText): response {
+    public static function handleErrors(int $error, string $defaultText): Response {
 
         $function = 'e' . $error;
 

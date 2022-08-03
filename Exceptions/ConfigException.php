@@ -5,4 +5,4 @@ namespace noirapi\Exceptions;
 
 use Exception;
 
-class FileNotFoundException extends Exception {}
+class ConfigException extends Exception {}

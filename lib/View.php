@@ -4,35 +4,41 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use core\Exceptions\FileNotFoundException;
 use Latte\Engine;
+use noirapi\Config;
+use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
-use stdClass;
 
 class View {
 
-    /** @var stdClass */
-    public stdClass $request;
+    /** @var Request */
+    public Request $request;
+
     /** @var string|null */
     private ?string $template = null;
+
     /** @var Engine */
     public Engine $latte;
+
     /** @var string|null */
     private ?string $layout = null;
+
     /** @var response */
     private response $response;
+
     /** @var string */
     private const latte_ext = '.latte';
+
     /** @var array */
     private array $extra_params = [];
 
     /**
      * View constructor.
-     * @param stdClass $request
+     * @param Request $request
      * @param response $response
      * @throws FileNotFoundException
      */
-    public function __construct(stdClass $request, Response $response) {
+    public function __construct(Request $request, Response $response) {
 
         $this->request = $request;
 
@@ -40,20 +46,24 @@ class View {
         $this->latte->setTempDirectory(ROOT . '/temp');
 
         //enable regeneration of the template files
-        $this->latte->setAutoRefresh(true);
-        $this->latte->addFilter(null, '\\noirapi\\helpers\\Filters::init');
-
-        new Macros($this->latte);
+        $this->latte->setAutoRefresh();
+        $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
         $this->response = $response;
 
-        if(defined('DEFAULT_LAYOUT')) {
-            $this->setLayout(DEFAULT_LAYOUT)
-                ->showHeader()
-                ->showFooter();
-        } else {
-            $this->hideHeader()
-                ->hideFooter();
+        $this->latte->addExtension(new Macros());
+        /** @noinspection PhpUndefinedClassInspection */
+        if(class_exists(\app\lib\Macros::class)) {
+            /** @noinspection PhpParamsInspection */
+            $this->latte->addExtension(new \app\lib\Macros());
+        }
+
+        $layout = Config::get('layout');
+
+        if($layout) {
+
+            $this->setLayout($layout);
+
         }
 
     }
@@ -164,40 +174,6 @@ class View {
     }
 
     /**
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function hideHeader(): view {
-        $this->request->header = false;
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function showHeader(): view {
-        $this->request->header = true;
-        return $this;
-    }
-
-    /**
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function hideFooter(): view {
-        $this->request->footer = false;
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
-    public function showFooter(): view {
-        $this->request->footer = true;
-        return $this;
-    }
-
-    /**
      * @param $param
      * @param $page
      * @return string
@@ -228,6 +204,10 @@ class View {
      */
     public function setLayoutExtraParams(array $params): void {
         $this->extra_params = $params;
+    }
+
+    public function addLayoutExtraParam(string $key, string|array $value): void {
+        $this->extra_params[$key] = $value;
     }
 
 }

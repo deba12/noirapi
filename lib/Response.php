@@ -10,26 +10,15 @@ namespace noirapi\lib;
 use JsonException;
 use LaLit\Array2XML;
 use RuntimeException;
+use function is_array;
 
 class Response {
 
-    /** @var $body string|callable */
-    private $body = '';
-
-    /** @var $status int  */
-    private $status = 200;
-
-    /** @var $contentType string  */
-    private $contentType = self::TYPE_HTML;
-
-    /** @var $location string */
-    private $location;
-
-    /** @var $headers array  */
-    private $headers = [];
-
-    /** @var $cookies array  */
-    private $cookies = [];
+    private string|array $body = '';
+    private int $status = 200;
+    private string $contentType = self::TYPE_HTML;
+    private array $headers = [];
+    private array $cookies = [];
 
     public const TYPE_JSON  = 'application/json';
     public const TYPE_XML   = 'text/xml';
@@ -50,7 +39,7 @@ class Response {
      * @param $body
      * @return $this
      */
-    public function setBody($body): response {
+    public function setBody($body): Response {
         $this->body = $body;
         return $this;
     }
@@ -59,7 +48,7 @@ class Response {
      * @param $body
      * @return $this
      */
-    public function appendBody($body): response {
+    public function appendBody($body): Response {
         $this->body .= $body;
         return $this;
     }
@@ -83,29 +72,41 @@ class Response {
             }
 
             return $this->body;
+
         }
 
         if($this->contentType === self::TYPE_XML) {
+
             if(is_array($this->body)) {
+
                 if(class_exists(Array2XML::class)) {
+
                     return Array2XML::createXML('root', $this->body)->saveXML();
+
                 }
 
                 throw new RuntimeException('Class LaLit\Array2XML is required');
+
             }
 
             return $this->body;
+
         }
 
         if(($this->contentType === self::TYPE_CSV) && is_array($this->body)) {
+
             $this->body = $this->toCsv($this->body);
+
         }
 
         return $this->body;
 
     }
 
-    public function getRawBody() {
+    /**
+     * @return array|string
+     */
+    public function getRawBody(): array|string {
         return $this->body;
     }
 
@@ -113,7 +114,7 @@ class Response {
      * @param int $status
      * @return $this
      */
-    public function withStatus(int $status): response {
+    public function withStatus(int $status): Response {
         $this->status = $status;
         return $this;
     }
@@ -129,7 +130,7 @@ class Response {
      * @param string $contentType
      * @return $this
      */
-    public function setContentType(string $contentType): response {
+    public function setContentType(string $contentType): Response {
         $this->contentType = $contentType;
         $this->addHeader('Content-Type', $contentType);
         return $this;
@@ -146,7 +147,7 @@ class Response {
      * @param string $location
      * @return $this
      */
-    public function withLocation(string $location): response {
+    public function withLocation(string $location): Response {
         $this->headers['Location'] = $location;
         return $this;
     }
@@ -167,7 +168,7 @@ class Response {
      * @param string $value
      * @return $this
      */
-    public function addHeader(string $key, string $value): response {
+    public function addHeader(string $key, string $value): Response {
         $this->headers[$key] = $value;
         return $this;
     }
@@ -176,7 +177,7 @@ class Response {
      * @param string $key
      * @return $this
      */
-    public function removeHeader(string $key): response {
+    public function removeHeader(string $key): Response {
         unset($this->headers[$key]);
         return $this;
     }
@@ -192,7 +193,7 @@ class Response {
      * @param string $filename
      * @return $this
      */
-    public function downloadFile(string $filename): response {
+    public function downloadFile(string $filename): Response {
         $this->addHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
         return $this;
     }
@@ -205,7 +206,7 @@ class Response {
      * @return $this
      * $expire is max date in the future supported by php
      */
-    public function addCookie(string $key, string $value, int $expire = 2147483647): response {
+    public function addCookie(string $key, string $value, int $expire = 2147483647): Response {
         $this->cookies[$key] = [
             'key'       => $key,
             'value'     => $value,
@@ -221,7 +222,7 @@ class Response {
      * @param string $key
      * @return $this
      */
-    public function clearCookie(string $key): response {
+    public function clearCookie(string $key): Response {
         $this->addCookie($key, '', 0);
         return $this;
     }
@@ -233,7 +234,7 @@ class Response {
         return $this->cookies;
     }
 
-    private function toCsv($data) {
+    private function toCsv($data): bool|string {
 
         $fh = fopen('php://temp', 'rwb');
         fputcsv($fh, array_keys(current($data)));

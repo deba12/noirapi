@@ -9,22 +9,17 @@ class Filters {
 
     /**
      * @param $filter
-     * @param $value
-     * @return mixed
+     * @return array
      * @throws FilterNotFoundException
      */
-    public static function init($filter, $value) {
+    public static function init($filter): array {
 
         if(class_exists(\app\lib\Filters::class) && method_exists(\app\lib\Filters::class, $filter)) {
-            $args = func_get_args();
-            array_shift($args);
-            return call_user_func_array([\app\lib\Filters::class, $filter], $args);
+            return [\app\lib\Filters::class, $filter];
         }
 
         if (method_exists(__CLASS__, $filter)) {
-            $args = func_get_args();
-            array_shift($args);
-            return call_user_func_array([__CLASS__, $filter], $args);
+            return [__CLASS__, $filter];
         }
 
         throw new FilterNotFoundException('Filter: ' . $filter . ' does not exists');
@@ -60,9 +55,9 @@ class Filters {
     /**
      * @param $date
      * @param $format
-     * @return false|string
+     * @return string
      */
-    public static function date_format($date, $format) {
+    public static function date_format($date, $format): string {
         return date($format, strtotime($date));
     }
 
