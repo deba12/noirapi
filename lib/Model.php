@@ -96,7 +96,7 @@ class Model {
      */
     public function begin(): void {
         if($this->driver === 'mysql') {
-            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
+            $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 0);
         }
         $this->db->getConnection()->getPDO()->beginTransaction();
     }
@@ -108,7 +108,7 @@ class Model {
     public function commit(): void {
         $this->db->getConnection()->getPDO()->commit();
         if($this->driver === 'mysql') {
-            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+            $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 1);
         }
     }
 
@@ -118,7 +118,7 @@ class Model {
     public function rollback(): void {
         $this->db->getConnection()->getPDO()->rollBack();
         if($this->driver === 'mysql') {
-            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+            $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 1);
         }
     }
 
