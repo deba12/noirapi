@@ -3,8 +3,9 @@
 declare(strict_types = 1);
 
 namespace noirapi\lib;
-use core\Exceptions\UnableToForwardException;
+
 use noirapi\Config;
+use noirapi\Exceptions\UnableToForwardException;
 
 class Controller {
 
