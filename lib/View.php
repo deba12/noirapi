@@ -8,6 +8,7 @@ use Latte\Engine;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
+use function count;
 
 class View {
 
@@ -23,8 +24,8 @@ class View {
     /** @var string|null */
     private ?string $layout = null;
 
-    /** @var response */
-    private response $response;
+    /** @var Response */
+    private Response $response;
 
     /** @var string */
     private const latte_ext = '.latte';
@@ -52,9 +53,7 @@ class View {
         $this->response = $response;
 
         $this->latte->addExtension(new Macros());
-        /** @noinspection PhpUndefinedClassInspection */
         if(class_exists(\app\lib\Macros::class)) {
-            /** @noinspection PhpParamsInspection */
             $this->latte->addExtension(new \app\lib\Macros());
         }
 
@@ -73,7 +72,7 @@ class View {
      * @return response
      * @throws FileNotFoundException
      */
-    public function display(array $params = []): response {
+    public function display(array $params = []): Response {
 
         if($this->template === null) {
             $this->setTemplate($this->request->function);
@@ -128,11 +127,11 @@ class View {
     /**
      * @param string $template
      * @param string|null $controller
-     * @return view
+     * @return View
      * @noinspection PhpUnused
      * @throws FileNotFoundException
      */
-    public function setTemplate(string $template, string $controller = null): view {
+    public function setTemplate(string $template, string $controller = null): View {
 
         if($controller === null) {
             $controller = $this->request->controller;
@@ -151,12 +150,11 @@ class View {
 
     /**
      * @param string|null $layout
-     * @return view
+     * @return View
      * @throws FileNotFoundException
      * @noinspection PhpUnused
      */
-    public function setLayout(?string $layout = null): view {
-
+    public function setLayout(?string $layout = null): View {
         if($layout === null) {
             $this->layout = null;
             return $this;
@@ -206,6 +204,12 @@ class View {
         $this->extra_params = $params;
     }
 
+    /**
+     * @param string $key
+     * @param string|array $value
+     * @return void
+     * @noinspection PhpUnused
+     */
     public function addLayoutExtraParam(string $key, string|array $value): void {
         $this->extra_params[$key] = $value;
     }
