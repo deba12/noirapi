@@ -1,0 +1,17 @@
+<div class="breadcrumb-dn mr-auto font-up-bold text-uppercase">
+
+    <nav aria-label="breadcrumb">
+
+        <ol class="breadcrumb">
+
+            {ifset $items}
+                {foreach $items as $item}
+                    <li class="breadcrumb-item {if $iterator->last}active{/if}">{ifset $item['url']}<a href="{$item['url']}">{$item['name']}</a>{else}{$item['name']}{/ifset}</li>
+                {/foreach}
+            {/ifset}
+
+        </ol>
+
+    </nav>
+
+</div>

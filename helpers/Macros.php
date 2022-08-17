@@ -9,13 +9,14 @@ use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\PrintContext;
 use Latte\Compiler\Tag;
 use Latte\Extension;
+use noirapi\helpers\View\BreadCrumb;
 
 class Macros extends Extension {
 
-    #[ArrayShape(['pager' => "array"])]
     public function getTags(): array {
         return [
-            'pager' => [$this, 'pager']
+            'pager'         => [$this, 'pager'],
+            'breadcrumb'    => [$this, 'breadCrumb']
         ];
     }
 
@@ -35,6 +36,20 @@ class Macros extends Extension {
                 $latte->addExtension(new Latte\Essential\RawPhpExtension);
                 echo $latte->renderToString(dirname(__DIR__) . \'/noirapi/templates/pager.latte\', [%node]);',
             $subject)
+        );
+
+    }
+
+    public function breadcrumb(Tag $tag): Node {
+
+        return new AuxiliaryNode(
+            fn(PrintContext $context) => $context->format('
+                $latte = new Latte\Engine;
+                $latte->setTempDirectory(dirname(__DIR__) . \'/temp\');
+                $latte->addExtension(new Latte\Essential\RawPhpExtension);
+                $items = [\'items\' => noirapi\helpers\View\BreadCrumb::getItems()];
+                echo $latte->renderToString(dirname(__DIR__) . \'/noirapi/templates/BreadCrumb.latte\', $items);',
+            )
         );
 
     }
