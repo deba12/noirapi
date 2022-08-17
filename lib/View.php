@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use Latte\Bridges\Tracy\BlueScreenPanel;
 use Latte\Engine;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
@@ -64,6 +65,8 @@ class View {
             $this->setLayout($layout);
 
         }
+
+        BlueScreenPanel::initialize();
 
     }
 
