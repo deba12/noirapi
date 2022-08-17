@@ -6,7 +6,7 @@
 
             {ifset $items}
                 {foreach $items as $item}
-                    <li class="breadcrumb-item {if $iterator->last}active{/if}">{ifset $item['url']}<a href="{$item['url']}">{$item['name']}</a>{else}{$item['name']}{/ifset}</li>
+                    <li class="breadcrumb-item {if $iterator->last || $item['active'] === true}active{/if}">{ifset $item['url']}<a href="{$item['url']}">{$item['name']}</a>{else}{$item['name']}{/ifset}</li>
                 {/foreach}
             {/ifset}
 
