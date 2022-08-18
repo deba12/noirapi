@@ -1,12 +1,14 @@
 <?php
+declare(strict_types=1);
 /**
  * @noinspection PhpUnused
- * @noinspection UnknownInspectionInspection
  */
 
 namespace noirapi\helpers;
 
 use noirapi\lib\Model;
+use function call_user_func;
+use function is_string;
 
 class Users {
 
@@ -26,8 +28,6 @@ class Users {
 
         if($secret !== null) {
             $this->secret = $secret;
-        } elseif(defined('SECRET')) {
-            $this->secret = SECRET;
         } else {
             $this->secret = '';
         }
@@ -37,8 +37,9 @@ class Users {
     /**
      * @param string $table
      * @return $this
+     * @noinspection PhpUnused
      */
-    public function setTable(string $table): users {
+    public function setTable(string $table): Users {
         $this->table = $table;
         return $this;
     }
@@ -47,7 +48,7 @@ class Users {
      * @param callable $hash
      * @return $this
      */
-    public function setHash(callable $hash): users {
+    public function setHash(callable $hash): Users {
         $this->hash = $hash;
         return $this;
     }
@@ -81,6 +82,7 @@ class Users {
      * @param string $username
      * @param string $password
      * @return bool
+     * @noinspection PhpUnused
      */
     public function loginWithUsername(string $username, string $password): mixed {
         return $this->login('username', $username, $password);
@@ -101,6 +103,7 @@ class Users {
      * @param string|null $email
      * @param string|null $ip
      * @return int|null
+     * @noinspection PhpUnused
      */
     public function newUserWithPassword(string $username, string $password, ?string $email = null, ?string $ip = null):? int {
 
@@ -256,6 +259,11 @@ class Users {
 
     }
 
+    /**
+     * @param string $password
+     * @return string
+     * @noinspection PhpUnused
+     */
     public function getHashedPassword(string $password): string {
         return call_user_func($this->hash, $password);
     }
@@ -281,7 +289,7 @@ class Users {
      * @param string|null $hash
      * @return bool|string
      * @noinspection PhpSameParameterValueInspection
-     * @noinspection PhpUnusedPrivateMethodInspection
+     * @noinspection PhpUnused
      */
     public function PasswordHash(string $password, ?string $hash = null): bool|string {
 
