@@ -34,6 +34,11 @@ class View {
     /** @var array */
     private array $extra_params = [];
 
+    private array $topCss = [];
+    private array $topJs = [];
+    private array $bottomCss = [];
+    private array $bottomJs = [];
+
     /**
      * View constructor.
      * @param Request $request
@@ -100,6 +105,10 @@ class View {
         }
 
         $params['extra_params'] = $this->extra_params;
+        $params['topCss'] = $this->topCss;
+        $params['bottomCss'] = $this->bottomCss;
+        $params['topJs'] = $this->topJs;
+        $params['bottomJs'] = $this->bottomJs;
 
         return $this->response->setBody($this->latte->renderToString($layout, array_merge((array)$this->request, $params)));
 
@@ -215,6 +224,46 @@ class View {
      */
     public function addLayoutExtraParam(string $key, string|array $value): void {
         $this->extra_params[$key] = $value;
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function addTopCss(string $file): View {
+        $this->topCss[] = $file;
+        return $this;
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function addBottomCss(string $file): View {
+        $this->bottomCss[] = $file;
+        return $this;
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function addTopJs(string $file): View {
+        $this->topJs[] = $file;
+        return $this;
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function addBottomJs(string $file): View {
+        $this->bottomJs[] = $file;
+        return $this;
     }
 
 }

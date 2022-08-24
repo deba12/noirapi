@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace noirapi\helpers;
 
 use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Pure;
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\PrintContext;
@@ -16,7 +17,11 @@ class Macros extends Extension {
     public function getTags(): array {
         return [
             'pager'         => [$this, 'pager'],
-            'breadcrumb'    => [$this, 'breadCrumb']
+            'breadcrumb'    => [$this, 'breadCrumb'],
+            'topCss'        => [$this, 'topCss'],
+            'bottomCss'     => [$this, 'bottomCss'],
+            'topJs'         => [$this, 'topJs'],
+            'bottomJs'      => [$this, 'bottomJs'],
         ];
     }
 
@@ -40,6 +45,12 @@ class Macros extends Extension {
 
     }
 
+    /**
+     * @param Tag $tag
+     * @return Node
+     * @noinspection PhpUnusedParameterInspection
+     */
+    #[Pure]
     public function breadcrumb(Tag $tag): Node {
 
         return new AuxiliaryNode(
@@ -52,6 +63,70 @@ class Macros extends Extension {
             )
         );
 
+    }
+
+    /**
+     * @param Tag $tag
+     * @return Node
+     * @noinspection PhpUnusedParameterInspection
+     */
+    #[Pure]
+    public function topCss(Tag $tag): Node {
+        return new AuxiliaryNode(
+            fn (PrintContext $context) => $context->format('
+                foreach($topCss as $css) {
+                    echo \'<link rel="stylesheet" href="\' . $css . \'" />\' . PHP_EOL;
+                }'
+            )
+        );
+    }
+
+    /**
+     * @param Tag $tag
+     * @return Node
+     * @noinspection PhpUnusedParameterInspection
+     */
+    #[Pure]
+    public function bottomCss(Tag $tag): Node {
+        return new AuxiliaryNode(
+            fn (PrintContext $context) => $context->format('
+                foreach($bottomCss as $css) {
+                    echo \'<link rel="stylesheet" href="\' . $css . \'" />\' . PHP_EOL;
+                }'
+            )
+        );
+    }
+
+    /**
+     * @param Tag $tag
+     * @return Node
+     * @noinspection PhpUnusedParameterInspection
+     */
+    #[Pure]
+    public function topJs(Tag $tag): Node {
+        return new AuxiliaryNode(
+            fn (PrintContext $context) => $context->format('
+                foreach($topJs as $js) {
+                    echo \'<script type="text/javascript" src="\' . $js . \'"></script>\' . PHP_EOL;
+                }'
+            )
+        );
+    }
+
+    /**
+     * @param Tag $tag
+     * @return Node
+     * @noinspection PhpUnusedParameterInspection
+     */
+    #[Pure]
+    public function bottomJs(Tag $tag): Node {
+        return new AuxiliaryNode(
+            fn (PrintContext $context) => $context->format('
+                foreach($bottomJs as $js) {
+                    echo \'<script type="text/javascript" src="\' . $js . \'"></script>\' . PHP_EOL;
+                }'
+            )
+        );
     }
 
 }
