@@ -73,4 +73,12 @@ class Filters {
         return 1;
     }
 
+    /**
+     * @param string $data
+     * @return string
+     */
+    public static function base64_encode(string $data): string {
+        return base64_encode($data);
+    }
+
 }
