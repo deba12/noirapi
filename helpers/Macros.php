@@ -69,6 +69,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @noinspection PhpUnusedParameterInspection
+     * @noinspection HtmlUnknownTarget
      */
     #[Pure]
     public function topCss(Tag $tag): Node {
@@ -85,6 +86,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @noinspection PhpUnusedParameterInspection
+     * @noinspection HtmlUnknownTarget
      */
     #[Pure]
     public function bottomCss(Tag $tag): Node {
@@ -101,6 +103,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @noinspection PhpUnusedParameterInspection
+     * @noinspection HtmlUnknownTarget
      */
     #[Pure]
     public function topJs(Tag $tag): Node {
@@ -117,6 +120,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @noinspection PhpUnusedParameterInspection
+     * @noinspection HtmlUnknownTarget
      */
     #[Pure]
     public function bottomJs(Tag $tag): Node {
