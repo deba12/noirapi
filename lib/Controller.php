@@ -94,18 +94,24 @@ class Controller {
         return $this->response->withStatus(500);
     }
 
-    public function message(string $text, string $type, $post = array()): self {
+    /**
+     * @param string $text
+     * @param string $type
+     * @param int|null $time_ms
+     * @return $this
+     */
+    public function message(string $text, string $type, ?int $time_ms = null): self {
 
         if (isset($_SESSION['message'])) {
             unset($_SESSION['message']);
         }
 
         if (!empty($text) && !empty($type)) {
-            $_SESSION['message'] = array('text' => $text, 'type' => $type);
-        }
-
-        if (isset($post) && is_array($post)) {
-            $_SESSION['message']['post'] = $post;
+            $_SESSION['message'] = [
+                'text' => $text,
+                'type' => $type,
+                'time' => $time_ms
+            ];
         }
 
         return $this;
