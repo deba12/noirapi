@@ -7,6 +7,7 @@ namespace noirapi\lib;
 use FastRoute\Dispatcher;
 use JsonException;
 use noirapi\Config;
+use noirapi\Exceptions\InternalServerError;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
 use noirapi\Exceptions\RestException;
@@ -127,6 +128,11 @@ class Route {
                     $response = new Response();
                     $response->withStatus($exception->getCode())
                         ->setBody($exception->getMessage());
+                } /** @noinspection PhpRedundantCatchClauseInspection */
+                catch (InternalServerError $exception) {
+                    $response = new Response();
+                    $response->withStatus(500)
+                        ->setBody($exception->getMessage() ?? 'Internal server error');
                 }
 
                 break;
