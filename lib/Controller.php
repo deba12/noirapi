@@ -6,6 +6,7 @@ namespace noirapi\lib;
 
 use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
+use noirapi\helpers\Message;
 
 class Controller {
 
@@ -94,18 +95,21 @@ class Controller {
         return $this->response->withStatus(500);
     }
 
-    public function message(string $text, string $type, $post = array()): self {
+    /**
+     * @param string|Message $text
+     * @param string|null $type
+     * @return $this
+     */
+    public function message(string|Message $text, ?string $type = null): self {
 
         if (isset($_SESSION['message'])) {
             unset($_SESSION['message']);
         }
 
-        if (!empty($text) && !empty($type)) {
-            $_SESSION['message'] = array('text' => $text, 'type' => $type);
-        }
-
-        if (isset($post) && is_array($post)) {
-            $_SESSION['message']['post'] = $post;
+        if($text instanceof Message) {
+            $_SESSION['message'] = $text;
+        } else {
+            $_SESSION['message'] = Message::new($text, $type ?? 'danger');
         }
 
         return $this;

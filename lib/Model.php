@@ -64,7 +64,13 @@ class Model {
     }
 
     public static function tracyGetPdo(): array {
-        return self::$pdo;
+
+        if(!empty(self::$pdo)) {
+            return self::$pdo;
+        }
+
+        return [];
+
     }
 
     /**
