@@ -21,8 +21,8 @@ class Request {
     public string $function;
     public array $route;
     public string $role;
-
-
+    public bool $https;
+    public bool $ajax;
 
     /**
      * @param array $server
@@ -44,6 +44,9 @@ class Request {
         $static->files     = $files;
         $static->cookies   = $cookies;
 
+        $static->https = self::is_https($server);
+        $static->ajax = self::is_ajax($server);
+
         return $static;
 
     }
@@ -58,6 +61,9 @@ class Request {
         $static->post = $post;
         $static->files = $files;
         $static->cookies = $cookies;
+
+        $static->https = self::is_https($server);
+        $static->ajax = self::is_ajax($server);
 
         return $static;
 
@@ -93,6 +99,63 @@ class Request {
 
         return $res;
 
+    }
+
+    /**
+     * @param array $server
+     * @return bool
+     */
+    private static function is_https(array $server): bool {
+
+        if (isset($_SERVER['HTTPS'])) {
+
+            if (strtolower($server['HTTPS'])  === 'on') {
+                return true;
+            }
+
+            if ($server['HTTPS'] === "1") {
+                return true;
+            }
+
+        } elseif (isset($server['SERVER_PORT']) && ($server['SERVER_PORT'] === 443)) {
+
+            return true;
+
+        }
+
+        return false;
+
+    }
+
+    private static function is_ajax(array $server): bool {
+
+        if(isset($server['HTTP_X_REQUESTED_WITH']) && strtolower($server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            return true;
+        }
+
+        return false;
+
+    }
+
+    /**
+     * @param bool $https
+     * @return $this
+     */
+    public function setHttps(bool $https): static {
+        $this->https = $https;
+
+        return $this;
+    }
+
+    /**
+     * @param bool $ajax
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function setAjax(bool $ajax): static {
+        $this->ajax = $ajax;
+
+        return $this;
     }
 
 }
