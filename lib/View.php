@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use JetBrains\PhpStorm\ArrayShape;
 use Latte\Bridges\Tracy\BlueScreenPanel;
 use Latte\Engine;
 use noirapi\Config;
@@ -38,6 +39,9 @@ class View {
     private array $topJs = [];
     private array $bottomCss = [];
     private array $bottomJs = [];
+
+    // used in systempanel
+    private array $params_readonly = [];
 
     /**
      * View constructor.
@@ -81,6 +85,8 @@ class View {
      * @throws FileNotFoundException
      */
     public function display(array $params = []): Response {
+
+        $this->params_readonly = $params;
 
         if($this->template === null) {
             $this->setTemplate($this->request->function);
@@ -258,6 +264,43 @@ class View {
     public function addBottomJs(string $file): View {
         $this->bottomJs[] = $file;
         return $this;
+    }
+
+    /**
+     * @return array this is used by system panel
+     *
+     * this is used by system panel
+     */
+    #[ArrayShape(['layout' => "string", 'view' => "string"])]
+    public function gerRenderInfo(): array {
+
+        $layout = !empty($this->layout) ? basename($this->layout) : 'No layout';
+        $view = !empty($this->template) ? basename($this->template) : 'No view';
+        return [
+            'layout' => $layout,
+            'view' => $view,
+        ];
+
+    }
+
+    /**
+     * @return array
+     * @noinspection PhpUnused
+     *
+     * this is used by system panel
+     */
+    #[ArrayShape(['params' => "array", 'extra_params' => "array", 'topCss' => "array", 'bottomCss' => "array", 'topJs' => "array", 'bottomJs' => "array"])]
+    public function getParams(): array {
+
+        return [
+            'params'        => $this->params_readonly,
+            'extra_params'  => $this->extra_params,
+            'topCss'        => $this->topCss,
+            'bottomCss'     => $this->bottomCss,
+            'topJs'         => $this->topJs,
+            'bottomJs'      => $this->bottomJs,
+        ];
+
     }
 
 }
