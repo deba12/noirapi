@@ -150,16 +150,18 @@ class Route {
                 header(ucfirst($key) . ': ' . $value);
             }
 
+            $domain = Config::get('cookie_domain');
+
             foreach($response->getCookies() as $cookie) {
-                $domain = Config::get('domain');
+
                 setcookie(
                     $cookie['key'],
                     $cookie['value'],
                     [
                         'expires'   => $cookie['expire'],
                         'path'      => '/',
-                        'domain'    => $domain,
-                        'secure'    => $cookie['secure'],
+                        'domain'    => $domain ?? $this->server['HTTP_HOST'] ?? $this->server['SERVER_NAME'],
+                        'secure'    => !$this->request->https ? false : $cookie['secure'],
                         'httponly'  => $cookie['httponly'],
                         'samesite'  => $cookie['samesite'],
                     ]);
