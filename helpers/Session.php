@@ -99,4 +99,11 @@ class Session {
 
     }
 
+    /**
+     * @return array
+     */
+    public static function all(): array {
+        return $_SESSION;
+    }
+
 }
