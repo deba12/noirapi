@@ -15,6 +15,7 @@ class Recaptcha implements Schema {
     private bool $nullable = false;
 
     private string $secret;
+    private string $ip;
 
     /**
      * @param bool $state
@@ -45,6 +46,13 @@ class Recaptcha implements Schema {
     public function secret(string $secret): self {
 
         $this->secret = $secret;
+        return $this;
+
+    }
+
+    public function ip(string $ip): self {
+
+        $this->ip = $ip;
         return $this;
 
     }
@@ -125,17 +133,21 @@ class Recaptcha implements Schema {
      */
     private function verify(string $code, string $secret): bool {
 
-        $post = http_build_query([
-            'secret'   => $secret,
-            'response'  =>$code
-        ]);
+        $post = [
+            'secret'    => $secret,
+            'response'  => $code
+        ];
+
+        if(!empty($this->ip)) {
+            $post['remoteip'] = $this->ip;
+        }
 
         $opts = [
             'http' =>
                 [
                     'method'  => 'POST',
                     'header'  => 'Content-type: application/x-www-form-urlencoded',
-                    'content' => $post
+                    'content' => http_build_query($post)
                 ]
         ];
 
