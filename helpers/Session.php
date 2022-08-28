@@ -8,39 +8,95 @@ class Session {
 
     /**
      * @param string $namespace
-     * @param string $key
+     * @param string|null $key
      * @return mixed
+     * Get $_SESSION['namespace']
+     * Get $_SESSION['namespace']['key']
+     * Get $_SESSION['namespace']->key
      */
-    public static function get(string $namespace, string $key): mixed {
-        return $_SESSION[$namespace][$key] ?? null;
+    public static function get(string $namespace, ?string $key = null): mixed {
+
+        if($key === null) {
+            return $_SESSION[$namespace] ?? null;
+        }
+
+        if(!isset($_SESSION[$namespace])) {
+            return null;
+        }
+
+        if(is_array($_SESSION[$namespace])) {
+            return $_SESSION[$namespace][$key] ?? null;
+        }
+
+        if(is_object($_SESSION[$namespace])) {
+            /** @noinspection PhpExpressionAlwaysNullInspection */
+            return $_SESSION[$namespace]->$key ?? null;
+        }
+
+        return null;
+
     }
 
     /**
      * @param string $namespace
-     * @param string $key
+     * @param string|null $key
      * @param mixed $value
      * @return void
+     * Set $_SESSION['namespace'] = $value
+     * Set $_SESSION['namespace']['key'] = $value
      */
-    public static function set(string $namespace, string $key, mixed $value): void {
-        $_SESSION[$namespace][$key] = $value;
+    public static function set(string $namespace, ?string $key, mixed $value): void {
+        if($key === null) {
+            $_SESSION[$namespace] = $value;
+        } else {
+            $_SESSION[$namespace][$key] = $value;
+        }
     }
 
     /**
      * @param string $namespace
-     * @param string $key
+     * @param string|null $key
      * @return bool
      */
-    public function has(string $namespace, string $key): bool {
-        return isset($_SESSION[$namespace][$key]);
+    public static function has(string $namespace, ?string $key = null): bool {
+
+        if($key === null) {
+            return isset($_SESSION[$namespace]);
+        }
+
+        if(!isset($_SESSION[$namespace])) {
+            return false;
+        }
+
+        if(is_array($_SESSION[$namespace])) {
+            return isset($_SESSION[$namespace][$key]);
+        }
+
+        if(is_object($_SESSION[$namespace])) {
+            /** @noinspection PhpExpressionAlwaysNullInspection */
+            return isset($_SESSION[$namespace]->$key);
+        }
+
+        return false;
+
     }
 
     /**
      * @param string $namespace
-     * @param string $key
+     * @param string|null $key
      * @return void
      */
-    public function remove(string $namespace, string $key): void {
-        unset($_SESSION[$namespace][$key]);
+    public static function remove(string $namespace, ?string $key = null): void {
+
+        if($key === null) {
+            unset($_SESSION[$namespace]);
+        } elseif(is_array($_SESSION[$namespace])) {
+            unset($_SESSION[$namespace][$key]);
+        }elseif(is_object($_SESSION[$namespace])) {
+            /** @noinspection PhpExpressionAlwaysNullInspection */
+            unset($_SESSION[$namespace]->$key);
+        }
+
     }
 
 }
