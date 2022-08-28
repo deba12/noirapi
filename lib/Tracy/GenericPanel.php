@@ -75,6 +75,9 @@ class GenericPanel implements IBarPanel{
             $html .= '</tr>';
         }
 
+        $html .= '</table>';
+        $html .= '</div>';
+
         return $html;
 
     }
