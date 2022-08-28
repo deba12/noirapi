@@ -53,7 +53,7 @@ class GenericPanel implements IBarPanel{
     public function getTab(): string {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
-        $html .= $this->title;
+        $html .= $this->title . ' (' . count($this->data) . ')';
 
         return $html;
 
