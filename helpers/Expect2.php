@@ -20,6 +20,7 @@ use noirapi\helpers\Schema\Domain;
 use noirapi\helpers\Schema\Ips;
 use noirapi\helpers\Schema\Json;
 use noirapi\helpers\Schema\Numeric;
+use noirapi\helpers\Schema\Recaptcha;
 use noirapi\helpers\Schema\Time;
 use noirapi\helpers\Schema\Url;
 use RuntimeException;
@@ -73,6 +74,11 @@ final class Expect2 {
     #[Pure]
     public static function Json(): Json {
         return new Json();
+    }
+
+    #[Pure]
+    public static function Recaptcha(): Recaptcha {
+        return new Recaptcha();
     }
 
     /**
