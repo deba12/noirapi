@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection ContractViolationInspection */
 /** @noinspection PhpUnused */
 declare(strict_types=1);
 
@@ -7,8 +7,9 @@ namespace noirapi\helpers\Schema;
 use JsonException;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
+use Nette\Schema\Schema;
 
-class Recaptcha {
+class Recaptcha implements Schema {
 
     private bool $required = false;
     private bool $nullable = false;
@@ -87,7 +88,6 @@ class Recaptcha {
      * @param $value
      * @param $base
      * @return mixed
-     * @noinspection PhpUnusedParameterInspection
      */
     public function merge($value, $base): mixed {
 
@@ -99,7 +99,6 @@ class Recaptcha {
      * @param $value
      * @param Context $context
      * @return mixed
-     * @noinspection PhpUnusedParameterInspection
      */
     public function complete($value, Context $context): mixed {
 
