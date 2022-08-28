@@ -212,11 +212,11 @@ class View {
 
     /**
      * @param string $key
-     * @param string|array $value
+     * @param string|array|null $value
      * @return void
      * @noinspection PhpUnused
      */
-    public function addLayoutExtraParam(string $key, string|array $value): void {
+    public function addLayoutExtraParam(string $key, null|string|array $value): void {
         $this->extra_params[$key] = $value;
     }
 
