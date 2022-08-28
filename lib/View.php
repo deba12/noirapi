@@ -98,12 +98,6 @@ class View {
         }
 
         $params['view'] = $this->template;
-
-        if(isset($_SESSION['message'])) {
-            $params['message'] = $_SESSION['message'];
-            unset($_SESSION['message']);
-        }
-
         $params['extra_params'] = $this->extra_params;
         $params['topCss'] = $this->topCss;
         $params['bottomCss'] = $this->bottomCss;
