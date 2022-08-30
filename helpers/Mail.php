@@ -23,7 +23,7 @@ class Mail {
     public string $message_id;
     private Mailer $mailer;
     private Email $message;
-    private string $body;
+    private string $body = '';
     private string $error;
 
     public function __construct(string $dsn) {
@@ -238,6 +238,13 @@ class Mail {
      */
     public function getError(): string {
         return $this->error;
+    }
+
+    /**
+     * @return string
+     */
+    public function getBody(): string {
+        return $this->body;
     }
 
 }
