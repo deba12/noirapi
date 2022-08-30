@@ -25,9 +25,11 @@ class SessionPanel implements IBarPanel {
     public string $value_mod_attributes = 'style="font-weight:bold;color:#A52A2A;font-family:Courier New;font-size:1.1em"';
 
     public array $SESSION;
+    public int $status;
 
-    public function __construct(array $SESSION) {
+    public function __construct(array $SESSION, int $status) {
         $this->SESSION = $SESSION;
+        $this->status = $status;
     }
 
     /**
@@ -36,7 +38,11 @@ class SessionPanel implements IBarPanel {
     public function getTab(): string {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
-        $html .= $this->title . ' (' . count($this->SESSION) . ')';
+        if($this->status !== PHP_SESSION_ACTIVE) {
+            $html .= $this->title . ' session not active';
+        } else {
+            $html .= $this->title . ' (' . count($this->SESSION) . ')';
+        }
 
         return $html;
 
