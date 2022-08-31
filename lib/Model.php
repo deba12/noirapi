@@ -18,7 +18,7 @@ class Model {
     public string $driver = 'mysql';
     public string $dsn;
     public Database $db;
-    private static array $pdo;
+    protected static array $pdo;
 
     /**
      * @throws ConfigException
