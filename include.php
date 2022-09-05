@@ -45,7 +45,7 @@ Debugger::$strictMode = E_ALL;
 $dev = Config::get('dev');
 $dev_ips = Config::get('dev_ips');
 
-if($dev === true || (!empty($dev_ips) && in_array($_SERVER['REMOTE_ADDR'], $dev_ips, true))) {
+if($dev === true || (!empty($dev_ips) && isset($_SERVER['REMOTE_ADDR']) && in_array($_SERVER['REMOTE_ADDR'], $dev_ips, true))) {
     //we are missing dome debug events in Tracy that's why we start session so early
     if(session_status() !== PHP_SESSION_ACTIVE) {
         session_start();

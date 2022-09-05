@@ -9,7 +9,7 @@ use RateLimit\Rate;
 use RateLimit\Status;
 use Tracy\IBarPanel;
 
-class RateLimitBarPanel implements IBarPanel{
+class RateLimitBarPanel implements IBarPanel {
 
     /**
      * Base64 icon for Tracy panel.
