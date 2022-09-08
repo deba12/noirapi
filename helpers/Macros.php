@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace noirapi\helpers;
 
 use JetBrains\PhpStorm\Pure;
+use Latte\CompileException;
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\PrintContext;
@@ -20,6 +21,7 @@ class Macros extends Extension {
             'bottomCss'     => [$this, 'bottomCss'],
             'topJs'         => [$this, 'topJs'],
             'bottomJs'      => [$this, 'bottomJs'],
+            'active'        => [$this, 'active'],
         ];
     }
 
@@ -153,6 +155,36 @@ class Macros extends Extension {
                 }'
             )
         );
+    }
+
+    /**
+     * @param Tag $tag
+     * @return Node
+     * @throws CompileException
+     */
+    public function active(Tag $tag): Node {
+
+        $tag->expectArguments();
+        $res = $tag->parser->parseArguments();
+
+        return new AuxiliaryNode(
+            fn (PrintContext $context) => $context->format('
+
+                $active = %node;
+
+                if(count($active) === 1) {
+                    if($this->params[\'controller\'] === $active[0]) {
+                        echo \'active\';
+                    }
+                } else {
+                    if($this->params[\'controller\'] === $active[0] && $this->params[\'function\'] === $active[1]) {
+                        echo \'active\';
+                    }
+                }',
+                $res
+            )
+        );
+
     }
 
 }
