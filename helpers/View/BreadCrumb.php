@@ -32,4 +32,14 @@ class BreadCrumb {
 
     }
 
+    /**
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public static function clearItems(): void {
+
+        self::$items = [];
+
+    }
+
 }
