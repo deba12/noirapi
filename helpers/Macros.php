@@ -116,13 +116,18 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
+     * @noinspection JSUnresolvedVariable
      */
     #[Pure]
     public function topJs(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 foreach($topJs as $js) {
-                    echo \'<script type="text/javascript" src="\' . $js . \'"></script>\' . PHP_EOL;
+                    if(\str_starts_with($js, \'/\')) {
+                        echo "<script type=\"text/javascript\" src=\"$js\"></script>" . PHP_EOL;
+                    } else {
+                        echo "<script type=\"text/javascript\">$js</script>" . PHP_EOL;
+                    }
                 }'
             )
         );
@@ -133,13 +138,18 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
+     * @noinspection JSUnresolvedVariable
      */
     #[Pure]
     public function bottomJs(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 foreach($bottomJs as $js) {
-                    echo \'<script type="text/javascript" src="\' . $js . \'"></script>\' . PHP_EOL;
+                    if(\str_starts_with($js, \'/\')) {
+                        echo "<script type=\"text/javascript\" src=\"$js\"></script>" . PHP_EOL;
+                    } else {
+                        echo "<script type=\"text/javascript\">$js</script>" . PHP_EOL;
+                    }
                 }'
             )
         );
