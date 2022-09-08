@@ -30,6 +30,12 @@ class Macros extends Extension {
      */
     public function pager(Tag $tag): Node {
 
+        $file = ROOT . '/app/layouts/pager.latte';
+
+        if(!is_readable($file)) {
+            $file = ROOT . '/noirapi/templates/pager.latte';
+        }
+
         $subject = $tag->parser->parseUnquotedStringOrExpression();
 
         return new AuxiliaryNode(
@@ -37,8 +43,10 @@ class Macros extends Extension {
                 $latte = new Latte\Engine;
                 $latte->setTempDirectory(dirname(__DIR__) . \'/temp\');
                 $latte->addExtension(new Latte\Essential\RawPhpExtension);
-                echo $latte->renderToString(dirname(__DIR__) . \'/noirapi/templates/pager.latte\', [%node]);',
-            $subject)
+                echo $latte->renderToString(\'%raw\', [%node]);',
+                $file,
+                $subject
+            )
         );
 
     }
@@ -62,7 +70,8 @@ class Macros extends Extension {
                 $latte->setTempDirectory(ROOT . \'/temp\');
                 $latte->addExtension(new Latte\Essential\RawPhpExtension);
                 $items = [\'items\' => noirapi\helpers\View\BreadCrumb::getItems()];
-                echo $latte->renderToString(\'%raw\', $items);', $file
+                echo $latte->renderToString(\'%raw\', $items);',
+                $file
             )
         );
 
