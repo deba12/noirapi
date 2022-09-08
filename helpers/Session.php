@@ -106,4 +106,8 @@ class Session {
         return $_SESSION;
     }
 
+    public static function clear(): void {
+        $_SESSION = [];
+    }
+
 }
