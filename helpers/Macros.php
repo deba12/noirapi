@@ -3,14 +3,12 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-use JetBrains\PhpStorm\ArrayShape;
 use JetBrains\PhpStorm\Pure;
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\PrintContext;
 use Latte\Compiler\Tag;
 use Latte\Extension;
-use noirapi\helpers\View\BreadCrumb;
 
 class Macros extends Extension {
 
@@ -50,16 +48,21 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnusedParameterInspection
      */
-    #[Pure]
     public function breadcrumb(Tag $tag): Node {
+
+        $file = ROOT . '/app/layouts/BreadCrumb.latte';
+
+        if(!is_readable($file)) {
+            $file = ROOT . '/noirapi/templates/BreadCrumb.latte';
+        }
 
         return new AuxiliaryNode(
             fn(PrintContext $context) => $context->format('
                 $latte = new Latte\Engine;
-                $latte->setTempDirectory(dirname(__DIR__) . \'/temp\');
+                $latte->setTempDirectory(ROOT . \'/temp\');
                 $latte->addExtension(new Latte\Essential\RawPhpExtension);
                 $items = [\'items\' => noirapi\helpers\View\BreadCrumb::getItems()];
-                echo $latte->renderToString(dirname(__DIR__) . \'/noirapi/templates/BreadCrumb.latte\', $items);',
+                echo $latte->renderToString(\'%raw\', $items);', $file
             )
         );
 
