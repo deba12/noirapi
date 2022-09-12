@@ -19,14 +19,11 @@ class Controller {
     public Response $response;
     /** @var View $view */
     public View $view;
-    /** @var Server|null $swoole */
-    public ?Server $swoole;
 
     /**
      * Controller constructor.
      * @param Request $request
      * @param array $server
-     * @param Server|null $swoole
      */
     public function __construct(Request $request, array $server) {
 
@@ -77,6 +74,7 @@ class Controller {
 
     /**
      * @return Response
+     * @noinspection PhpUnused
      */
     public function ok(): Response {
         return $this->response->withStatus(200);

@@ -52,6 +52,7 @@ class Route {
     public function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): void {
         $this->request = Request::fromSwoole($server, $get, $post, $files, $cookies);
         $this->server = Request::swooleUpperCase($server);
+        $this->request->swoole = $this->swoole_server ?? null;
 
         $this->type = self::type_swoole;
     }
