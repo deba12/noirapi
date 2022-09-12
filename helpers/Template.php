@@ -1,9 +1,10 @@
-<?php declare(strict_types = 1);
+<?php
+declare(strict_types = 1);
 
 namespace noirapi\helpers;
 
-use core\Exceptions\FileNotFoundException;
 use Latte;
+use noirapi\Exceptions\FileNotFoundException;
 
 class Template {
 
@@ -14,9 +15,9 @@ class Template {
     public function __construct() {
 
         $this->latte = new Latte\Engine;
-        $this->latte->setAutoRefresh(true);
+        $this->latte->setAutoRefresh();
         $this->latte->setTempDirectory(ROOT . '/temp');
-        $this->latte->addFilter(null, '\\noirapi\\helpers\\Filters::init');
+        $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
     }
 

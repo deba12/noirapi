@@ -2,8 +2,7 @@
 declare(strict_types=1);
 
 namespace noirapi\Exceptions;
+
 use Exception;
 
-class FilterNotFoundException extends Exception {
-
-}
+class FilterNotFoundException extends Exception {}

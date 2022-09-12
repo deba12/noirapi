@@ -1,6 +1,8 @@
-<?php /** @noinspection PhpUnused */
-/** @noinspection PhpUnusedAliasInspection */
-
+<?php
+/**
+ * @noinspection PhpUnused
+ * @noinspection PhpUnusedAliasInspection
+ */
 declare(strict_types=1);
 
 namespace noirapi\helpers;
@@ -16,7 +18,10 @@ use noirapi\helpers\Schema\DateTime;
 use noirapi\helpers\Schema\Date;
 use noirapi\helpers\Schema\Domain;
 use noirapi\helpers\Schema\Ips;
+use noirapi\helpers\Schema\Json;
 use noirapi\helpers\Schema\Numeric;
+use noirapi\helpers\Schema\Recaptcha;
+use noirapi\helpers\Schema\Time;
 use noirapi\helpers\Schema\Url;
 use RuntimeException;
 
@@ -30,6 +35,10 @@ final class Expect2 {
 
     public static function dateTime($format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null): DateTime {
         return new DateTime($format, $timeZone);
+    }
+
+    public static function time($format = 'H:i', ?DateTimeZone $timeZone = null): DateTime {
+        return new Time($format, $timeZone);
     }
 
     #[Pure]
@@ -60,6 +69,16 @@ final class Expect2 {
     #[Pure]
     public static function Url(): Url {
         return new Url();
+    }
+
+    #[Pure]
+    public static function Json(): Json {
+        return new Json();
+    }
+
+    #[Pure]
+    public static function Recaptcha(): Recaptcha {
+        return new Recaptcha();
     }
 
     /**

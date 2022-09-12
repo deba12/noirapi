@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 
-namespace core\Exceptions;
+namespace noirapi\Exceptions;
+
 use Exception;
 
-class UnableToForwardException extends Exception {
-
-}
+class UnableToForwardException extends Exception {}

@@ -4,15 +4,22 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use JetBrains\PhpStorm\ArrayShape;
+use Latte\Bridges\Tracy\BlueScreenPanel;
 use Latte\Engine;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
+use function count;
 
 class View {
 
     /** @var Request */
     public Request $request;
+    /** @var Response */
+    private Response $response;
+
+    private array $params;
 
     /** @var string|null */
     private ?string $template = null;
@@ -23,8 +30,7 @@ class View {
     /** @var string|null */
     private ?string $layout = null;
 
-    /** @var response */
-    private response $response;
+
 
     /** @var string */
     private const latte_ext = '.latte';
@@ -32,15 +38,26 @@ class View {
     /** @var array */
     private array $extra_params = [];
 
+    private array $topCss = [];
+    private array $topJs = [];
+    private array $bottomCss = [];
+    private array $bottomJs = [];
+
+    // used in system-panel
+    private array $params_readonly = [];
+
     /**
      * View constructor.
      * @param Request $request
      * @param response $response
+     * @param array|null $params
      * @throws FileNotFoundException
      */
-    public function __construct(Request $request, Response $response) {
+    public function __construct(Request $request, Response $response, ?array $params = []) {
 
         $this->request = $request;
+        $this->response = $response;
+        $this->params = $params;
 
         $this->latte = new Engine;
         $this->latte->setTempDirectory(ROOT . '/temp');
@@ -49,14 +66,8 @@ class View {
         $this->latte->setAutoRefresh();
         $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
-        $this->response = $response;
-
         $this->latte->addExtension(new Macros());
-        /** @noinspection PhpUndefinedClassInspection */
-        /** @noinspection PhpUndefinedNamespaceInspection */
         if(class_exists(\app\lib\Macros::class)) {
-            /** @noinspection PhpParamsInspection */
-            /** @noinspection PhpUndefinedNamespaceInspection */
             $this->latte->addExtension(new \app\lib\Macros());
         }
 
@@ -68,6 +79,8 @@ class View {
 
         }
 
+        BlueScreenPanel::initialize();
+
     }
 
     /**
@@ -75,7 +88,9 @@ class View {
      * @return response
      * @throws FileNotFoundException
      */
-    public function display(array $params = []): response {
+    public function display(array $params = []): Response {
+
+        $this->params_readonly = $params;
 
         if($this->template === null) {
             $this->setTemplate($this->request->function);
@@ -93,15 +108,16 @@ class View {
         }
 
         $params['view'] = $this->template;
-
-        if(isset($_SESSION['message'])) {
-            $params['message'] = $_SESSION['message'];
-            unset($_SESSION['message']);
-        }
-
         $params['extra_params'] = $this->extra_params;
+        $params['topCss'] = $this->topCss;
+        $params['bottomCss'] = $this->bottomCss;
+        $params['topJs'] = $this->topJs;
+        $params['bottomJs'] = $this->bottomJs;
 
-        return $this->response->setBody($this->latte->renderToString($layout, array_merge((array)$this->request, $params)));
+        $params = array_merge($this->params, $params);
+        $params = array_merge((array)$this->request, $params);
+
+        return $this->response->setBody($this->latte->renderToString($layout, $params));
 
     }
 
@@ -118,6 +134,7 @@ class View {
             $this->setLayout($layout);
             $this->setTemplate($view);
             $params['view'] = $this->template;
+            $params = array_merge($this->params, $params);
             return $this->latte->renderToString($this->layout, $params);
         }
 
@@ -130,11 +147,11 @@ class View {
     /**
      * @param string $template
      * @param string|null $controller
-     * @return view
+     * @return View
      * @noinspection PhpUnused
      * @throws FileNotFoundException
      */
-    public function setTemplate(string $template, string $controller = null): view {
+    public function setTemplate(string $template, string $controller = null): View {
 
         if($controller === null) {
             $controller = $this->request->controller;
@@ -153,12 +170,11 @@ class View {
 
     /**
      * @param string|null $layout
-     * @return view
+     * @return View
      * @throws FileNotFoundException
      * @noinspection PhpUnused
      */
-    public function setLayout(?string $layout = null): view {
-
+    public function setLayout(?string $layout = null): View {
         if($layout === null) {
             $this->layout = null;
             return $this;
@@ -206,6 +222,94 @@ class View {
      */
     public function setLayoutExtraParams(array $params): void {
         $this->extra_params = $params;
+    }
+
+    /**
+     * @param string $key
+     * @param string|array|null $value
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public function addLayoutExtraParam(string $key, null|string|array $value): void {
+        $this->extra_params[$key] = $value;
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function addTopCss(string $file): View {
+        $this->topCss[] = $file;
+        return $this;
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function addBottomCss(string $file): View {
+        $this->bottomCss[] = $file;
+        return $this;
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function addTopJs(string $file): View {
+        $this->topJs[] = $file;
+        return $this;
+    }
+
+    /**
+     * @param string $file
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function addBottomJs(string $file): View {
+        $this->bottomJs[] = $file;
+        return $this;
+    }
+
+    /**
+     * @return array this is used by system panel
+     *
+     * this is used by system panel
+     */
+    #[ArrayShape(['layout' => "string", 'view' => "string"])]
+    public function gerRenderInfo(): array {
+
+        $layout = !empty($this->layout) ? basename($this->layout) : 'No layout';
+        $view = !empty($this->template) ? basename($this->template) : 'No view';
+        return [
+            'layout' => $layout,
+            'view' => $view,
+        ];
+
+    }
+
+    /**
+     * @return array
+     * @noinspection PhpUnused
+     *
+     * this is used by system panel
+     * @noinspection GetSetMethodCorrectnessInspection
+     */
+    #[ArrayShape(['params' => "array", 'extra_params' => "array", 'topCss' => "array", 'bottomCss' => "array", 'topJs' => "array", 'bottomJs' => "array"])]
+    public function getParams(): array {
+
+        return [
+            'params'        => $this->params_readonly,
+            'extra_params'  => $this->extra_params,
+            'topCss'        => $this->topCss,
+            'bottomCss'     => $this->bottomCss,
+            'topJs'         => $this->topJs,
+            'bottomJs'      => $this->bottomJs,
+        ];
+
     }
 
 }

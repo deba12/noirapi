@@ -7,6 +7,7 @@ namespace noirapi\lib;
 use FastRoute\Dispatcher;
 use JsonException;
 use noirapi\Config;
+use noirapi\Exceptions\InternalServerError;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
 use noirapi\Exceptions\RestException;
@@ -141,6 +142,11 @@ class Route {
                     $response = new Response();
                     $response->withStatus($exception->getCode())
                         ->setBody($exception->getMessage());
+                } /** @noinspection PhpRedundantCatchClauseInspection */
+                catch (InternalServerError $exception) {
+                    $response = new Response();
+                    $response->withStatus(500)
+                        ->setBody($exception->getMessage() ?? 'Internal server error');
                 }
 
                 break;
@@ -158,16 +164,18 @@ class Route {
                 header(ucfirst($key) . ': ' . $value);
             }
 
+            $domain = Config::get('cookie_domain');
+
             foreach($response->getCookies() as $cookie) {
-                $domain = Config::get('domain');
+
                 setcookie(
                     $cookie['key'],
                     $cookie['value'],
                     [
                         'expires'   => $cookie['expire'],
                         'path'      => '/',
-                        'domain'    => $domain,
-                        'secure'    => $cookie['secure'],
+                        'domain'    => $domain ?? $this->server['HTTP_HOST'] ?? $this->server['SERVER_NAME'],
+                        'secure'    => !$this->request->https ? false : $cookie['secure'],
                         'httponly'  => $cookie['httponly'],
                         'samesite'  => $cookie['samesite'],
                     ]);

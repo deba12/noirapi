@@ -14,100 +14,89 @@ use DateTimeZone;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
+use function get_class;
+use function gettype;
+use function is_string;
 
-class DateTime implements Schema
-{
-    /** @var bool */
-    private $required = false;
+class DateTime implements Schema {
 
-    /** @var bool */
-    private $nullable = true;
+    private bool $required = false;
+    protected bool $nullable = true;
+    protected mixed $format;
+    protected ?DateTimeZone $timeZone;
+    protected string $output_format;
 
-    /** @var string */
-    private $format;
-
-    /** @var DateTimeZone */
-    private $timeZone;
-
-    /** @var string */
-    protected $output_format;
-
-    public function __construct($format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null)
-    {
+    public function __construct($format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null) {
         $this->format = $format;
         $this->timeZone = $timeZone ?? new DateTimeZone(date_default_timezone_get());
     }
 
-    public function required(bool $state = true): self
-    {
+    public function required(bool $state = true): self {
         $this->required = $state;
         return $this;
     }
 
-    public function nullable(bool $state = true): self
-    {
+    public function nullable(bool $state = true): self {
         $this->nullable = $state;
         return $this;
     }
 
-    public function format(string $format): self
-    {
+    public function format(string $format): self {
         $this->output_format = $format;
         return $this;
     }
 
-    public function normalize($value, Context $context)
-    {
+    /**
+     * @param $value
+     * @param Context $context
+     * @return string|DateTimeImmutable|null
+     */
+    public function normalize($value, Context $context): string|null|DateTimeImmutable {
 
-        if($this->nullable === true && empty($value)){
+        if($this->nullable && empty($value)) {
             return null;
         }
 
         // Must be string or empty (null / 0 / false /
-        if (is_string($value) === false && empty($value) === false) {
+        if (!is_string($value) && !empty($value)) {
             $type = gettype($value);
             $context->addError("The option %path% expects Date, $type given.", Message::PATTERN_MISMATCH);
             return null;
         }
 
-        if ($this->nullable === false && empty($value)) {
-            $context->addError("The option %path% expects not-nullable Date, nothing given.", Message::PATTERN_MISMATCH);
+        if (!$this->nullable && empty($value)) {
+            $context->addError('The option %path% expects not-nullable Date, nothing given.', Message::PATTERN_MISMATCH);
             return null;
         }
 
         $normalized = DateTimeImmutable::createFromFormat($this->format, $value, $this->timeZone);
-        if ($normalized instanceof DateTimeImmutable === false) {
+        if (!$normalized instanceof DateTimeImmutable) {
             $context->addError("The option %path% expects Date to match pattern '$this->format', '$value' given.", Message::PATTERN_MISMATCH);
             return null;
         }
 
-        if($normalized->format($this->format) !== $value)
-        {
+        if($normalized->format($this->format) !== $value) {
             $context->addError("The option %path% expects Date to be valid Date format. Input Date is not the same as formatted date. Format:'$this->format' Input: '$value', Formatted: '{$normalized->format($this->format)}'.", Message::PATTERN_MISMATCH);
             return null;
         }
 
-        //We should not format DateTime object when we aer called from Date
-        if($this->output_format !== null && get_class($this) === __CLASS__) {
+        if(!empty($this->output_format)) {
             return $normalized->format($this->output_format);
         }
 
         return $normalized;
     }
 
-    public function merge($value, $base)
-    {
+    public function merge($value, $base) {
         return $value;
     }
 
-    public function complete($value, Context $context)
-    {
+    public function complete($value, Context $context) {
         return $value;
     }
 
     /** @noinspection ReturnTypeCanBeDeclaredInspection */
-    public function completeDefault(Context $context)
-    {
+    public function completeDefault(Context $context) {
         if ($this->required) {
             $context->addError('The mandatory option %path% is missing.', Message::MISSING_ITEM);
         }

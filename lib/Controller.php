@@ -3,9 +3,10 @@
 declare(strict_types = 1);
 
 namespace noirapi\lib;
-use core\Exceptions\UnableToForwardException;
+
 use noirapi\Config;
-use Swoole\Http\Server;
+use noirapi\Exceptions\UnableToForwardException;
+use noirapi\helpers\Message;
 
 class Controller {
 
@@ -27,11 +28,10 @@ class Controller {
      * @param array $server
      * @param Server|null $swoole
      */
-    public function __construct(Request $request, array $server, ?Server $swoole = null) {
+    public function __construct(Request $request, array $server) {
 
         $this->request = $request;
         $this->server = $server;
-        $this->swoole = $swoole;
 
         $db = Config::get('db');
 
@@ -45,6 +45,8 @@ class Controller {
         }
 
         $this->response = new Response();
+
+        new TracyExtras();
 
     }
 
@@ -96,18 +98,21 @@ class Controller {
         return $this->response->withStatus(500);
     }
 
-    public function message(string $text, string $type, $post = array()): self {
+    /**
+     * @param string|Message $text
+     * @param string|null $type
+     * @return $this
+     */
+    public function message(string|Message $text, ?string $type = null): self {
 
         if (isset($_SESSION['message'])) {
             unset($_SESSION['message']);
         }
 
-        if (!empty($text) && !empty($type)) {
-            $_SESSION['message'] = array('text' => $text, 'type' => $type);
-        }
-
-        if (isset($post) && is_array($post)) {
-            $_SESSION['message']['post'] = $post;
+        if($text instanceof Message) {
+            $_SESSION['message'] = $text;
+        } else {
+            $_SESSION['message'] = Message::new($text, $type ?? 'danger');
         }
 
         return $this;

@@ -5,4 +5,4 @@ namespace noirapi\Exceptions;
 
 use Exception;
 
-class UsersException extends Exception {}
+class InternalServerError extends Exception {}

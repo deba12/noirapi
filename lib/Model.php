@@ -7,9 +7,10 @@ namespace noirapi\lib;
 use Nette\Utils\Paginator;
 use noirapi\Config;
 use noirapi\Exceptions\ConfigException;
+use noirapi\PDO\PDO;
 use Opis\Database\Connection;
 use Opis\Database\Database;
-use PDO;
+
 use RuntimeException;
 
 class Model {
@@ -17,7 +18,7 @@ class Model {
     public string $driver = 'mysql';
     public string $dsn;
     public Database $db;
-    private static $pdo;
+    protected static array $pdo;
 
     /**
      * @throws ConfigException
@@ -34,14 +35,14 @@ class Model {
             if(empty(self::$pdo[$this->driver])) {
 
                 if(!empty($this->dsn)) {
-                    self::$pdo[ $this->driver ] = new PDO($this->dsn . ':' . $db[ $this->driver ][ 'dsn' ], $db[ $this->driver ][ 'user' ] ?? null, $db[ $this->driver ][ 'pass' ] ?? null);
+                    self::$pdo[$this->driver] = new PDO($this->dsn . ':' . $db[ $this->driver ][ 'dsn' ], $db[ $this->driver ][ 'user' ] ?? null, $db[ $this->driver ][ 'pass' ] ?? null);
                 } else {
                     self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
                 }
-                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-                self::$pdo[$this->driver]->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
 
             }
 
@@ -49,15 +50,26 @@ class Model {
 
         } else {
 
-            $pdo = new PDO($this->driver . ':' . $params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
-            $pdo ->setAttribute(PDO::ATTR_STRINGIFY_FETCHES, false);
-            $pdo ->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-            $pdo ->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            $pdo ->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_OBJ);
+            $pdo = new PDO($params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
+
+            $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+            $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
 
             $this->db = new Database(Connection::fromPDO($pdo));
 
         }
+
+    }
+
+    public static function tracyGetPdo(): array {
+
+        if(!empty(self::$pdo)) {
+            return self::$pdo;
+        }
+
+        return [];
 
     }
 
@@ -90,7 +102,7 @@ class Model {
      */
     public function begin(): void {
         if($this->driver === 'mysql') {
-            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
+            $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 0);
         }
         $this->db->getConnection()->getPDO()->beginTransaction();
     }
@@ -102,7 +114,7 @@ class Model {
     public function commit(): void {
         $this->db->getConnection()->getPDO()->commit();
         if($this->driver === 'mysql') {
-            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+            $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 1);
         }
     }
 
@@ -112,7 +124,7 @@ class Model {
     public function rollback(): void {
         $this->db->getConnection()->getPDO()->rollBack();
         if($this->driver === 'mysql') {
-            $this->db->getConnection()->getPDO()->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+            $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 1);
         }
     }
 

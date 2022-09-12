@@ -12,7 +12,6 @@ namespace noirapi\helpers;
 use Latte\Engine;
 use RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\Mailer;
 use Symfony\Component\Mailer\Transport;
 
 use Symfony\Component\Mime\Address;
@@ -21,14 +20,20 @@ use Symfony\Component\Mime\Email;
 class Mail {
 
     public string $message_id;
-    private Mailer $mailer;
+
     private Email $message;
-    private string $body;
+    private string $body = '';
+    private string $error;
+    private bool $debug;
+    private string $debug_data;
+    private Transport\TransportInterface $transport;
 
+    public function __construct(string $dsn, bool $debug = false) {
 
-    public function __construct(string $dsn) {
-        $this->mailer = new Mailer(Transport::fromDsn($dsn));
+        $this->transport = Transport::fromDsn($dsn);
+        $this->debug = $debug;
         $this->message = new Email();
+
     }
 
     /**
@@ -106,7 +111,7 @@ class Mail {
 
         $latte = new Engine();
         $latte->setTempDirectory(ROOT . '/temp');
-        $this->body = $latte->renderToString($template, $params);
+        $this->body = $latte->renderToString($file, $params);
 
         return $this;
 
@@ -202,21 +207,23 @@ class Mail {
     }
 
     /**
-     * @param string|null $error
      * @return bool
-     * @noinspection PhpUnusedParameterInspection
      */
-    public function send(?string $error = null): bool {
+    public function send(): bool {
 
         $this->message->html($this->body);
         $this->message->text(strip_tags($this->body));
 
         try {
-            $this->mailer->send($this->message);
+            $res = $this->transport->send($this->message);
         } catch (TransportExceptionInterface $e) {
-            /** @noinspection PhpUnusedLocalVariableInspection */
-            $error = $e->getMessage();
+            $this->error = $e->getMessage();
+            $this->debug_data = $e->getDebug();
             return false;
+        }
+
+        if($this->debug) {
+            $this->debug_data = $res->getDebug();
         }
 
         return true;
@@ -232,6 +239,28 @@ class Mail {
 
         return $this;
 
+    }
+
+    /**
+     * @return string
+     */
+    public function getBody(): string {
+        return $this->body;
+    }
+
+    /**
+     * @return string
+     */
+    public function getError(): string {
+        return $this->error;
+    }
+
+    /**
+     * @return string
+     * @noinspection GetSetMethodCorrectnessInspection
+     */
+    public function getDebug(): string {
+        return $this->debug_data;
     }
 
 }

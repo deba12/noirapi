@@ -58,11 +58,36 @@ class Config {
      */
     public static function get(string $option): mixed {
 
-        if(empty(self::$options[$option])) {
-            return null;
+        if(str_contains($option, '.')) {
+
+            $parts = explode('.', $option);
+
+            // here we cache our found key
+            $path = [];
+
+            foreach($parts as $part) {
+                // empty element
+                if(empty($part)) {
+                    return null;
+                }
+
+                if(empty($path)) {
+                    if(isset(self::$options[$part])) {
+                        $path = self::$options[$part];
+                    }
+                } else if(isset($path[$part])) {
+                    $path = $path[$part];
+                } else {
+                    return null;
+                }
+
+            }
+
+            return $path;
+
         }
 
-        return self::$options[$option];
+        return self::$options[$option] ?? null;
 
     }
 

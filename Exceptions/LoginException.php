@@ -1,8 +1,8 @@
-<?php /** @noinspection PhpUnused */
-
+<?php
+declare(strict_types=1);
 
 namespace noirapi\Exceptions;
+
 use Exception;
 
-class LoginException extends Exception {
-}
+class LoginException extends Exception {}
