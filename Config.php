@@ -83,7 +83,7 @@ class Config {
 
             }
 
-            return $path;
+            return empty($path) ? null : $path;
 
         }
 
