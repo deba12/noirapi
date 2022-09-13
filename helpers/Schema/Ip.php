@@ -16,17 +16,10 @@ use Nette\Schema\Schema;
 
 class Ip implements Schema {
 
-    /** @var bool */
-    private $required = false;
-
-    /** @var bool */
-    private $nullable = false;
-
-    /** @var string */
-    private $from = 'string';
-
-    /** @var string */
-    private $to = 'string';
+    private bool $required = false;
+    private bool $nullable = false;
+    private string $from = 'string';
+    private string $to = 'string';
 
     public function fromBin()
     {
@@ -100,6 +93,7 @@ class Ip implements Schema {
 
             case 'long':
                 if(!ctype_digit($value)) {
+                    /** @noinspection UnusedFunctionResultInspection */
                     $context->addError('The option %path% is not valid integer.', Message::TYPE_MISMATCH);
                     return null;
                 }
@@ -107,6 +101,7 @@ class Ip implements Schema {
                 $value = (int) $value;
                 $from = long2ip($value);
                 if($value !== ip2long($from)) {
+                    /** @noinspection UnusedFunctionResultInspection */
                     $context->addError('The option %path% is not valid (long) ipv4 address.', Message::TYPE_MISMATCH);
                     return null;
                 }
@@ -115,6 +110,7 @@ class Ip implements Schema {
             case 'bin':
                 $from = inet_ntop($value);
                 if($value !== inet_pton($from)) {
+                    /** @noinspection UnusedFunctionResultInspection */
                     $context->addError('The option %path% is not valid (binary) ip address.', Message::TYPE_MISMATCH);
                     return null;
                 }
