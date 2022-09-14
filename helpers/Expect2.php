@@ -13,6 +13,7 @@ use Nette;
 use Nette\Schema\Elements\Type;
 use Nette\Schema\Schema;
 use noirapi\helpers\Schema\Ascii;
+use noirapi\helpers\Schema\Cidr;
 use noirapi\helpers\Schema\Ip;
 use noirapi\helpers\Schema\DateTime;
 use noirapi\helpers\Schema\Date;
@@ -79,6 +80,15 @@ final class Expect2 {
     #[Pure]
     public static function Recaptcha(): Recaptcha {
         return new Recaptcha();
+    }
+
+    /**
+     * @param bool $multiple
+     * @return Cidr
+     */
+    #[Pure]
+    public static function Cidr(bool $multiple = false): Cidr {
+        return new Cidr($multiple);
     }
 
     /**
