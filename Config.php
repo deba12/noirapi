@@ -83,7 +83,7 @@ class Config {
 
             }
 
-            return $path;
+            return empty($path) ? null : $path;
 
         }
 
@@ -100,6 +100,13 @@ class Config {
 
         self::$options[$option] = $data;
 
+    }
+
+    /**
+     * @return array
+     */
+    public static function getAll(): array {
+        return self::$options;
     }
 
 }

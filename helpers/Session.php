@@ -48,6 +48,8 @@ class Session {
     public static function set(string $namespace, ?string $key, mixed $value): void {
         if($key === null) {
             $_SESSION[$namespace] = $value;
+        } else if(is_object($_SESSION[$namespace])) {
+            $_SESSION[$namespace]->$key = $value;
         } else {
             $_SESSION[$namespace][$key] = $value;
         }

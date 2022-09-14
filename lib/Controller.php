@@ -74,6 +74,7 @@ class Controller {
 
     /**
      * @return Response
+     * @noinspection PhpUnused
      */
     public function ok(): Response {
         return $this->response->withStatus(200);

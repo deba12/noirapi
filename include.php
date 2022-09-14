@@ -1,8 +1,7 @@
-<?php
-/**
- * @noinspection PhpUndefinedClassInspection
- * @noinspection PhpUndefinedNamespaceInspection
- */
+<?php /** @noinspection PhpUnused */
+/** @noinspection PhpUndefinedNamespaceInspection */
+/** @noinspection PhpUndefinedClassInspection */
+
 declare(strict_types = 1);
 
 use noirapi\Config;
@@ -40,7 +39,14 @@ if(empty($config)) {
 /** @noinspection PhpUnhandledExceptionInspection */
 Config::init($config);
 
+define("SESSION_ROOT", Config::get('SESSION_ROOT') ?? (ROOT . '/sessions'));
+
 Debugger::$strictMode = E_ALL;
+
+/** @noinspection PhpUndefinedClassInspection */
+if(class_exists(GitVersionPanel::class)) {
+    Debugger::getBar()->addPanel(GitVersionPanel::createDefault());
+}
 
 $dev = Config::get('dev');
 $dev_ips = Config::get('dev_ips');

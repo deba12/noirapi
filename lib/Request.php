@@ -23,6 +23,7 @@ class Request {
     public string $role;
     public bool $https;
     public bool $ajax;
+    public $swoole = null;
 
     /**
      * @param array $server
