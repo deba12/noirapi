@@ -3,7 +3,7 @@
 mb_internal_encoding('UTF-8');
 error_reporting(E_ALL);
 
-define('ROOT', dirname(__FILE__, 1) . DIRECTORY_SEPARATOR);
-define('APPROOT', ROOT . 'app' . DIRECTORY_SEPARATOR);
-define('WWWROOT', ROOT . 'htdocs' . DIRECTORY_SEPARATOR);
+define('ROOT', dirname(__DIR__) . DIRECTORY_SEPARATOR);
+const APPROOT = ROOT . 'app' . DIRECTORY_SEPARATOR;
+const WWWROOT = ROOT . 'htdocs' . DIRECTORY_SEPARATOR;
 require('kernel.php');
