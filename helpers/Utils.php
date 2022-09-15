@@ -28,6 +28,26 @@ class Utils {
     }
 
     /**
+     * @param int $min
+     * @param int $max
+     * @return float
+     * @throws Exception
+     */
+    public static function randomFloat(int $min = 0, int $max = PHP_INT_MAX): float {
+        return random_int($min, $max -1) / $max;
+    }
+
+    /**
+     * @param int $min
+     * @param int $max
+     * @return int
+     * @throws Exception
+     */
+    public static function randomInt(int $min = 0, int $max = PHP_INT_MAX): int {
+        return random_int($min, $max);
+    }
+
+    /**
      * @param string $cmd
      * @return void
      */
