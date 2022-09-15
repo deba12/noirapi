@@ -24,8 +24,6 @@ class Route {
     private Request $request;
     private array $server;
 
-    public Server $swoole_server;
-
     /**
      * @param array $server
      * @param array $get
@@ -62,7 +60,7 @@ class Route {
      * @return void
      */
     public function setSwoole(Server $server): void {
-        $this->swoole_server = $server;
+        $this->request->swoole = $server;
     }
 
     /**
@@ -106,7 +104,7 @@ class Route {
 
                     $response = call_user_func_array(
                         [
-                            new $this->request->route[1][0]($this->request, $this->server, $this->swoole_server),
+                            new $this->request->route[1][0]($this->request, $this->server),
                             $this->request->route[1][1]
                         ],
                         $this->request->route[2]
