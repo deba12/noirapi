@@ -6,6 +6,7 @@ namespace noirapi\helpers;
 
 use Exception;
 use Nette\StaticClass;
+use RuntimeException;
 
 class Utils {
 
@@ -80,6 +81,27 @@ class Utils {
 
         // Output the 36 character UUID.
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
+
+    }
+
+    /**
+     * @param string|object $class
+     * @return string
+     */
+    public static function getClassName(string|object $class): string {
+
+        if(is_object($class)) {
+            $class = get_class($class);
+        }
+
+        $path = explode('\\', $class);
+        $res = array_pop($path);
+
+        if(!is_string($res)) {
+            throw new RuntimeException('Unable to get class name');
+        }
+
+        return $res;
 
     }
 

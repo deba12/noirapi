@@ -7,6 +7,7 @@ namespace noirapi\lib;
 use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
+use noirapi\helpers\Utils;
 
 class Controller {
 
@@ -52,8 +53,7 @@ class Controller {
      * @return string
      */
     public static function getClassName(string $class):string {
-        $path = explode('\\', $class);
-        return array_pop($path);
+        return Utils::getClassName($class);
     }
 
     /**
