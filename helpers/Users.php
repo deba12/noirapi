@@ -12,13 +12,10 @@ use function is_string;
 
 class Users {
 
-    /** @var model */
     private Model $model;
     /** @var callable  */
     private $hash;
-    /** @var string  */
     private string $secret;
-    /** @var string  */
     private string $table = 'users';
 
     public function __construct(Model $model, string $secret = null) {
@@ -30,6 +27,10 @@ class Users {
             $this->secret = $secret;
         } else {
             $this->secret = '';
+        }
+
+        if($model::table !== null) {
+            $this->table = $model::table;
         }
 
     }
