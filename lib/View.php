@@ -33,6 +33,8 @@ class View {
     // used in system-panel
     private array $params_readonly = [];
 
+    private static string $uri;
+
     /**
      * View constructor.
      * @param Request $request
@@ -67,6 +69,8 @@ class View {
         }
 
         BlueScreenPanel::initialize();
+
+        self::$uri = $request->uri;
 
     }
 
@@ -187,11 +191,11 @@ class View {
     public static function add_url_var($param, $page): string {
 
         /** @noinspection UriPartExtractionInspection */
-        $url = parse_url($_SERVER['REQUEST_URI'], PHP_URL_QUERY);
+        $params = parse_url(self::$uri, PHP_URL_QUERY);
 
-        if(isset($url['query'])) {
+        if(!empty($params)) {
 
-            parse_str($url['query'], $array);
+            parse_str($params, $array);
 
             if(count($array) > 0) {
                 $array[$param] = $page;
