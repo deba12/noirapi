@@ -271,7 +271,7 @@ class View {
      * this is used by system panel
      */
     #[ArrayShape(['layout' => "string", 'view' => "string"])]
-    public function gerRenderInfo(): array {
+    public function getRenderInfo(): array {
 
         $layout = !empty($this->layout) ? basename($this->layout) : 'No layout';
         $view = !empty($this->template) ? basename($this->template) : 'No view';
