@@ -14,30 +14,17 @@ use function count;
 
 class View {
 
-    /** @var Request */
     public Request $request;
-    /** @var Response */
     private Response $response;
 
     private array $params;
-
-    /** @var string|null */
     private ?string $template = null;
 
-    /** @var Engine */
     public Engine $latte;
-
-    /** @var string|null */
     private ?string $layout = null;
-
-
-
-    /** @var string */
     private const latte_ext = '.latte';
 
-    /** @var array */
     private array $extra_params = [];
-
     private array $topCss = [];
     private array $topJs = [];
     private array $bottomCss = [];
@@ -67,16 +54,16 @@ class View {
         $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
         $this->latte->addExtension(new Macros());
+        /** @noinspection PhpUndefinedClassInspection */
         if(class_exists(\app\lib\Macros::class)) {
+            /** @noinspection PhpParamsInspection */
             $this->latte->addExtension(new \app\lib\Macros());
         }
 
         $layout = Config::get('layout');
 
         if($layout) {
-
             $this->setLayout($layout);
-
         }
 
         BlueScreenPanel::initialize();
