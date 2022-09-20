@@ -190,7 +190,6 @@ class View {
      */
     public static function add_url_var($param, $page): string {
 
-        /** @noinspection UriPartExtractionInspection */
         $params = parse_url(self::$uri, PHP_URL_QUERY);
 
         if(!empty($params)) {
