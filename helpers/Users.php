@@ -29,8 +29,8 @@ class Users {
             $this->secret = '';
         }
 
-        if($model::table !== null) {
-            $this->table = $model::table;
+        if(isset($model::$table)) {
+            $this->table = $model::$table;
         }
 
     }
