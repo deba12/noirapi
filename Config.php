@@ -54,9 +54,10 @@ class Config {
 
     /**
      * @param string $option
+     * @param string|null $default
      * @return mixed
      */
-    public static function get(string $option): mixed {
+    public static function get(string $option, string|null $default): mixed {
 
         if(str_contains($option, '.')) {
 
@@ -83,11 +84,11 @@ class Config {
 
             }
 
-            return empty($path) ? null : $path;
+            return empty($path) ? $default ?? null : $path;
 
         }
 
-        return self::$options[$option] ?? null;
+        return self::$options[$option] ?? $default ?? null;
 
     }
 
@@ -104,6 +105,7 @@ class Config {
 
     /**
      * @return array
+     * @noinspection PhpUnused
      */
     public static function getAll(): array {
         return self::$options;
