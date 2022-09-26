@@ -54,10 +54,10 @@ class Config {
 
     /**
      * @param string $option
-     * @param string|null $default
+     * @param mixed $default
      * @return mixed
      */
-    public static function get(string $option, string|null $default): mixed {
+    public static function get(string $option, mixed $default): mixed {
 
         if(str_contains($option, '.')) {
 
