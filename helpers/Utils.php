@@ -7,12 +7,20 @@ namespace noirapi\helpers;
 use Exception;
 use Nette\StaticClass;
 use RuntimeException;
+use function array_pop;
+use function array_splice;
+use function bin2hex;
 use function chr;
+use function count;
 use function get_class;
 use function is_object;
 use function is_string;
 use function ord;
+use function proc_close;
+use function proc_open;
+use function str_split;
 use function strlen;
+use function vsprintf;
 
 class Utils {
 
@@ -108,6 +116,29 @@ class Utils {
         }
 
         return $res;
+
+    }
+
+    /**
+     * @param array $array
+     * @return array
+     * @throws Exception
+     */
+    public static function array_shuffle(array $array): array {
+
+        $random = [];
+        $length = count($array);
+
+        if($length < 2) {
+            return $array;
+        }
+
+        while($length > 0) {
+            $random[] = array_splice($array, random_int(0, $length - 1), 1)[0];
+            $length--;
+        }
+
+        return $random;
 
     }
 
