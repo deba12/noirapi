@@ -57,7 +57,7 @@ class Config {
      * @param mixed $default
      * @return mixed
      */
-    public static function get(string $option, mixed $default): mixed {
+    public static function get(string $option, mixed $default = null): mixed {
 
         if(str_contains($option, '.')) {
 
@@ -69,7 +69,7 @@ class Config {
             foreach($parts as $part) {
                 // empty element
                 if(empty($part)) {
-                    return null;
+                    return $default ?? null;
                 }
 
                 if(empty($path)) {
@@ -79,7 +79,7 @@ class Config {
                 } else if(isset($path[$part])) {
                     $path = $path[$part];
                 } else {
-                    return null;
+                    return $default ?? null;
                 }
 
             }
