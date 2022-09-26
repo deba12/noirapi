@@ -7,6 +7,12 @@ namespace noirapi\helpers;
 use Exception;
 use Nette\StaticClass;
 use RuntimeException;
+use function chr;
+use function get_class;
+use function is_object;
+use function is_string;
+use function ord;
+use function strlen;
 
 class Utils {
 
