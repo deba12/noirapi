@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
+use function is_array;
+use function is_object;
+
 class Session {
 
     /**
@@ -48,7 +51,7 @@ class Session {
     public static function set(string $namespace, ?string $key, mixed $value): void {
         if($key === null) {
             $_SESSION[$namespace] = $value;
-        } else if(is_object($_SESSION[$namespace])) {
+        } else if(isset($_SESSION[$namespace]) && is_object($_SESSION[$namespace])) {
             $_SESSION[$namespace]->$key = $value;
         } else {
             $_SESSION[$namespace][$key] = $value;
