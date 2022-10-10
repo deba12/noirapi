@@ -158,4 +158,13 @@ class Utils {
 
     }
 
+    /**
+     * @return bool
+     */
+    public static function is_tty(): bool {
+
+        return posix_isatty(defined('STDOUT') ? STDOUT : null);
+
+    }
+
 }
