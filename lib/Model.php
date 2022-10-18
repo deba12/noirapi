@@ -25,12 +25,12 @@ class Model {
      */
     public function __construct(array $params = []) {
 
-        $db = Config::get('db');
-        if (empty($db[$this->driver])) {
-            throw new ConfigException('Model: unable to find config for: ' . $this->driver);
-        }
-
         if(empty($params)) {
+
+            $db = Config::get('db');
+            if (empty($db[$this->driver])) {
+                throw new ConfigException('Model: unable to find config for: ' . $this->driver);
+            }
 
             if(empty(self::$pdo[$this->driver])) {
 
