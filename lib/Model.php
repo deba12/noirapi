@@ -27,12 +27,12 @@ class Model {
 
         if(empty($params)) {
 
-            $db = Config::get('db');
-            if (empty($db[$this->driver])) {
-                throw new ConfigException('Model: unable to find config for: ' . $this->driver);
-            }
-
             if(empty(self::$pdo[$this->driver])) {
+
+                $db = Config::get('db');
+                if (empty($db[$this->driver])) {
+                    throw new ConfigException('Model: unable to find config for: ' . $this->driver);
+                }
 
                 if(!empty($this->dsn)) {
                     self::$pdo[$this->driver] = new PDO($this->dsn . ':' . $db[ $this->driver ][ 'dsn' ], $db[ $this->driver ][ 'user' ] ?? null, $db[ $this->driver ][ 'pass' ] ?? null);
