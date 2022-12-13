@@ -118,10 +118,11 @@ class Controller {
     }
 
     /**
+     * @param bool $same_domain
      * @return string
      * @noinspection PhpUnused
      */
-    public function referer(): string {
+    public function referer(bool $same_domain = true): string {
 
         if(isset($this->server['HTTP_REFERER'])) {
 
@@ -130,6 +131,10 @@ class Controller {
             $url = parse_url(preg_replace('/\s+/', '', $url));
 
             if(!$url) {
+                return '/';
+            }
+
+            if($same_domain && $url['host'] !== $this->server['HTTP_HOST']) {
                 return '/';
             }
 
