@@ -21,7 +21,7 @@ class Users {
     public function __construct(Model $model, string $secret = null) {
 
         $this->model = $model;
-        $this->hash = 'self::PasswordHash';
+        $this->hash = [$this, 'PasswordHash'];
 
         if($secret !== null) {
             $this->secret = $secret;

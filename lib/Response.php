@@ -198,6 +198,16 @@ class Response {
         return $this;
     }
 
+    /**
+     * @param string $filename
+     * @return $this
+     */
+    public function inlineFile(string $filename): Response {
+        $this->addHeader('Content-Disposition', 'inline; filename="' . $filename . '"');
+        $this->addHeader('Content-Transfer-Encoding', 'binary');
+        return $this;
+    }
+
 
     /**
      * @param string $key
