@@ -58,5 +58,5 @@ if($dev === true || (!empty($dev_ips) && isset($_SERVER['REMOTE_ADDR']) && in_ar
     }
     Debugger::enable(Debugger::DEVELOPMENT, PATH_LOGS);
 } else {
-    Debugger::enable(Debugger::PRODUCTION, PATH_LOGS);
+    Debugger::enable(Debugger::PRODUCTION, PATH_LOGS, Config::get('dev_email'));
 }
