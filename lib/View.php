@@ -21,7 +21,7 @@ class View {
     private ?string $template = null;
 
     public Engine $latte;
-    private ?string $layout = null;
+    private ?string $layout_file = null;
     private const latte_ext = '.latte';
 
     private array $extra_params = [];
@@ -87,7 +87,7 @@ class View {
             $this->setTemplate($this->request->function);
         }
 
-        $layout = $this->layout ?? $this->template;
+        $layout = $this->layout_file ?? $this->template;
 
         if(isset($_SERVER['HTTP_X_PJAX'])) {
             $layout = $params['view'];
@@ -126,7 +126,7 @@ class View {
             $this->setTemplate($view);
             $params['view'] = $this->template;
             $params = array_merge($this->params, $params);
-            return $this->latte->renderToString($this->layout, $params);
+            return $this->latte->renderToString($this->layout_file, $params);
         }
 
         $this->setTemplate($view);
@@ -160,25 +160,25 @@ class View {
     }
 
     /**
-     * @param string|null $layout
+     * @param string|null $layout_file
      * @return View
      * @throws FileNotFoundException
      * @noinspection PhpUnused
      */
-    public function setLayout(?string $layout = null): View {
-        if($layout === null) {
-            $this->layout = null;
+    public function setLayout(?string $layout_file = null): View {
+        if($layout_file === null) {
+            $this->layout_file = null;
             return $this;
         }
 
-        $file = PATH_LAYOUTS . $layout . self::latte_ext;
+        $file = PATH_LAYOUTS . $layout_file . self::latte_ext;
 
         if(is_readable($file)) {
-            $this->layout = $file;
+            $this->layout_file = $file;
             return $this;
         }
 
-        throw new FileNotFoundException('Unable to find layout: ' . $file);
+        throw new FileNotFoundException('Unable to find layout_file: ' . $file);
 
     }
 
@@ -269,14 +269,12 @@ class View {
      *
      * this is used by system panel
      */
-    #[ArrayShape(['layout' => "string", 'view' => "string"])]
+    #[ArrayShape(['layout_file' => "string", 'view' => "string"])]
     public function getRenderInfo(): array {
 
-        $layout = !empty($this->layout) ? basename($this->layout) : 'No layout';
-        $view = !empty($this->template) ? basename($this->template) : 'No view';
         return [
-            'layout' => $layout,
-            'view' => $view,
+            'layout_file'   => !empty($this->layout_file) ? basename($this->layout_file) : 'No layout',
+            'view'          => !empty($this->template) ? basename($this->template) : 'No view',
         ];
 
     }

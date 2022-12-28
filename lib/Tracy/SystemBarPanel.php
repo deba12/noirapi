@@ -39,7 +39,7 @@ class SystemBarPanel implements IBarPanel {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
         $view = $this->view->getRenderInfo();
-        $html .= $this->request->method . ' [ ' . $this->request->controller . '=>' . $this->request->function . ' ] || [ ' . $view['layout'] . '->' . $view['view'] . ' ]';
+        $html .= $this->request->method . ' [ ' . $this->request->controller . '=>' . $this->request->function . ' ] || [ ' . $view['layout_file'] . '->' . $view['view'] . ' ]';
 
         return $html;
 
