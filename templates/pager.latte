@@ -1,86 +1,65 @@
-{var $pager = $this->params[0]}
+{if $pager->getPageCount() > 1}
 
-{if $pager}
+<nav>
 
-	{if $pager->getPageCount() > 1}
+    <ul class="pagination pg-blue justify-content-center">
 
-	<nav>
+        <li class="page-item {if $pager->isFirst()}disabled{/if} d-none d-sm-none d-md-block">
 
-		<ul class="pagination pg-blue justify-content-center">
+            <a class="page-link" aria-label="Previous" href="{\noirapi\lib\View::add_url_var('page', 1)}" data-page="1">&#x21E4;</a>
 
-			<li class="page-item {if $pager->isFirst()}disabled{/if} d-none d-sm-none d-md-block">
+        </li>
 
-				<a class="page-link" aria-label="Previous" href="{\noirapi\lib\View::add_url_var('page', 1)}" data-page="1">&#x21E4;</a>
+        <li class="page-item {if $pager->isFirst()}disabled{/if}">
 
-			</li>
+            <a class="page-link page-prev" aria-label="Previous" href="{\noirapi\lib\View::add_url_var('page', $pager->getPage()-1)}" data-page="{=$pager->getPage()-1}">&#x2190;</a>
 
-			<li class="page-item {if $pager->isFirst()}disabled{/if}">
+        </li>
 
-				<a class="page-link page-prev" aria-label="Previous" href="{\noirapi\lib\View::add_url_var('page', $pager->getPage()-1)}" data-page="{=$pager->getPage()-1}">&#x2190;</a>
+        {var $iterator = 1}
+        {for $p = $pager->getPage() - $idxl; $p <= $pager->getPage() + $idxr; $p++}
 
-			</li>
+            {continueIf $p < 1}
 
-			{php
+            <li class="page-item {if $pager->getPage() == $p}active{/if}">
 
-				if($pager->getPageCount() == 1) { $idxl = 0; $idxr = 0; }
-				else if($pager->getPageCount() < 5) {
-					$idxl = round($pager->getPageCount() / $pager->getPage(), 0, PHP_ROUND_HALF_UP) + $pager->getPage();
-					$idxr = $pager->getPageCount()-$pager->getPage();
-				}
-				else if($pager->getPage() == 1) { $idxl = 0; $idxr = 4; }
-				else if($pager->getPage() == 2) { $idxl = 1; $idxr = 3; }
-				else if($pager->getPage() == $pager->getLastPage()) { $idxl = 4; $idxr = 0; }
-				else if($pager->getPage() == $pager->getLastPage() -1 ) { $idxl = 3; $idxr = 1; }
-				else { $idxl = 2; $idxr = 2; }
+                <a class="page-link" href="{\noirapi\lib\View::add_url_var('page', $p)}" data-page="{=$p}">{=$p}</a>
 
-			}
+            </li>
 
-			{var $iterator = 1}
-			{for $p = $pager->getPage() - $idxl; $p <= $pager->getPage() + $idxr; $p++}
+        {php $iterator++}
+        {/for}
 
-				{continueIf $p < 1}
+        <li class="page-item {if $pager->isLast()}disabled{/if}">
 
-				<li class="page-item {if $pager->getPage() == $p}active{/if}">
+            <a class="page-link page-next" href="{\noirapi\lib\View::add_url_var('page', $pager->getPage()+1)}" data-page="{=$pager->getPage()+1}">&#x2192;</a>
 
-					<a class="page-link" href="{\noirapi\lib\View::add_url_var('page', $p)}" data-page="{=$p}">{=$p}</a>
+        </li>
 
-				</li>
+        <li class="page-item {if $pager->isLast()}disabled{/if} d-none d-sm-none d-md-block">
 
-			{php $iterator++}
-			{/for}
+            <a class="page-link" href="{\noirapi\lib\View::add_url_var('page', $pager->getLastPage())}" data-page="{=$pager->getLastPage()}">&#x21E5;</a>
 
-			<li class="page-item {if $pager->isLast()}disabled{/if}">
+        </li>
 
-				<a class="page-link page-next" href="{\noirapi\lib\View::add_url_var('page', $pager->getPage()+1)}" data-page="{=$pager->getPage()+1}">&#x2192;</a>
+    </ul>
 
-			</li>
+</nav>
 
-			<li class="page-item {if $pager->isLast()}disabled{/if} d-none d-sm-none d-md-block">
+{else}
 
-				<a class="page-link" href="{\noirapi\lib\View::add_url_var('page', $pager->getLastPage())}" data-page="{=$pager->getLastPage()}">&#x21E5;</a>
+<nav>
 
-			</li>
+    <ul class="pagination pg-blue justify-content-center p-0 m-0">
 
-		</ul>
+        <li class="page-item active">
 
-	</nav>
+            <a class="page-link" href="#"> 1 </a>
 
-	{else}
+        </li>
 
-	<nav>
+    </ul>
 
-		<ul class="pagination pg-blue justify-content-center p-0 m-0">
-
-			<li class="page-item active">
-
-				<a class="page-link" href="#"> 1 </a>
-
-			</li>
-
-		</ul>
-
-	</nav>
-
-	{/if}
+</nav>
 
 {/if}
