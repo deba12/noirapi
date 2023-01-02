@@ -22,7 +22,25 @@ class Macros extends Extension {
             'topJs'         => [$this, 'topJs'],
             'bottomJs'      => [$this, 'bottomJs'],
             'active'        => [$this, 'active'],
+            'title'         => [$this, 'title'],
         ];
+    }
+
+    /**
+     * @param Tag $tag
+     * @return Node
+     * @noinspection PhpUnused
+     * @noinspection PhpUnusedParameterInspection
+     */
+    public function title(Tag $tag): Node {
+
+        return new AuxiliaryNode(
+            fn (PrintContext $context) => $context->format('
+            if(isset($extra_params[\'title_page\'])) {
+                echo " - " . $extra_params[\'title_page\'];
+            }')
+        );
+
     }
 
     /**

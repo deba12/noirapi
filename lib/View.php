@@ -11,6 +11,8 @@ use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
 use noirapi\lib\View\Layout;
+use RuntimeException;
+use stdClass;
 use function count;
 
 class View {
@@ -18,38 +20,28 @@ class View {
     public Request $request;
     private Response $response;
 
-    private array $params;
+    private stdClass $params;
     private ?string $template = null;
 
     public Engine $latte;
     private ?string $layout_file = null;
     private const latte_ext = '.latte';
 
-    private array $extra_params = [];
-    private array $topCss = [];
-    private array $topJs = [];
-    private array $bottomCss = [];
-    private array $bottomJs = [];
-
-    // used in system-panel
-    private array $params_readonly = [];
-
     private static string $uri;
 
-    private $layout;
+    public Layout $layout;
 
     /**
      * View constructor.
      * @param Request $request
      * @param response $response
-     * @param array|null $params
      * @throws FileNotFoundException
      */
-    public function __construct(Request $request, Response $response, ?array $params = []) {
+    public function __construct(Request $request, Response $response) {
 
         $this->request = $request;
         $this->response = $response;
-        $this->params = $params;
+        $this->params = new stdClass();
 
         $this->latte = new Engine;
         $this->latte->setTempDirectory(ROOT . '/temp');
@@ -59,9 +51,15 @@ class View {
         $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
         $this->latte->addExtension(new Macros());
-        /** @noinspection PhpUndefinedClassInspection */
+        /**
+         * @noinspection PhpUndefinedClassInspection
+         * @noinspection RedundantSuppression
+         */
         if(class_exists(\app\lib\Macros::class)) {
-            /** @noinspection PhpParamsInspection */
+            /**
+             * @noinspection PhpParamsInspection
+             * @noinspection RedundantSuppression
+             */
             $this->latte->addExtension(new \app\lib\Macros());
         }
 
@@ -86,8 +84,6 @@ class View {
      */
     public function display(array $params = []): Response {
 
-        $this->params_readonly = $params;
-
         if($this->template === null) {
             $this->setTemplate($this->request->function);
         }
@@ -98,23 +94,22 @@ class View {
             $layout = $params['view'];
         }
 
+        $this->mergeParams($this->request, 'request');
+
+        $this->mergeParams($params);
+
         if(isset($_SESSION['message'])) {
-            $params['message'] = $_SESSION['message'];
+            $this->mergeParams(['message' => $_SESSION['message']]);
             unset($_SESSION['message']);
         }
 
-        $params['view'] = $this->template;
-        $params['extra_params'] = $this->extra_params;
-        $params['topCss'] = $this->topCss;
-        $params['bottomCss'] = $this->bottomCss;
-        $params['topJs'] = $this->topJs;
-        $params['bottomJs'] = $this->bottomJs;
+        $this->mergeParams([
+            'template'  => $this->template
+        ]);
 
-        $params = array_merge($this->params, $params);
-        $params = array_merge((array)$this->request, $params);
-        $params = array_merge($this->layout->getLayoutInfo(), $params);
+        $this->mergeParams($this->layout->getLayoutInfo(), 'layout');
 
-        return $this->response->setBody($this->latte->renderToString($layout, $params));
+        return $this->response->setBody($this->latte->renderToString($layout, $this->params));
 
     }
 
@@ -127,17 +122,20 @@ class View {
      */
     public function print(?string $layout, string $view, array $params = []): string {
 
+        $this->setTemplate($view);
+        $params['template'] = $this->template;
+        $this->mergeParams($params);
+
         if($layout !== null) {
             $this->setLayout($layout);
             $this->setTemplate($view);
-            $params['view'] = $this->template;
-            $params = array_merge($this->params, $params);
-            return $this->latte->renderToString($this->layout_file, $params);
+
+            return $this->latte->renderToString($this->layout_file, $this->params);
         }
 
         $this->setTemplate($view);
 
-        return $this->latte->renderToString($this->template, $params);
+        return $this->latte->renderToString($this->template, $this->params);
 
     }
 
@@ -213,65 +211,6 @@ class View {
     }
 
     /**
-     * @param array $params
-     * @return void
-     * @noinspection PhpUnused
-     */
-    public function setLayoutExtraParams(array $params): void {
-        $this->extra_params = $params;
-    }
-
-    /**
-     * @param string $key
-     * @param string|array|null $value
-     * @return void
-     * @noinspection PhpUnused
-     */
-    public function addLayoutExtraParam(string $key, null|string|array $value): void {
-        $this->extra_params[$key] = $value;
-    }
-
-    /**
-     * @param string $file
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function addTopCss(string $file): View {
-        $this->topCss[] = $file;
-        return $this;
-    }
-
-    /**
-     * @param string $file
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function addBottomCss(string $file): View {
-        $this->bottomCss[] = $file;
-        return $this;
-    }
-
-    /**
-     * @param string $file
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function addTopJs(string $file): View {
-        $this->topJs[] = $file;
-        return $this;
-    }
-
-    /**
-     * @param string $file
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function addBottomJs(string $file): View {
-        $this->bottomJs[] = $file;
-        return $this;
-    }
-
-    /**
      * @return array this is used by system panel
      *
      * this is used by system panel
@@ -296,14 +235,32 @@ class View {
     #[ArrayShape(['params' => "array", 'extra_params' => "array", 'topCss' => "array", 'bottomCss' => "array", 'topJs' => "array", 'bottomJs' => "array"])]
     public function getParams(): array {
 
-        return [
-            'params'        => $this->params_readonly,
-            'extra_params'  => $this->extra_params,
-            'topCss'        => $this->topCss,
-            'bottomCss'     => $this->bottomCss,
-            'topJs'         => $this->topJs,
-            'bottomJs'      => $this->bottomJs,
-        ];
+        return get_object_vars($this);
+
+    }
+
+    /**
+     * @param array|object $params
+     * @param string|null $namespace
+     * @return void
+     */
+    public function mergeParams(array|object $params, ?string $namespace = null): void {
+
+        if($namespace === null) {
+
+            foreach($params as $key => $value) {
+                if(!isset($this->params->$key)) {
+                    $this->params->$key = $value;
+                } else {
+                    throw new RuntimeException("Duplicate key ain view params: $key");
+                }
+            }
+
+        } else if(!isset($this->params->$namespace)) {
+            $this->params->$namespace = $params;
+        } else {
+            throw new RuntimeException("Duplicate key ain view params: $namespace");
+        }
 
     }
 
