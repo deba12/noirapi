@@ -102,7 +102,7 @@ class Macros extends Extension {
     public function topCss(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                foreach($topCss as $css) {
+                foreach($this->params[\'layout\']->topCss as $css) {
                     echo \'<link rel="stylesheet" href="\' . $css . \'" />\' . PHP_EOL;
                 }'
             )
@@ -119,7 +119,7 @@ class Macros extends Extension {
     public function bottomCss(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                foreach($bottomCss as $css) {
+                foreach($this->params[\'layout\']->bottomCss as $css) {
                     echo \'<link rel="stylesheet" href="\' . $css . \'" />\' . PHP_EOL;
                 }'
             )
@@ -137,7 +137,7 @@ class Macros extends Extension {
     public function topJs(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                foreach($topJs as $js) {
+                foreach($this->params[\'layout\']->topJs as $js) {
                     if(\str_starts_with($js, \'/\')) {
                         echo "<script type=\"text/javascript\" src=\"$js\"></script>" . PHP_EOL;
                     } else {
@@ -159,7 +159,7 @@ class Macros extends Extension {
     public function bottomJs(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                foreach($bottomJs as $js) {
+                foreach($this->params[\'layout\']->bottomJs as $js) {
                     if(\str_starts_with($js, \'/\')) {
                         echo "<script type=\"text/javascript\" src=\"$js\"></script>" . PHP_EOL;
                     } else {
@@ -186,11 +186,11 @@ class Macros extends Extension {
                 $active = %node;
 
                 if(count($active) === 1) {
-                    if($this->params[\'controller\'] === $active[0]) {
+                    if($this->params[\'request\']->controller === $active[0]) {
                         echo \'active\';
                     }
                 } else {
-                    if($this->params[\'controller\'] === $active[0] && $this->params[\'function\'] === $active[1]) {
+                    if($this->params[\'request\']->controller === $active[0] && $this->params[\'request\']->function === $active[1]) {
                         echo \'active\';
                     }
                 }',
