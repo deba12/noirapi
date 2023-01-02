@@ -36,8 +36,8 @@ class Macros extends Extension {
 
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-            if(isset($extra_params[\'title_page\'])) {
-                echo " - " . $extra_params[\'title_page\'];
+            if(isset($this->params[\'layout\']->title)) {
+                echo " - " . $this->params[\'layout\']->title;
             }')
         );
 

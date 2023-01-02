@@ -107,7 +107,7 @@ class View {
             'template'  => $this->template
         ]);
 
-        $this->mergeParams($this->layout->getLayoutInfo(), 'layout');
+        $this->mergeParams($this->layout, 'layout');
 
         return $this->response->setBody($this->latte->renderToString($layout, $this->params));
 

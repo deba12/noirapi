@@ -5,12 +5,12 @@ namespace noirapi\lib\View;
 
 class Layout {
 
-    private string $title;
-    private array $breadcrumbs = [];
-    private array $topJs = [];
-    private array $bottomJs = [];
-    private array $topCss = [];
-    private array $bottomCss = [];
+    public string $title = '';
+    public array $breadcrumbs = [];
+    public array $topJs = [];
+    public array $bottomJs = [];
+    public array $topCss = [];
+    public array $bottomCss = [];
 
     /**
      * @param string $title
@@ -79,15 +79,6 @@ class Layout {
     public function addBottomJs(string $file): static {
         $this->bottomJs[] = $file;
         return $this;
-    }
-
-    /**
-     * @return array
-     */
-    public function getLayoutInfo(): array {
-
-        return get_object_vars($this);
-
     }
 
 }
