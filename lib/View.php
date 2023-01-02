@@ -10,6 +10,7 @@ use Latte\Engine;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
+use noirapi\lib\View\Layout;
 use function count;
 
 class View {
@@ -34,6 +35,8 @@ class View {
     private array $params_readonly = [];
 
     private static string $uri;
+
+    private $layout;
 
     /**
      * View constructor.
@@ -72,6 +75,8 @@ class View {
 
         self::$uri = $request->uri;
 
+        $this->layout = new Layout();
+
     }
 
     /**
@@ -107,6 +112,7 @@ class View {
 
         $params = array_merge($this->params, $params);
         $params = array_merge((array)$this->request, $params);
+        $params = array_merge($this->layout->getLayoutInfo(), $params);
 
         return $this->response->setBody($this->latte->renderToString($layout, $params));
 
@@ -164,6 +170,7 @@ class View {
      * @return View
      * @throws FileNotFoundException
      * @noinspection PhpUnused
+     * @noinspection GetSetMethodCorrectnessInspection
      */
     public function setLayout(?string $layout_file = null): View {
         if($layout_file === null) {
