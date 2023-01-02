@@ -95,9 +95,9 @@ class Session {
 
         if($key === null) {
             unset($_SESSION[$namespace]);
-        } elseif(is_array($_SESSION[$namespace])) {
+        } elseif (isset($_SESSION[$namespace]) && is_array($_SESSION[$namespace])) {
             unset($_SESSION[$namespace][$key]);
-        }elseif(is_object($_SESSION[$namespace])) {
+        }elseif (isset($_SESSION[$namespace]) &&  is_object($_SESSION[$namespace])) {
             /** @noinspection PhpExpressionAlwaysNullInspection */
             unset($_SESSION[$namespace]->$key);
         }
