@@ -78,20 +78,15 @@ class Macros extends Extension {
      */
     public function breadcrumb(Tag $tag): Node {
 
-        $file = ROOT . '/app/layouts/BreadCrumb.latte';
+        $file = ROOT . '/app/layouts/BreadCrumbs.latte';
 
         if(!is_readable($file)) {
-            $file = ROOT . '/noirapi/templates/BreadCrumb.latte';
+            $file = ROOT . '/noirapi/templates/BreadCrumbs.latte';
         }
 
         return new AuxiliaryNode(
-            fn(PrintContext $context) => $context->format('
-                $latte = new Latte\Engine;
-                $latte->setTempDirectory(ROOT . \'/temp\');
-                $latte->addExtension(new Latte\Essential\RawPhpExtension);
-                $items = [\'items\' => noirapi\helpers\View\BreadCrumb::getItems()];
-                echo $latte->renderToString(\'%raw\', $items);',
-                $file
+            fn(PrintContext $context) => $context->format(
+                '$this->createTemplate(\'%raw\', [ \'breadcrumbs\' => $this->params[\'layout\']->breadcrumbs ], \'include\')->renderToContentType(\'html\');', $file
             )
         );
 
