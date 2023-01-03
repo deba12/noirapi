@@ -17,13 +17,13 @@ $listen_port = Config::get('swoole.listen_port') ?? 9400;
 $server = new Swoole\HTTP\Server($listen_ip, $listen_port);
 $static_files = Config::get('swoole.static_files');
 $server->set([
-    'worker_num' => Config::get('swoole.workers') ?? 1,
-    'task_worker_num' => Config::get('swoole.task_workers') ?? 1,
+    'worker_num'        => Config::get('swoole.workers') ?? 1,
+    'task_worker_num'   => Config::get('swoole.task_workers') ?? 1,
 ]);
 
 if(!empty($static_files)) {
     $server->set([
-        'document_root' => ROOT . '/htdocs',
+        'document_root'         => ROOT . '/htdocs',
         'enable_static_handler' => true,
     ]);
 }
