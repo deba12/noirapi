@@ -7,10 +7,6 @@ class Layout {
 
     public string $title        = '';
     public array $breadcrumbs   = [];
-    public array $topJs         = [];
-    public array $bottomJs      = [];
-    public array $topCss        = [];
-    public array $bottomCss     = [];
     public array $params        = [];
 
     /**
@@ -42,45 +38,12 @@ class Layout {
     }
 
     /**
-     * @param string $file
-     * @return $this
-     * @noinspection PhpUnused
+     * @param string $key
+     * @param mixed $value
+     * @return void
      */
-    public function addTopCss(string $file): static {
-        $this->topCss[] = $file;
-
-        return $this;
-    }
-
-    /**
-     * @param string $file
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function addBottomCss(string $file): static {
-        $this->bottomCss[] = $file;
-
-        return $this;
-    }
-
-    /**
-     * @param string $file
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function addTopJs(string $file): static {
-        $this->topJs[] = $file;
-        return $this;
-    }
-
-    /**
-     * @param string $file
-     * @return $this
-     * @noinspection PhpUnused
-     */
-    public function addBottomJs(string $file): static {
-        $this->bottomJs[] = $file;
-        return $this;
+    public function add(string $key, mixed $value): void {
+        $this->params[$key][] = $value;
     }
 
     /**
@@ -88,16 +51,8 @@ class Layout {
      * @param mixed $value
      * @return void
      */
-    public function addParam(string $key, mixed $value): void {
+    public function set(string $key, mixed $value): void {
         $this->params[$key] = $value;
-    }
-
-    /**
-     * @return array
-     * @noinspection PhpUnused
-     */
-    public function getParams(): array {
-        return $this->params;
     }
 
     /**
@@ -106,7 +61,7 @@ class Layout {
      * @return mixed
      * @noinspection PhpUnused
      */
-    public function getParam(string $key, mixed $default = null): mixed {
+    public function get(string $key, mixed $default = null): mixed {
         return $this->params[$key] ?? $default ?? null;
     }
 
@@ -115,7 +70,7 @@ class Layout {
      * @return bool
      * @noinspection PhpUnused
      */
-    public function existParam(string $key): bool {
+    public function exists(string $key): bool {
         return isset($this->params[$key]);
     }
 
