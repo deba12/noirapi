@@ -5,12 +5,13 @@ namespace noirapi\lib\View;
 
 class Layout {
 
-    public string $title = '';
-    public array $breadcrumbs = [];
-    public array $topJs = [];
-    public array $bottomJs = [];
-    public array $topCss = [];
-    public array $bottomCss = [];
+    public string $title        = '';
+    public array $breadcrumbs   = [];
+    public array $topJs         = [];
+    public array $bottomJs      = [];
+    public array $topCss        = [];
+    public array $bottomCss     = [];
+    public array $params        = [];
 
     /**
      * @param string $title
@@ -28,6 +29,7 @@ class Layout {
      * @param string|null $url
      * @param bool|null $active
      * @return void
+     * @noinspection PhpUnused
      */
     public function addBreadCrumb(int|string $name, ?string $url = null, ?bool $active = null): void {
 
@@ -79,6 +81,42 @@ class Layout {
     public function addBottomJs(string $file): static {
         $this->bottomJs[] = $file;
         return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function addParam(string $key, mixed $value): void {
+        $this->params[$key] = $value;
+    }
+
+    /**
+     * @return array
+     * @noinspection PhpUnused
+     */
+    public function getParams(): array {
+        return $this->params;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed|null $default
+     * @return mixed
+     * @noinspection PhpUnused
+     */
+    public function getParam(string $key, mixed $default = null): mixed {
+        return $this->params[$key] ?? $default ?? null;
+    }
+
+    /**
+     * @param string $key
+     * @return bool
+     * @noinspection PhpUnused
+     */
+    public function existParam(string $key): bool {
+        return isset($this->params[$key]);
     }
 
 }
