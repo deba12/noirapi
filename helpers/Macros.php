@@ -208,11 +208,11 @@ class Macros extends Extension {
                 $active = %node;
 
                 if(count($active) === 1) {
-                    if($this->params[\'request\']->controller === $active[0]) {
+                    if($request->controller === $active[0]) {
                         echo \'active\';
                     }
                 } else {
-                    if($this->params[\'request\']->controller === $active[0] && $this->params[\'request\']->function === $active[1]) {
+                    if($request->controller === $active[0] && $request->function === $active[1]) {
                         echo \'active\';
                     }
                 }',
