@@ -180,7 +180,7 @@ class Macros extends Extension {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 if($layout->exists(\'bottom-js\')) {
-                    foreach($layout->get(\'bottom`-js\') as $js) {
+                    foreach($layout->get(\'bottom-js\') as $js) {
                         if(\str_starts_with($js, \'/\')) {
                             echo "<script type=\"text/javascript\" src=\"$js\"></script>" . PHP_EOL;
                         } else {
