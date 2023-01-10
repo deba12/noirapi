@@ -232,7 +232,6 @@ class View {
      * this is used by system panel
      * @noinspection GetSetMethodCorrectnessInspection
      */
-    #[ArrayShape(['params' => "array", 'extra_params' => "array", 'topCss' => "array", 'bottomCss' => "array", 'topJs' => "array", 'bottomJs' => "array"])]
     public function getParams(): array {
 
         return get_object_vars($this);
