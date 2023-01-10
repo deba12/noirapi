@@ -188,6 +188,33 @@ class View {
     }
 
     /**
+     * @param string $template
+     * @param string|null $controller
+     * @return bool
+     * @noinspection PhpUnused
+     */
+    public function templateExists(string $template, string $controller = null): bool {
+        if($controller === null) {
+            $controller = $this->request->controller;
+        }
+
+        $file = PATH_VIEWS . $controller . DIRECTORY_SEPARATOR . $template . self::latte_ext;
+
+        return is_readable($file);
+    }
+
+    /**
+     * @param string $layout
+     * @return bool
+     * @noinspection PhpUnused
+     */
+    public function layoutExists(string $layout): bool {
+        $file = PATH_LAYOUTS . $layout . self::latte_ext;
+
+        return is_readable($file);
+    }
+
+    /**
      * @param $param
      * @param $page
      * @return string
