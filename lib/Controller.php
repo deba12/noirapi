@@ -9,6 +9,7 @@ use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
 use noirapi\helpers\Utils;
+use noirapi\Tracy\PDOBarPanel;
 use Tracy\Debugger;
 
 class Controller {
@@ -42,6 +43,8 @@ class Controller {
         /**
          * @noinspection PhpUndefinedClassInspection
          * @noinspection RedundantSuppression
+         *
+         * Tracy debug bar
          */
         if($this->dev && class_exists(GitVersionPanel::class) && !isset(self::$panels[ 'git' ])) {
             self::$panels['git'] = true;
@@ -55,6 +58,25 @@ class Controller {
             } else {
                 $this->model = new Model();
             }
+        }
+
+        /**
+         * Tracy debug bar
+         */
+        if($this->dev && !empty($db)) {
+
+            foreach(Model::tracyGetPdo() as $driver => $pdo) {
+
+                if(!isset(self::$panels[$driver])) {
+                    self::$panels[$driver] = true;
+
+                    $panel = new PDOBarPanel($pdo);
+                    $panel->title = $driver;
+                    Debugger::getBar()->addPanel($panel);
+                }
+
+            }
+
         }
 
         $this->response = new Response();
