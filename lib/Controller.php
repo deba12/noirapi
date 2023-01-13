@@ -81,8 +81,6 @@ class Controller {
 
         $this->response = new Response();
 
-        new TracyExtras();
-
     }
 
     /**
