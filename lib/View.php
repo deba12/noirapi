@@ -11,8 +11,10 @@ use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
 use noirapi\lib\View\Layout;
+use noirapi\Tracy\SystemBarPanel;
 use RuntimeException;
 use stdClass;
+use Tracy\Debugger;
 use function count;
 
 class View {
@@ -70,6 +72,9 @@ class View {
         }
 
         BlueScreenPanel::initialize();
+
+        $panel = new SystemBarPanel($this->request, $this);
+        Debugger::getBar()->addPanel($panel);
 
         self::$uri = $request->uri;
 
