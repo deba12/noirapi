@@ -20,6 +20,9 @@ class Controller {
     public Response $response;
     /** @var View $view */
     public View $view;
+    public bool $dev;
+
+    public static $panels;
 
     /**
      * Controller constructor.
@@ -32,6 +35,7 @@ class Controller {
         $this->server = $server;
 
         $db = Config::get('db');
+        $this->dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
 
         if($db && empty($this->model)) {
             $model = 'app\\models\\' . self::getClassName(get_class($this));
