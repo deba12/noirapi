@@ -4,10 +4,12 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use JanDrabek\Tracy\GitVersionPanel;
 use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
 use noirapi\helpers\Utils;
+use Tracy\Debugger;
 
 class Controller {
 
@@ -36,6 +38,15 @@ class Controller {
 
         $db = Config::get('db');
         $this->dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
+
+        /**
+         * @noinspection PhpUndefinedClassInspection
+         * @noinspection RedundantSuppression
+         */
+        if($this->dev && class_exists(GitVersionPanel::class) && !isset(self::$panels[ 'git' ])) {
+            self::$panels['git'] = true;
+            Debugger::getBar()->addPanel(new GitVersionPanel());
+        }
 
         if($db && empty($this->model)) {
             $model = 'app\\models\\' . self::getClassName(get_class($this));
