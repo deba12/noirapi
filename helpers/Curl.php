@@ -4,10 +4,27 @@ declare(strict_types=1);
 namespace noirapi\helpers;
 
 use JsonException;
+use noirapi\lib\Controller;
+use noirapi\Tracy\CurlBarPanel;
+use Tracy\Debugger;
 
 class Curl extends \Curl\Curl {
 
     private static array $requests = [];
+
+    public function __construct() {
+
+        if(!isset(Controller::$panels['curl'])) {
+            Controller::$panels['curl'] = true;
+
+            $panel = new CurlBarPanel();
+            $panel->title = 'Curl';
+
+            Debugger::getBar()->addPanel($panel);
+        }
+
+
+    }
 
     public function exec($ch = null): mixed {
 
