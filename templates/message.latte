@@ -1,0 +1,30 @@
+{ifset $message}
+
+    <div class="container fixed-top text-center mt-4">
+
+        <div id="alert" class="alert alert-{$message->type|noescape} alert-dismissible fade show mt-4" role="alert">
+
+        {if $message->html}
+            {$message->message|nocheck|noescape}
+        {else}
+            {$message->message}
+        {/if}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+
+        </div>
+
+    </div>
+
+    <script>
+
+        {if $message->timeout_ms > 0}
+        setTimeout( function() {
+            let alertNode = document.querySelector('#alert')
+            let alert = bootstrap.Alert.getOrCreateInstance(alertNode)
+            alert.close()
+        }, {$message->timeout_ms});
+        {/if}
+
+    </script>
+
+{/ifset}

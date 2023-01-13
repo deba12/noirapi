@@ -23,6 +23,7 @@ class Macros extends Extension {
             'bottomJs'      => [$this, 'bottomJs'],
             'active'        => [$this, 'active'],
             'title'         => [$this, 'title'],
+            'message'       => [$this, 'message'],
         ];
     }
 
@@ -217,6 +218,25 @@ class Macros extends Extension {
                     }
                 }',
                 $res
+            )
+        );
+
+    }
+
+    public function message(Tag $tag) {
+
+        $file = ROOT . '/app/layouts/message.latte';
+
+        if(!is_readable($file)) {
+            $file = ROOT . '/noirapi/templates/message.latte';
+        }
+
+        return new AuxiliaryNode(
+            fn(PrintContext $context) => $context->format('
+                $this->createTemplate(\'%raw\', [
+                    \'message\' => $message ?? null
+                 ], \'include\')->renderToContentType(\'html\');',
+                $file
             )
         );
 

@@ -8,6 +8,7 @@ use JanDrabek\Tracy\GitVersionPanel;
 use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
+use noirapi\helpers\Session;
 use noirapi\helpers\Utils;
 use noirapi\Tracy\PDOBarPanel;
 use Tracy\Debugger;
@@ -138,14 +139,12 @@ class Controller {
      */
     public function message(string|Message $text, ?string $type = null): self {
 
-        if (isset($_SESSION['message'])) {
-            unset($_SESSION['message']);
-        }
+        Session::remove('message');
 
         if($text instanceof Message) {
-            $_SESSION['message'] = $text;
+            Session::set('message', null, $text);
         } else {
-            $_SESSION['message'] = Message::new($text, $type ?? 'danger');
+            Session::set('message', null, Message::new($text, $type ?? 'danger'));
         }
 
         return $this;
