@@ -223,7 +223,13 @@ class Macros extends Extension {
 
     }
 
-    public function message(Tag $tag) {
+    /**
+     * @param Tag $tag
+     * @return AuxiliaryNode
+     * @noinspection PhpUnusedParameterInspection
+     */
+    #[Pure(true)]
+    public function message(Tag $tag): AuxiliaryNode {
 
         $file = ROOT . '/app/layouts/message.latte';
 
