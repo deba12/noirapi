@@ -37,9 +37,10 @@ class View {
      * View constructor.
      * @param Request $request
      * @param response $response
+     * @param bool $dev
      * @throws FileNotFoundException
      */
-    public function __construct(Request $request, Response $response) {
+    public function __construct(Request $request, Response $response, bool $dev = false) {
 
         $this->request = $request;
         $this->response = $response;
@@ -71,10 +72,14 @@ class View {
             $this->setLayout($layout);
         }
 
-        BlueScreenPanel::initialize();
+        if($dev) {
 
-        $panel = new SystemBarPanel($this->request, $this);
-        Debugger::getBar()->addPanel($panel);
+            BlueScreenPanel::initialize();
+
+            $panel = new SystemBarPanel($this->request, $this);
+            Debugger::getBar()->addPanel($panel);
+
+        }
 
         self::$uri = $request->uri;
 
