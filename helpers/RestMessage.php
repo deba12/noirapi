@@ -4,14 +4,16 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
+use InvalidArgumentException;
 use JsonException;
 
 class RestMessage {
 
     private bool $status;
     private string $message;
+    private ?string $next;
 
-    public static function new(bool $status, string|object|array $message): RestMessage {
+    public static function new(bool $status, string|object|array $message, ?string $next = null): RestMessage {
 
         $static = new self();
 
@@ -23,8 +25,9 @@ class RestMessage {
 
             foreach($message as $key => $value) {
 
-                if($key === 'status' || $key === 'message') {
-                    throw new \InvalidArgumentException('Invalid key in message object: ' . $key);
+                /** @noinspection InArrayCanBeUsedInspection */
+                if($key === 'status' || $key === 'message' || $key === 'next') {
+                    throw new InvalidArgumentException('Invalid key in message object: ' . $key);
                 }
 
                 $static->$key = $value;
@@ -33,6 +36,7 @@ class RestMessage {
         }
 
         $static->status = $status;
+        $static->next = $next;
 
         return $static;
 
