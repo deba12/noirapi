@@ -23,6 +23,7 @@ class Curl extends \Curl\Curl {
             Debugger::getBar()->addPanel($panel);
         }
 
+        parent::__construct();
 
     }
 
