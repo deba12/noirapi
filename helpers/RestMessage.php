@@ -9,9 +9,9 @@ use JsonException;
 
 class RestMessage {
 
-    private bool $status;
-    private string $message;
-    private ?string $next;
+    public bool $status;
+    public string $message;
+    public ?string $next;
 
     public static function new(bool $status, string|object|array $message, ?string $next = null): RestMessage {
 
