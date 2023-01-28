@@ -47,7 +47,7 @@ class RestMessage {
      * @throws JsonException
      */
     public function toJson(): string {
-        return json_encode($this->message, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
+        return json_encode(get_object_vars($this), JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
     }
 
 }
