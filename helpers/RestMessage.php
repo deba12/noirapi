@@ -13,6 +13,8 @@ class RestMessage {
     public string $message;
     public ?string $next;
 
+    private array $params = [];
+
     public static function new(bool $status, string|object|array $message, ?string $next = null): RestMessage {
 
         $static = new self();
@@ -30,7 +32,12 @@ class RestMessage {
                     throw new InvalidArgumentException('Invalid key in message object: ' . $key);
                 }
 
-                $static->$key = $value;
+                if(property_exists($static, $key)) {
+                    $static->$key = $value;
+                } else {
+                    $static->params[$key] = $value;
+                }
+
             }
 
         }
@@ -47,7 +54,15 @@ class RestMessage {
      * @throws JsonException
      */
     public function toJson(): string {
-        return json_encode(get_object_vars($this), JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
+
+        $vars = [
+            'status'    => $this->status,
+            'message'   => $this->message,
+            'next'      => $this->next,
+        ];
+
+        return json_encode(array_merge($vars, $this->params), JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
+
     }
 
 }
