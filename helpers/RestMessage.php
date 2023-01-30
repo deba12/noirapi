@@ -55,11 +55,17 @@ class RestMessage {
      */
     public function toJson(): string {
 
-        $vars = [
-            'status'    => $this->status,
-            'message'   => $this->message,
-            'next'      => $this->next,
-        ];
+        $vars = [];
+
+        if(!empty($this->status)) {
+            $vars['status'] = $this->status;
+        }
+        if(!empty($this->message)) {
+            $vars['message'] = $this->message;
+        }
+        if(!empty($this->next)) {
+            $vars['next'] = $this->next;
+        }
 
         return json_encode(array_merge($vars, $this->params), JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
 
