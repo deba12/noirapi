@@ -74,4 +74,13 @@ class Layout {
         return isset($this->params[$key]);
     }
 
+    /**
+     * @param string $name
+     * @return mixed|null
+     * @noinspection MagicMethodsValidityInspection
+     */
+    public function __get(string $name) {
+        return $this->params[ $name ] ?? null;
+    }
+
 }
