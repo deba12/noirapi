@@ -9,12 +9,13 @@ namespace noirapi\lib;
 
 use JsonException;
 use LaLit\Array2XML;
+use noirapi\helpers\RestMessage;
 use RuntimeException;
 use function is_array;
 
 class Response {
 
-    private string|array $body = '';
+    private string|array|RestMessage $body = '';
     private int $status = 200;
     private string $contentType = self::TYPE_HTML;
     private array $headers = [];
@@ -60,6 +61,10 @@ class Response {
      * @noinspection PhpUndefinedClassInspection
      */
     public function getBody(): string {
+
+        if($this->body instanceof RestMessage) {
+            return $this->body->toJson();
+        }
 
         if($this->contentType === self::TYPE_HTML) {
             return $this->body;
@@ -108,6 +113,16 @@ class Response {
      */
     public function getRawBody(): array|string {
         return $this->body;
+    }
+
+    public function getRestMessage(): RestMessage {
+
+        if($this->body instanceof RestMessage) {
+            return $this->body;
+        }
+
+        throw new RuntimeException('Response body is not a RestMessage');
+
     }
 
     /**
