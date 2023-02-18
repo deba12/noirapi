@@ -10,11 +10,14 @@ class Layout {
     public array $params        = [];
 
     /**
-     * @param string $title
+     * @param string|null $title
      * @return $this
      * @noinspection PhpUnused
      */
-    public function setTitle(string $title): static {
+    public function setTitle(?string $title): static {
+        if(empty($title)) {
+            $title = '';
+        }
         $this->title = $title;
 
         return $this;
