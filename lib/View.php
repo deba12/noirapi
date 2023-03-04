@@ -100,6 +100,7 @@ class View {
 
         $layout = $this->layout_file ?? $this->template;
 
+        //TODO Fix this to use $this->server
         if(isset($_SERVER['HTTP_X_PJAX'])) {
             $layout = $params['view'];
         }
@@ -109,6 +110,7 @@ class View {
         $this->mergeParams($params);
 
         if(isset($_SESSION['message'])) {
+            //TODO Fix this to use Session handler
             $this->mergeParams(['message' => $_SESSION['message']]);
             unset($_SESSION['message']);
         }
@@ -298,6 +300,16 @@ class View {
             throw new RuntimeException("Duplicate key ain view params: $namespace");
         }
 
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public function addParam(string $key, mixed $value): void {
+        $this->params->$key = $value;
     }
 
 }
