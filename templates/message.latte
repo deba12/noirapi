@@ -15,16 +15,27 @@
 
     </div>
 
-    <script {nonce}>
+    {if $message->timeout_ms > 0}
 
-        {if $message->timeout_ms > 0}
-        setTimeout( function() {
+        <script {nonce}>
+
+            let should_close = true;
             let alertNode = document.querySelector('#alert')
             let alert = bootstrap.Alert.getOrCreateInstance(alertNode)
-            alert.close()
-        }, {$message->timeout_ms});
-        {/if}
+            alertNode.addEventListener('close.bs.alert', function() {
+                should_close = false;
+            })
 
-    </script>
+            setTimeout( function() {
+
+                if(should_close) {
+                    alert.close()
+                }
+
+            }, {$message->timeout_ms});
+
+        </script>
+
+    {/if}
 
 {/ifset}
