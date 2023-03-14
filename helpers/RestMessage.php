@@ -71,4 +71,29 @@ class RestMessage {
 
     }
 
+    /**
+     * @param string $name
+     * @return mixed|null
+     */
+    public function __get(string $name) {
+        return $this->params[$name] ?? null;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @return void
+     */
+    public function __set(string $name, mixed $value) {
+        $this->params[$name] = $value;
+    }
+
+    /**
+     * @param string $name
+     * @return bool
+     */
+    public function __isset(string $name): bool {
+        return !empty($this->params[$name]);
+    }
+
 }

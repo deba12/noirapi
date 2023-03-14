@@ -1,4 +1,8 @@
-<?php /** @noinspection UnknownInspectionInspection */
+<?php
+/**
+ * @noinspection HtmlUnknownAttribute
+ * @noinspection UnknownInspectionInspection
+ */
 declare(strict_types=1);
 
 namespace noirapi\helpers;
@@ -24,6 +28,7 @@ class Macros extends Extension {
             'active'        => [$this, 'active'],
             'title'         => [$this, 'title'],
             'message'       => [$this, 'message'],
+            'nonce'         => [$this, 'nonce'],
         ];
     }
 
@@ -118,8 +123,9 @@ class Macros extends Extension {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 if($layout->exists(\'top-css\')) {
+                    $nonce_inline = !empty($nonce) ? "nonce=\"$nonce\"" : "";
                     foreach($layout->get(\'top-css\') as $css) {
-                        echo \'<link rel="stylesheet" href="\' . $css . \'">\';
+                        echo \'<link rel="stylesheet" href="\' . $css . \'" $nonce_inline>\';
                     }
                 }'
             )
@@ -137,8 +143,9 @@ class Macros extends Extension {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 if($layout->exists(\'bottom-css\')) {
+                    $nonce_inline = !empty($nonce) ? "nonce=\"$nonce\"" : "";
                     foreach($layout->get(\'bottom-css\') as $css) {
-                        echo \'<link rel="stylesheet" href="\' . $css . \'">\';
+                        echo \'<link rel="stylesheet" href="\' . $css . \'" $nonce_inline>\';
                     }
                 }'
             )
@@ -157,11 +164,12 @@ class Macros extends Extension {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 if($layout->exists(\'top-js\')) {
+                    $nonce_inline = !empty($nonce) ? "nonce=\"$nonce\"" : "";
                     foreach($layout->get(\'top-js\') as $js) {
                         if(\str_starts_with($js, \'/\')) {
-                            echo "<script type=\"text/javascript\" src=\"$js\"></script>" . PHP_EOL;
+                            echo "<script type=\"text/javascript\" src=\"$js\" $nonce_inline></script>" . PHP_EOL;
                         } else {
-                            echo "<script type=\"text/javascript\">$js</script>" . PHP_EOL;
+                            echo "<script type=\"text/javascript\" $nonce_inline>$js</script>" . PHP_EOL;
                         }
                     }
                 }'
@@ -181,11 +189,12 @@ class Macros extends Extension {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 if($layout->exists(\'bottom-js\')) {
+                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
                     foreach($layout->get(\'bottom-js\') as $js) {
                         if(\str_starts_with($js, \'/\')) {
-                            echo "<script type=\"text/javascript\" src=\"$js\"></script>" . PHP_EOL;
+                            echo "<script type=\"text/javascript\" src=\"$js\" $nonce_inline></script>" . PHP_EOL;
                         } else {
-                            echo "<script type=\"text/javascript\">$js</script>" . PHP_EOL;
+                            echo "<script type=\"text/javascript\" $nonce>$js</script>" . PHP_EOL;
                         }
                     }
                 }'
@@ -246,6 +255,21 @@ class Macros extends Extension {
             )
         );
 
+    }
+
+    /**
+     * @param Tag $tag
+     * @return AuxiliaryNode
+     * @noinspection PhpUnusedParameterInspection
+     */
+    #[Pure]
+    public function nonce(Tag $tag): AuxiliaryNode {
+        return new AuxiliaryNode(
+            fn(PrintContext $context) => $context->format('
+                $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
+                echo $nonce_inline;
+            ')
+        );
     }
 
 }

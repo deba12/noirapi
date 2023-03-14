@@ -15,17 +15,12 @@ use Tracy\Debugger;
 
 class Controller {
 
-    /** @var Request $request */
     public Request $request;
-    /** @var array $server */
     public array $server;
     public $model;
-    /** @var Response $response */
     public Response $response;
-    /** @var View $view */
     public View $view;
     public bool $dev;
-
     public static $panels;
 
     /**

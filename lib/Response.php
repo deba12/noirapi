@@ -21,6 +21,8 @@ class Response {
     private array $headers = [];
     private array $cookies = [];
 
+    private array $headersCallback = [];
+
     public const TYPE_JSON  = 'application/json';
     public const TYPE_XML   = 'text/xml';
     public const TYPE_TEXT  = 'text/plain';
@@ -201,7 +203,18 @@ class Response {
      * @return array
      */
     public function getHeaders(): array {
-        return $this->headers;
+
+        $headers = array_merge([], $this->headers);
+
+        foreach($this->headersCallback as $callback) {
+            $res = $callback($this);
+            if(is_array($res)) {
+                $headers = array_merge($headers, $res);
+            }
+        }
+
+        return $headers;
+
     }
 
     /**
@@ -257,6 +270,11 @@ class Response {
      */
     public function getCookies(): array {
         return $this->cookies;
+    }
+
+    public function addHeadersCallback(callable $callback): Response {
+        $this->headersCallback[] = $callback;
+        return $this;
     }
 
     private function toCsv($data): bool|string {

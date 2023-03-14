@@ -1,5 +1,9 @@
 <?php
-/** @noinspection PhpMultipleClassDeclarationsInspection */
+/**
+ * @noinspection PhpUndefinedNamespaceInspection
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpMultipleClassDeclarationsInspection
+ */
 declare(strict_types = 1);
 
 namespace noirapi\lib;
@@ -58,6 +62,7 @@ class Route {
     /**
      * @param Server $server
      * @return void
+     * @noinspection PhpUndefinedClassInspection
      */
     public function setSwoole(Server $server): void {
         $this->request->swoole = $server;
