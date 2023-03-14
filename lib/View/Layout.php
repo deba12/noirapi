@@ -21,6 +21,17 @@ class Layout {
     }
 
     /**
+     * @param string $title
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function appendTitle(string $title): static {
+        $this->title .= $title;
+
+        return $this;
+    }
+
+    /**
      * @param int|string $name
      * @param string|null $url
      * @param bool|null $active
