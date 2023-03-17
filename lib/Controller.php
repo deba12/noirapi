@@ -1,4 +1,6 @@
-<?php
+<?php /** @noinspection PhpUndefinedNamespaceInspection */
+/** @noinspection PhpUndefinedClassInspection */
+/** @noinspection PhpParamsInspection */
 /** @noinspection PhpMissingFieldTypeInspection */
 declare(strict_types = 1);
 
@@ -8,10 +10,13 @@ use JanDrabek\Tracy\GitVersionPanel;
 use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
+use noirapi\helpers\RestMessage;
 use noirapi\helpers\Session;
 use noirapi\helpers\Utils;
 use noirapi\Tracy\PDOBarPanel;
 use Tracy\Debugger;
+use function get_class;
+use function in_array;
 
 class Controller {
 
@@ -187,6 +192,23 @@ class Controller {
         }
 
         return '/';
+
+    }
+
+    /**
+     * @param bool $status
+     * @param object|array|string $message
+     * @param string|null $next
+     * @return Response
+     */
+    public function restMessage(bool $status, object|array|string $message, ?string $next = null): Response {
+
+        return $this->response->setBody(RestMessage::new(
+                ok: $status,
+                message: $message instanceof Message ? $message->message : $message,
+                next: $next
+            )
+        );
 
     }
 

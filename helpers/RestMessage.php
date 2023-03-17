@@ -1,49 +1,46 @@
 <?php
-/** @noinspection PhpPropertyOnlyWrittenInspection */
 declare(strict_types=1);
 
 namespace noirapi\helpers;
 
 use InvalidArgumentException;
 use JsonException;
+use function in_array;
+use function is_array;
+use function is_object;
+use function is_string;
 
+/**
+ * @property string|null $message
+ * @property bool $ok
+ */
 class RestMessage {
-
-    public bool $status;
-    public string $message;
-    public ?string $next;
 
     private array $params = [];
 
-    public static function new(bool $status, string|object|array $message, ?string $next = null): RestMessage {
+    public static function new(bool $ok, string|object|array $message, string|null $next): RestMessage {
 
         $static = new self();
+        $static->params['ok'] = $ok;
+        $static->params['next'] = $next;
 
         if(is_string($message)) {
 
-            $static->message = $message;
+            $static->params['message'] = $message;
 
-        } elseif(is_object($message) || is_array($message)) {
+        } elseif(is_array($message) || is_object($message)) {
 
             foreach($message as $key => $value) {
 
-                /** @noinspection InArrayCanBeUsedInspection */
-                if($key === 'status' || $key === 'message' || $key === 'next') {
+                if(in_array($key, ['ok', 'message', 'next'], true)) {
                     throw new InvalidArgumentException('Invalid key in message object: ' . $key);
                 }
 
-                if(property_exists($static, $key)) {
-                    $static->$key = $value;
-                } else {
-                    $static->params[$key] = $value;
-                }
+                $static->params[$key] = $value;
 
             }
 
         }
-
-        $static->status = $status;
-        $static->next = $next;
 
         return $static;
 
@@ -55,19 +52,7 @@ class RestMessage {
      */
     public function toJson(): string {
 
-        $vars = [];
-
-        if(!empty($this->status)) {
-            $vars['status'] = $this->status;
-        }
-        if(!empty($this->message)) {
-            $vars['message'] = $this->message;
-        }
-        if(!empty($this->next)) {
-            $vars['next'] = $this->next;
-        }
-
-        return json_encode(array_merge($vars, $this->params), JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
+        return json_encode($this->params, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
 
     }
 
