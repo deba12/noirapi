@@ -10,6 +10,7 @@ use Latte\Engine;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\Macros;
+use noirapi\helpers\Session;
 use noirapi\lib\View\Layout;
 use noirapi\Tracy\SystemBarPanel;
 use RuntimeException;
@@ -66,10 +67,12 @@ class View {
             $this->latte->addExtension(new \app\lib\Macros());
         }
 
-        $layout = Config::get('layout');
+        $this->layout = new Layout();
 
-        if($layout) {
-            $this->setLayout($layout);
+        $layout_file = Config::get('layout');
+
+        if($layout_file) {
+            $this->setLayout($layout_file);
         }
 
         if($dev) {
@@ -83,7 +86,6 @@ class View {
 
         self::$uri = $request->uri;
 
-        $this->layout = new Layout();
 
     }
 
@@ -109,10 +111,11 @@ class View {
 
         $this->mergeParams($params);
 
-        if(isset($_SESSION['message'])) {
-            //TODO Fix this to use Session handler
-            $this->mergeParams(['message' => $_SESSION['message']]);
-            unset($_SESSION['message']);
+        $message = Session::get('message');
+
+        if(!empty($message)) {
+            $this->mergeParams(['message' => $message]);
+            Session::remove('message');
         }
 
         $this->mergeParams([
@@ -180,7 +183,6 @@ class View {
      * @return View
      * @throws FileNotFoundException
      * @noinspection PhpUnused
-     * @noinspection GetSetMethodCorrectnessInspection
      */
     public function setLayout(?string $layout_file = null): View {
         if($layout_file === null) {
@@ -192,6 +194,7 @@ class View {
 
         if(is_readable($file)) {
             $this->layout_file = $file;
+            $this->layout->setName($layout_file);
             return $this;
         }
 
@@ -269,7 +272,6 @@ class View {
      * @noinspection PhpUnused
      *
      * this is used by system panel
-     * @noinspection GetSetMethodCorrectnessInspection
      */
     public function getParams(): array {
 

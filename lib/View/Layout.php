@@ -5,9 +5,14 @@ namespace noirapi\lib\View;
 
 class Layout {
 
+    public string $name         = '';
     public string $title        = '';
     public array $breadcrumbs   = [];
     public array $params        = [];
+
+    public function setName(string $name): void {
+        $this->name = $name;
+    }
 
     /**
      * @param string|null $title
