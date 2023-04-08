@@ -111,9 +111,9 @@ class Response {
     }
 
     /**
-     * @return array|string
+     * @return string|array|\RestMessage
      */
-    public function getRawBody(): array|string {
+    public function getRawBody(): string|array|\RestMessage {
         return $this->body;
     }
 
