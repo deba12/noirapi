@@ -57,6 +57,13 @@ class Url implements Schema {
             return false;
         }
 
+        /** @noinspection HttpUrlsUsage */
+        if(!str_starts_with($value, 'http://') && !str_starts_with($value, 'https://')) {
+            /** @noinspection UnusedFunctionResultInspection */
+            $context->addError("The option %path% requires valid http(s):// url scheme", Message::PATTERN_MISMATCH);
+            return false;
+        }
+
         /** @noinspection BypassedUrlValidationInspection */
         $ret = filter_var($value, FILTER_VALIDATE_URL);
 
