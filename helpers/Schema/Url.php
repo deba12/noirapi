@@ -16,24 +16,34 @@ use Nette\Schema\Schema;
 
 class Url implements Schema {
 
-    /** @var bool */
-    private $required = false;
+    private bool $required = false;
+    private bool $nullable = false;
 
-    /** @var bool */
-    private $nullable = false;
-
+    /**
+     * @param bool $state
+     * @return $this
+     */
     public function required(bool $state = true): self
     {
         $this->required = $state;
         return $this;
     }
 
+    /**
+     * @param bool $state
+     * @return $this
+     */
     public function nullable(bool $state = true): self
     {
         $this->nullable = $state;
         return $this;
     }
 
+    /**
+     * @param $value
+     * @param Context $context
+     * @return false|mixed|null
+     */
     public function normalize($value, Context $context)
     {
 
@@ -42,6 +52,7 @@ class Url implements Schema {
         }
 
         if(!$this->nullable && empty($value)) {
+            /** @noinspection UnusedFunctionResultInspection */
             $context->addError("The option %path% requires valid url address", Message::PATTERN_MISMATCH);
             return false;
         }
@@ -50,6 +61,7 @@ class Url implements Schema {
         $ret = filter_var($value, FILTER_VALIDATE_URL);
 
         if($ret === false) {
+            /** @noinspection UnusedFunctionResultInspection */
             $context->addError("The option %path% requires valid url address", Message::PATTERN_MISMATCH);
             return false;
         }
@@ -58,11 +70,21 @@ class Url implements Schema {
 
     }
 
+    /**
+     * @param $value
+     * @param $base
+     * @return mixed
+     */
     public function merge($value, $base)
     {
         return $value;
     }
 
+    /**
+     * @param $value
+     * @param Context $context
+     * @return mixed
+     */
     public function complete($value, Context $context)
     {
         return $value;
