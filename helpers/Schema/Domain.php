@@ -15,11 +15,8 @@ use Nette\Schema\Schema;
 
 class Domain implements Schema {
 
-    /** @var bool */
-    private $wildcard = false;
-
-    /** @var bool */
-    private $required;
+    private bool $wildcard = false;
+    private bool $required;
 
     /**
      * @param bool $required
@@ -68,17 +65,28 @@ class Domain implements Schema {
 
     }
 
-    public function merge($value, $base)
-    {
+    /**
+     * @param $value
+     * @param $base
+     * @return mixed
+     */
+    public function merge($value, $base): mixed {
         return $value;
     }
 
-    public function complete($value, Context $context)
-    {
+    /**
+     * @param $value
+     * @param Context $context
+     * @return mixed
+     */
+    public function complete($value, Context $context): mixed {
         return $value;
     }
 
-    /** @noinspection ReturnTypeCanBeDeclaredInspection */
+    /**
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     * @noinspection PhpMissingReturnTypeInspection
+     */
     public function completeDefault(Context $context)
     {
         if ($this->required) {
