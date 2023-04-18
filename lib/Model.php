@@ -131,11 +131,11 @@ class Model {
     /**
      * @param int $itemCount
      * @param int $itemsPerPage
-     * @param null $page
+     * @param int|null $page
      * @return Paginator
      * @noinspection PhpUnused
      */
-    public function paginator(int $itemCount, int $itemsPerPage = 20, $page = null): Paginator {
+    public function paginator(int $itemCount, int $itemsPerPage = 20, ?int $page = null): Paginator {
 
         if(!class_exists(Paginator::class)) {
             throw new RuntimeException('Unable to find nette/paginator');
@@ -145,7 +145,7 @@ class Model {
         $paginator->setItemCount($itemCount);
         $paginator->setItemsPerPage($itemsPerPage);
         if($page !== null) {
-            $paginator->setPage((int)$page);
+            $paginator->setPage($page);
         }
 
         return $paginator;
