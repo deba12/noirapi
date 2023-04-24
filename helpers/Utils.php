@@ -44,6 +44,19 @@ class Utils {
     }
 
     /**
+     * @param bool $long
+     * @return string
+     * @throws Exception
+     */
+    public static function generateKey(bool $long = true): string {
+
+        $algo = $long ? 'sha256' : 'sha1';
+
+        return hash($algo, random_bytes(64));
+
+    }
+
+    /**
      * @param int $min
      * @param int $max
      * @return float
