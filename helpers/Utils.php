@@ -12,6 +12,7 @@ use function array_splice;
 use function bin2hex;
 use function chr;
 use function count;
+use function defined;
 use function get_class;
 use function is_object;
 use function is_string;
@@ -170,6 +171,7 @@ class Utils {
     /**
      * @param string $string
      * @return string
+     * @noinspection SpellCheckingInspection
      */
     public static function mb_ucfirst(string $string): string {
 
