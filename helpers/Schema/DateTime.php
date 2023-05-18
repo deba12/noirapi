@@ -11,10 +11,10 @@ namespace noirapi\helpers\Schema;
 
 use DateTimeImmutable;
 use DateTimeZone;
+use Exception;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
-use function get_class;
 use function gettype;
 use function is_string;
 
@@ -26,7 +26,12 @@ class DateTime implements Schema {
     protected ?DateTimeZone $timeZone;
     protected string $output_format;
 
-    public function __construct($format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null) {
+    /**
+     * @param string $format
+     * @param DateTimeZone|null $timeZone
+     * @throws Exception
+     */
+    public function __construct(string $format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null) {
         $this->format = $format;
         $this->timeZone = $timeZone ?? new DateTimeZone(date_default_timezone_get());
     }
@@ -95,7 +100,10 @@ class DateTime implements Schema {
         return $value;
     }
 
-    /** @noinspection ReturnTypeCanBeDeclaredInspection */
+    /**
+     * @noinspection ReturnTypeCanBeDeclaredInspection
+     * @noinspection PhpMissingReturnTypeInspection
+     */
     public function completeDefault(Context $context) {
         if ($this->required) {
             $context->addError('The mandatory option %path% is missing.', Message::MISSING_ITEM);

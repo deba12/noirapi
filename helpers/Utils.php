@@ -12,6 +12,7 @@ use function array_splice;
 use function bin2hex;
 use function chr;
 use function count;
+use function defined;
 use function get_class;
 use function is_object;
 use function is_string;
@@ -40,6 +41,19 @@ class Utils {
         }
 
         return $res;
+    }
+
+    /**
+     * @param bool $long
+     * @return string
+     * @throws Exception
+     */
+    public static function generateKey(bool $long = true): string {
+
+        $algo = $long ? 'sha256' : 'sha1';
+
+        return hash($algo, random_bytes(64));
+
     }
 
     /**
@@ -170,6 +184,7 @@ class Utils {
     /**
      * @param string $string
      * @return string
+     * @noinspection SpellCheckingInspection
      */
     public static function mb_ucfirst(string $string): string {
 
