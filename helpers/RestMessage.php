@@ -35,7 +35,7 @@ class RestMessage {
 
             foreach($message as $key => $value) {
 
-                if(in_array($key, ['ok', 'message', 'next'], true)) {
+                if(in_array($key, ['ok', 'message', 'next', 'message_tag'], true)) {
                     throw new InvalidArgumentException('Invalid key in message object: ' . $key);
                 }
 
