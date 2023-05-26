@@ -199,14 +199,16 @@ class Controller {
      * @param bool $status
      * @param object|array|string $message
      * @param string|null $next
+     * @param string|null $message_tag
      * @return Response
      */
-    public function restMessage(bool $status, object|array|string $message, ?string $next = null): Response {
+    public function restMessage(bool $status, object|array|string $message, ?string $next = null, ?string $message_tag = null): Response {
 
         return $this->response->setBody(RestMessage::new(
                 ok: $status,
                 message: $message instanceof Message ? $message->message : $message,
-                next: $next
+                next: $next,
+                message_tag: $message_tag
             )
         );
 

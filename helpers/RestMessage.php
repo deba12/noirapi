@@ -11,18 +11,21 @@ use function is_object;
 use function is_string;
 
 /**
- * @property string|null $message
  * @property bool $ok
+ * @property string|object|array $message
+ * @property string|null $next
+ * @property string|null $message_tag
  */
 class RestMessage {
 
     private array $params = [];
 
-    public static function new(bool $ok, string|object|array $message, string|null $next): RestMessage {
+    public static function new(bool $ok, string|object|array $message, string|null $next, string|null $message_tag): RestMessage {
 
         $static = new self();
         $static->params['ok'] = $ok;
         $static->params['next'] = $next;
+        $static->params['message_tag'] = $message_tag;
 
         if(is_string($message)) {
 
