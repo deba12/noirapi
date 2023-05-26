@@ -82,6 +82,11 @@ class Controller {
 
         $this->response = new Response();
 
+        // We need this when we are moving across domains
+        if(isset($this->request->get['message'], $this->request->get[ 'type' ])) {
+            $this->message($this->request->get['message'], $this->request->get['type']);
+        }
+
     }
 
     /**
