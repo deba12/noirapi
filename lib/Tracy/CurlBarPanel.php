@@ -5,6 +5,7 @@ namespace noirapi\Tracy;
 
 use Exception;
 use noirapi\helpers\Curl;
+use Tracy\Debugger;
 use Tracy\IBarPanel;
 
 /**
@@ -147,8 +148,15 @@ class CurlBarPanel implements IBarPanel {
         }
         $html .= '</div>';
 
-        $html .= <<<'EOT'
-<script>
+		// Works only with custom Tracy version
+		if(isset(Debugger::$nonce)) {
+			$nonce = 'nonce-' . Debugger::$nonce;
+		} else {
+			$nonce = '';
+		}
+
+        $html .= <<<EOT
+<script $nonce>
     function toggle(id) {
         let e = document.getElementById(id);
         if (e.style.display === 'block') {
