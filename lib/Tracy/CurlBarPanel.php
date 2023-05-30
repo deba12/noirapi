@@ -113,7 +113,7 @@ class CurlBarPanel implements IBarPanel {
                     $html .= gettype($request['request']);
                     $html .= '</td>';
                     $html .= '<td>';
-                    $html .= '<a href="#" onclick="toggle(\'tracy-curl-request-' . $this->rnd . '\');">Request...</a>' . PHP_EOL;
+                    $html .= '<a href="#" id="tracy-curl-request-' . $this->rnd . '-click">Request...</a>' . PHP_EOL;
                     $html .= '<pre id="tracy-curl-request-' . $this->rnd . '" style="display:none">';
                     if(is_array($request['request'])) {
                         $html .= print_r($request[ 'request' ], true);
@@ -130,7 +130,7 @@ class CurlBarPanel implements IBarPanel {
                 $html .= gettype($request['response']);
                 $html .= '</td>';
                 $html .= '<td>';
-                $html .= '<a href="#" onclick="toggle(\'tracy-curl-response-' . $this->rnd . '\');">Response...</a>' . PHP_EOL;
+                $html .= '<a href="#" id="tracy-curl-response-' . $this->rnd .'-click">Response...</a>' . PHP_EOL;
                 $html .= '<pre id="tracy-curl-response-' . $this->rnd . '" style="display:none">';
                 if(is_object($request['response'])) {
                     $html .= print_r($request[ 'response' ], true);
@@ -157,6 +157,17 @@ class CurlBarPanel implements IBarPanel {
 
         $html .= <<<EOT
 <script $nonce>
+
+	let request = document.getElementById("tracy-curl-request-$this->rnd-click");
+	request.addEventListener("click",function(e){
+		toggle("tracy-curl-request-$this->rnd");
+	},false);
+
+	let response = document.getElementById("tracy-curl-response-$this->rnd-click");
+	request.addEventListener("click",function(e){
+		toggle("tracy-curl-response-$this->rnd");
+	},false);
+
     function toggle(id) {
         let e = document.getElementById(id);
         if (e.style.display === 'block') {
@@ -165,9 +176,9 @@ class CurlBarPanel implements IBarPanel {
             e.style.display = 'block';
         }
     }
+
 </script>
 EOT;
-
 
         return $html;
 
