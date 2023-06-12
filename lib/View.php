@@ -179,6 +179,15 @@ class View {
     }
 
     /**
+     * @return $this
+     * @noinspection PhpUnused
+     */
+    public function noLayout(): View {
+        $this->layout_file = null;
+        return $this;
+    }
+
+    /**
      * @param string|null $layout_file
      * @return View
      * @throws FileNotFoundException

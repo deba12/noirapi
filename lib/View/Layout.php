@@ -94,12 +94,48 @@ class Layout {
     }
 
     /**
+     * @param string $js
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public function addTopJS(string $js): void {
+        $this->params['top-js'][] = $js;
+    }
+
+    /**
+     * @param string $js
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public function addBottomJS(string $js): void {
+        $this->params['bottom-js'][] = $js;
+    }
+
+    /**
+     * @param string $css
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public function addTopCss(string $css): void {
+        $this->params['top-css'][] = $css;
+    }
+
+    /**
+     * @param string $css
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public function addBottomCss(string $css): void {
+        $this->params['bottom-css'][] = $css;
+    }
+
+    /**
      * @param string $name
      * @return mixed|null
      * @noinspection MagicMethodsValidityInspection
      */
     public function __get(string $name) {
-        return $this->params[ $name ] ?? null;
+        return $this->params[$name] ?? null;
     }
 
 }

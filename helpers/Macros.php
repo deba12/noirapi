@@ -123,9 +123,9 @@ class Macros extends Extension {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 if($layout->exists(\'top-css\')) {
-                    $nonce_inline = !empty($nonce) ? "nonce=\"$nonce\"" : "";
+                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
                     foreach($layout->get(\'top-css\') as $css) {
-                        echo \'<link rel="stylesheet" href="\' . $css . \'" $nonce_inline>\';
+                        echo "<link rel=\"stylesheet\" href=\"$css\"$nonce_inline>" . PHP_EOL;
                     }
                 }'
             )
@@ -143,9 +143,9 @@ class Macros extends Extension {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 if($layout->exists(\'bottom-css\')) {
-                    $nonce_inline = !empty($nonce) ? "nonce=\"$nonce\"" : "";
+                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
                     foreach($layout->get(\'bottom-css\') as $css) {
-                        echo \'<link rel="stylesheet" href="\' . $css . \'" $nonce_inline>\';
+                        echo "<link rel=\"stylesheet\" href=\"$css\"$nonce_inline>" . PHP_EOL;
                     }
                 }'
             )
@@ -164,12 +164,12 @@ class Macros extends Extension {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 if($layout->exists(\'top-js\')) {
-                    $nonce_inline = !empty($nonce) ? "nonce=\"$nonce\"" : "";
+                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
                     foreach($layout->get(\'top-js\') as $js) {
                         if(\str_starts_with($js, \'/\')) {
-                            echo "<script type=\"text/javascript\" src=\"$js\" $nonce_inline></script>" . PHP_EOL;
+                            echo "<script type=\"text/javascript\" src=\"$js\"$nonce_inline></script>" . PHP_EOL;
                         } else {
-                            echo "<script type=\"text/javascript\" $nonce_inline>$js</script>" . PHP_EOL;
+                            echo "<script type=\"text/javascript\"$nonce_inline>$js</script>" . PHP_EOL;
                         }
                     }
                 }'
