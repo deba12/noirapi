@@ -18,6 +18,7 @@ class Url implements Schema {
 
     private bool $required = false;
     private bool $nullable = false;
+    private bool $https = false;
 
     /**
      * @param bool $state
@@ -39,10 +40,17 @@ class Url implements Schema {
         return $this;
     }
 
+    public function require_https(bool $state = true): self
+    {
+        $this->https = $state;
+        return $this;
+    }
+
     /**
      * @param $value
      * @param Context $context
      * @return false|mixed|null
+     * @noinspection HttpUrlsUsage
      */
     public function normalize($value, Context $context)
     {
@@ -57,12 +65,20 @@ class Url implements Schema {
             return false;
         }
 
-        /** @noinspection HttpUrlsUsage */
-        if(!str_starts_with($value, 'http://') && !str_starts_with($value, 'https://')) {
+        if($this->https) {
+
+            if(!str_starts_with($value, 'https://')) {
+                /** @noinspection UnusedFunctionResultInspection */
+                $context->addError("The option %path% requires valid https:// url scheme", Message::TYPE_MISMATCH);
+                return false;
+            }
+
+        } else if(!str_starts_with($value, 'http://') && !str_starts_with($value, 'https://')) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError("The option %path% requires valid http(s):// url scheme", Message::PATTERN_MISMATCH);
             return false;
         }
+
 
         /** @noinspection BypassedUrlValidationInspection */
         $ret = filter_var($value, FILTER_VALIDATE_URL);
