@@ -79,13 +79,12 @@ class View {
 
             BlueScreenPanel::initialize();
 
-            $panel = new SystemBarPanel($this->request, $this);
+            $panel = new SystemBarPanel($this);
             Debugger::getBar()->addPanel($panel);
 
         }
 
         self::$uri = $request->uri;
-
 
     }
 

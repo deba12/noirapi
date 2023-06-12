@@ -1,8 +1,8 @@
 <?php
+declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
-use noirapi\lib\Request;
 use noirapi\lib\View;
 use Tracy\IBarPanel;
 
@@ -22,12 +22,10 @@ class SystemBarPanel implements IBarPanel {
     public string $value_attributes = 'style="font-weight:bold;color:#555;font-family:Courier New;font-size:1.1em"';
     public string $value_mod_attributes = 'style="font-weight:bold;color:#A52A2A;font-family:Courier New;font-size:1.1em"';
 
-    private Request $request;
     private View $view;
 
-    public function __construct(Request $request, View $view) {
+    public function __construct(View $view) {
 
-        $this->request = $request;
         $this->view = $view;
 
     }
@@ -39,7 +37,7 @@ class SystemBarPanel implements IBarPanel {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
         $view = $this->view->getRenderInfo();
-        $html .= $this->request->method . ' [ ' . $this->request->controller . '=>' . $this->request->function . ' ] || [ ' . $view['layout_file'] . '->' . $view['view'] . ' ]';
+        $html .= $this->view->request->method . ' [ ' . $this->view->request->controller . '=>' . $this->view->request->function . ' ] || [ ' . $view['layout_file'] . '->' . $view['view'] . ' ]';
 
         return $html;
 
@@ -51,9 +49,9 @@ class SystemBarPanel implements IBarPanel {
         $html .= '<div class="tracy-inner tracy-InfoPanel" style="width: 600px;">';
         $html .= $this->cell([
             'System' => [
-                'Method'        => $this->request->method,
-                'Controller'    => $this->request->controller,
-                'Function'      => $this->request->function,
+                'Method'        => $this->view->request->method,
+                'Controller'    => $this->view->request->controller,
+                'Function'      => $this->view->request->function,
             ]
         ]);
 
