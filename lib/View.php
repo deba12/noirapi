@@ -102,8 +102,7 @@ class View {
 
         $layout = $this->layout_file ?? $this->template;
 
-        //TODO Fix this to use $this->server
-        if(isset($_SERVER['HTTP_X_PJAX'])) {
+        if($this->request->ajax) {
             $layout = $params['view'];
         }
 
