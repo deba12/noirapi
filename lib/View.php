@@ -102,7 +102,7 @@ class View {
         $layout = $this->layout_file ?? $this->template;
 
         if($this->request->ajax) {
-            $layout = $params['view'];
+            $layout = $this->template;
         }
 
         $this->mergeParams($this->request, 'request');
