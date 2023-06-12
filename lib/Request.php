@@ -130,17 +130,14 @@ class Request {
 
     private static function is_ajax(array $server): bool {
 
-        if(isset($server['HTTP_X_REQUESTED_WITH']) && strtolower($server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
-            return true;
-        }
-
-        return false;
+        return isset($server[ 'HTTP_X_REQUESTED_WITH' ]) && strtolower($server[ 'HTTP_X_REQUESTED_WITH' ]) === 'xmlhttprequest';
 
     }
 
     /**
      * @param bool $https
      * @return $this
+     * @noinspection PhpUnused
      */
     public function setHttps(bool $https): static {
         $this->https = $https;

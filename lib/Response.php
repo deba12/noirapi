@@ -209,6 +209,7 @@ class Response {
         foreach($this->headersCallback as $callback) {
             $res = $callback($this);
             if(is_array($res)) {
+                /** @noinspection SlowArrayOperationsInLoopInspection */
                 $headers = array_merge($headers, $res);
             }
         }
