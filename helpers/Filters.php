@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 namespace noirapi\helpers;
+use JsonException;
 use noirapi\Exceptions\FilterNotFoundException;
 
 class Filters {
@@ -81,4 +82,12 @@ class Filters {
         return base64_encode($data);
     }
 
+    /**
+     * @param object|array $data
+     * @return string
+     * @throws JsonException
+     */
+    public static function json_prettify(object|array $data): string {
+        return json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+    }
 }
