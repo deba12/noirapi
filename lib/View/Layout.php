@@ -48,7 +48,9 @@ class Layout {
      */
     public function addBreadCrumb(int|string $name, ?string $url = null, ?bool $active = null): void {
 
-        $this->breadcrumbs[] = [
+        $key = md5($name);
+
+        $this->breadcrumbs[$key] = [
             'name'      => (string)$name,
             'url'       => $url,
             'active'    => $active
