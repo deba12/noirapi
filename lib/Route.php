@@ -14,6 +14,7 @@ use noirapi\Config;
 use noirapi\Exceptions\InternalServerError;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
+use noirapi\Exceptions\NotFoundException;
 use noirapi\Exceptions\RestException;
 use Swoole\Http\Server;
 use function call_user_func_array;
@@ -148,9 +149,10 @@ class Route {
                         ->setBody($exception->getMessage());
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (InternalServerError $exception) {
-                    $response = new Response();
-                    $response->withStatus(500)
-                        ->setBody($exception->getMessage() ?? 'Internal server error');
+                    $response = self::handleErrors(500, $exception->getMessage() ?? 'Internal server error');
+                }
+                catch (NotFoundException $exception) {
+                    $response = self::handleErrors(404, $exception->getMessage() ?? '404 Not found');
                 }
 
                 break;
@@ -211,10 +213,10 @@ class Route {
 
         $function = 'e' . $error;
 
-        if(class_exists('app\\controllers\\error')) {
+        if(class_exists(app\controllers\errors::class)) {
             /** @noinspection PhpUndefinedNamespaceInspection */
             /** @noinspection PhpUndefinedClassInspection */
-            $response = (new app\controllers\error())->$function();
+            $response = (new app\controllers\errors())->$function();
         } else {
             $response = new Response();
             $response->setBody($defaultText);
