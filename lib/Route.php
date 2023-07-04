@@ -92,12 +92,12 @@ class Route {
 
             case Dispatcher::NOT_FOUND:
 
-                $response = self::handleErrors(404, '404 Not found');
+                $response = $this->handleErrors(404, '404 Not found');
                 break;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
 
-                $response = self::handleErrors(405, '405 Method not allowed');
+                $response = $this->handleErrors(405, '405 Method not allowed');
                 break;
 
             case Dispatcher::FOUND:
@@ -149,17 +149,17 @@ class Route {
                         ->setBody($exception->getMessage());
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (InternalServerError $exception) {
-                    $response = self::handleErrors(500, $exception->getMessage() ?? 'Internal server error');
-                }
+                    $response = $this->handleErrors(500, $exception->getMessage() ?? 'Internal server error');
+                } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (NotFoundException $exception) {
-                    $response = self::handleErrors(404, $exception->getMessage() ?? '404 Not found');
+                    $response = $this->handleErrors(404, $exception->getMessage() ?? '404 Not found');
                 }
 
                 break;
 
             default:
 
-                $response = self::handleErrors(500, 'Internal server error');
+                $response = $this->handleErrors(500, 'Internal server error');
 
         }
 
@@ -209,14 +209,20 @@ class Route {
 
     }
 
-    public static function handleErrors(int $error, string $defaultText): Response {
+    /**
+     * @param int $error
+     * @param string $defaultText
+     * @return Response
+     * @noinspection PhpFullyQualifiedNameUsageInspection
+     */
+    private function handleErrors(int $error, string $defaultText): Response {
 
         $function = 'e' . $error;
 
-        if(class_exists(app\controllers\errors::class)) {
+        if(class_exists(\app\controllers\errors::class)) {
             /** @noinspection PhpUndefinedNamespaceInspection */
             /** @noinspection PhpUndefinedClassInspection */
-            $response = (new app\controllers\errors())->$function();
+            $response = (new \app\controllers\errors($this->request, $this->server))->$function();
         } else {
             $response = new Response();
             $response->setBody($defaultText);
