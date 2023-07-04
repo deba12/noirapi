@@ -11,6 +11,7 @@ namespace noirapi\lib;
 use FastRoute\Dispatcher;
 use JsonException;
 use noirapi\Config;
+use noirapi\Exceptions\FileNotFoundException;
 use noirapi\Exceptions\InternalServerError;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
@@ -214,14 +215,15 @@ class Route {
      * @param string $defaultText
      * @return Response
      * @noinspection PhpFullyQualifiedNameUsageInspection
+     * @throws FileNotFoundException
      */
     private function handleErrors(int $error, string $defaultText): Response {
 
         $function = 'e' . $error;
 
-        if(class_exists(\app\controllers\errors::class)) {
-            /** @noinspection PhpUndefinedNamespaceInspection */
-            /** @noinspection PhpUndefinedClassInspection */
+        if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
+            $this->request->controller = 'errors';
+            $this->request->function = $function;
             $response = (new \app\controllers\errors($this->request, $this->server))->$function();
         } else {
             $response = new Response();
