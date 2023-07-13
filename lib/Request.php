@@ -24,6 +24,7 @@ class Request {
     public bool $https;
     public bool $ajax;
     public $swoole = null;
+    public string $host;
 
     /**
      * @param array $server
@@ -38,12 +39,13 @@ class Request {
         $static = new static();
 
         $static->globalsRequestHeaders($server);
-        $static->method    = $server['REQUEST_METHOD'];
-        $static->uri       = $server['REQUEST_URI'];
-        $static->get       = $get;
-        $static->post      = $post;
-        $static->files     = $files;
-        $static->cookies   = $cookies;
+        $static->host       = $server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? '';
+        $static->method     = $server['REQUEST_METHOD'];
+        $static->uri        = $server['REQUEST_URI'];
+        $static->get        = $get;
+        $static->post       = $post;
+        $static->files      = $files;
+        $static->cookies    = $cookies;
 
         $static->https = self::is_https($server);
         $static->ajax = self::is_ajax($server);
