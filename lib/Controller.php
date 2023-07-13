@@ -166,11 +166,15 @@ class Controller {
         if(isset($this->server['HTTP_REFERER'])) {
 
             $url = str_replace('@', '', $this->server['HTTP_REFERER']);
-            $url = filter_var($url, FILTER_SANITIZE_URL);
-            $url = parse_url(preg_replace('/\s+/', '', $url));
+            $orig_url = filter_var($url, FILTER_SANITIZE_URL);
+            $url = parse_url(preg_replace('/\s+/', '', $orig_url));
 
             if(!$url) {
                 return '/';
+            }
+
+            if(!isset($url['host'])) {
+                return $orig_url;
             }
 
             if($same_domain && $url['host'] !== $this->server['HTTP_HOST']) {
