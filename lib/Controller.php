@@ -104,10 +104,14 @@ class Controller {
      * @throws UnableToForwardException
      * @noinspection PhpUnused
      */
-    public function forward(string $location, int $status = 302): Response {
+    public function forward(?string $location = null, int $status = 302): Response {
 
         if($status !== 302 && $status !== 301) {
             throw new UnableToForwardException('Unable to forward with status code: ' . $status);
+        }
+
+        if(empty($location)) {
+            $location = $this->referer();
         }
 
         return $this->response->withStatus($status)->withLocation($location);
