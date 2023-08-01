@@ -100,7 +100,11 @@ class Utils {
         proc_close(proc_open( "$cmd &", [], $pipes ));
     }
 
-    public static function returnNull($object) {
+    /**
+     * @param mixed $object
+     * @return mixed|null
+     */
+    public static function returnNull(mixed $object): mixed {
 
         if(empty($object)) {
             return null;
