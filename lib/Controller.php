@@ -53,7 +53,7 @@ class Controller {
         }
 
         if($db && empty($this->model)) {
-            $model = 'app\\models\\' . self::getClassName(get_class($this));
+            $model = 'app\\models\\' . Utils::getClassName(get_class($this));
             if(class_exists($model)) {
                 $this->model = new $model();
             } else {
@@ -90,19 +90,10 @@ class Controller {
     }
 
     /**
-     * @param string $class
-     * @return string
-     */
-    public static function getClassName(string $class):string {
-        return Utils::getClassName($class);
-    }
-
-    /**
-     * @param string $location
+     * @param string|null $location
      * @param int $status
      * @return Response
      * @throws UnableToForwardException
-     * @noinspection PhpUnused
      */
     public function forward(?string $location = null, int $status = 302): Response {
 
@@ -214,6 +205,7 @@ class Controller {
      * @param string|null $next
      * @param string|null $message_tag
      * @return Response
+     * @noinspection PhpUnused
      */
     public function restMessage(bool $status, object|array|string $message, ?string $next = null, ?string $message_tag = null): Response {
 
