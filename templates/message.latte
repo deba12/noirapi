@@ -1,3 +1,4 @@
+{varType noirapi\helpers\Message $message}
 {ifset $message}
 
     <div class="container fixed-top text-center mt-4">
@@ -15,27 +16,37 @@
 
     </div>
 
-    {if $message->timeout_ms > 0}
+    <!--suppress JSUnusedAssignment, JSUnresolvedReference -->
+    <script>
 
-        <script {nonce}>
+        {if $message->timeout_ms > 0}
 
-            let should_close = true;
-            let alertNode = document.querySelector('#alert')
-            let alert = bootstrap.Alert.getOrCreateInstance(alertNode)
-            alertNode.addEventListener('close.bs.alert', function() {
-                should_close = false;
-            })
+        const alertElements = document.querySelectorAll(".alert");
 
-            setTimeout( function() {
+        alertElements.forEach(function(alertElement) {
+            const timeout_ms = {=$message->timeout_ms};
 
-                if(should_close) {
+            setTimeout(function() {
+                fadeOutAndClose(alertElement);
+            }, timeout_ms);
+        });
+
+        function fadeOutAndClose(element) {
+            let opacity = 1;
+            let fadeOutInterval = setInterval(function() {
+                if (opacity > 0) {
+                    opacity -= 0.1;
+                    element.style.opacity = opacity;
+                } else {
+                    clearInterval(fadeOutInterval);
+                    let alert = bootstrap.Alert.getInstance(element)
                     alert.close()
                 }
+            }, 50);
+        }
 
-            }, {$message->timeout_ms});
+        {/if}
 
-        </script>
-
-    {/if}
+    </script>
 
 {/ifset}
