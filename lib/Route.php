@@ -17,6 +17,7 @@ use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
 use noirapi\Exceptions\NotFoundException;
 use noirapi\Exceptions\RestException;
+use noirapi\helpers\Utils;
 use Swoole\Http\Server;
 use function call_user_func_array;
 use function http_response_code;
@@ -105,7 +106,7 @@ class Route {
 
             case Dispatcher::FOUND:
 
-                $this->request->controller = $this->findController($this->request->route[1][0]);
+                $this->request->controller = Utils::getCLassName($this->request->route[1][0]);
                 $this->request->function = $this->request->route[1][1];
 
                 /** @var $response response */
@@ -234,15 +235,6 @@ class Route {
 
         return $response->withStatus($error);
 
-    }
-
-    /**
-     * @param string $class
-     * @return string
-     */
-    private function findController(string $class): string {
-        $ex = explode('\\', $class);
-        return end($ex);
     }
 
 }
