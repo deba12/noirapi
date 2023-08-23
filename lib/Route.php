@@ -90,6 +90,15 @@ class Route {
 
         $uri = rawurldecode($uri);
 
+        // Check for language, if found strip it from the uri
+        foreach (Config::get('languages') ?? [] as $code => $lang) {
+            if (str_starts_with($uri, '/' . $code . '/')) {
+                $this->request->language = $code;
+                $uri = substr($uri, strlen($code) + 1);
+                break;
+            }
+        }
+
         $this->request->route = $route->process($this->request->method, $uri);
 
         switch ($this->request->route[0]) {

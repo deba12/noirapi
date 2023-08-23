@@ -25,6 +25,7 @@ class Request {
     public bool $ajax;
     public $swoole = null;
     public string $host;
+    public ?string $language = null;
 
     /**
      * @param array $server

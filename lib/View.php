@@ -7,8 +7,11 @@ namespace noirapi\lib;
 use JetBrains\PhpStorm\ArrayShape;
 use Latte\Bridges\Tracy\BlueScreenPanel;
 use Latte\Engine;
+use Latte\Essential\TranslatorExtension;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
+use noirapi\helpers\DummyTranslator;
+use noirapi\helpers\EasyTranslator;
 use noirapi\helpers\Macros;
 use noirapi\helpers\Session;
 use noirapi\lib\View\Layout;
@@ -85,6 +88,25 @@ class View {
         }
 
         self::$uri = $request->uri;
+
+        $languages = Config::get('languages') ?? [];
+        if(empty($this->request->language)) {
+            $this->request->language = Config::get('default_language') ?? 'en';
+        }
+
+        if(!empty($languages)) {
+            $translator = new EasyTranslator($this->request->language, $this->request->controller, $this->request->function);
+        } else {
+            $translator = new DummyTranslator();
+        }
+
+        $extension = new TranslatorExtension(
+            [$translator, 'translate'],
+            $this->request->language
+        );
+
+        $this->latte->addExtension($extension);
+        $this->addParam('languages', $languages);
 
     }
 
