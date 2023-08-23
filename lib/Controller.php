@@ -92,10 +92,11 @@ class Controller {
     /**
      * @param string|null $location
      * @param int $status
+     * @param bool $skip_lang
      * @return Response
      * @throws UnableToForwardException
      */
-    public function forward(?string $location = null, int $status = 302): Response {
+    public function forward(?string $location = null, int $status = 302, bool $skip_lang = false): Response {
 
         if($status !== 302 && $status !== 301) {
             throw new UnableToForwardException('Unable to forward with status code: ' . $status);
@@ -103,6 +104,10 @@ class Controller {
 
         if(empty($location)) {
             $location = $this->referer();
+        }
+
+        if(!$skip_lang && !empty($this->request->language) && str_starts_with($location, '/')) {
+            return $this->response->withStatus($status)->withLocation('/' . $this->request->language . $location);
         }
 
         return $this->response->withStatus($status)->withLocation($location);

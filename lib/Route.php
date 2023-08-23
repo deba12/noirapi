@@ -90,13 +90,43 @@ class Route {
 
         $uri = rawurldecode($uri);
 
+        $languages = Config::get('languages') ?? [];
+
         // Check for language, if found strip it from the uri
-        foreach (Config::get('languages') ?? [] as $code => $lang) {
+        foreach ($languages as $code => $lang) {
             if (str_starts_with($uri, '/' . $code . '/')) {
                 $this->request->language = $code;
                 $uri = substr($uri, strlen($code) + 1);
                 break;
             }
+        }
+
+        if(empty($this->request->language) && !empty($languages)) {
+
+            $response = $this->redirect('/' . (Config::get('default_language') ?? 'en') . $uri, 307);
+
+            if($this->type === self::type_globals) {
+                http_response_code($response->getStatus());
+
+                foreach($response->getHeaders() as $key => $value) {
+                    header(ucfirst($key) . ': ' . $value);
+                }
+
+                return $response->getBody();
+
+            }
+
+            if($this->type === self::type_swoole) {
+
+                $res = [
+                    'status'    => $response->getStatus(),
+                    'body'      => $response->getBody(),
+                    'cookies'   => $response->getCookies(),
+                    'headers'   => $response->getHeaders(),
+                ];
+
+            }
+
         }
 
         $this->request->route = $route->process($this->request->method, $uri);
@@ -243,6 +273,17 @@ class Route {
         }
 
         return $response->withStatus($error);
+
+    }
+
+    /**
+     * @param string $location
+     * @param int $status
+     * @return Response
+     */
+    private function redirect(string $location, int $status = 302): Response {
+
+        return (new Response())->withLocation($location)->withStatus($status);
 
     }
 
