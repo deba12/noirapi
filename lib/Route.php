@@ -71,6 +71,8 @@ class Route {
     }
 
     /**
+     * @return array|string
+     * @throws FileNotFoundException
      * @throws JsonException
      */
     public function serve(): array|string {
