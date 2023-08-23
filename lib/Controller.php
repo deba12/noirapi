@@ -1,7 +1,10 @@
-<?php /** @noinspection PhpUndefinedNamespaceInspection */
-/** @noinspection PhpUndefinedClassInspection */
-/** @noinspection PhpParamsInspection */
-/** @noinspection PhpMissingFieldTypeInspection */
+<?php
+/**
+ * @noinspection PhpUndefinedNamespaceInspection
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpParamsInspection
+ * @noinspection PhpMissingFieldTypeInspection
+ */
 declare(strict_types = 1);
 
 namespace noirapi\lib;
