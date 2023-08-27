@@ -292,6 +292,11 @@ class Route {
      */
     private function redirect(string $location, int $status = 302): Response {
 
+        // Attach get to current future location
+        if(!empty($this->request->get)) {
+            $location .= '?' . http_build_query($this->request->get);
+        }
+
         return (new Response())->withLocation($location)->withStatus($status);
 
     }
