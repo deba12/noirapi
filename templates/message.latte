@@ -39,8 +39,10 @@
                     element.style.opacity = opacity;
                 } else {
                     clearInterval(fadeOutInterval);
-                    let alert = bootstrap.Alert.getInstance(element)
-                    alert.close()
+                    let alert = bootstrap.Alert.getInstance(element);
+                    if(alert !== null) {
+                        alert.close()
+                    }
                 }
             }, 50);
         }
