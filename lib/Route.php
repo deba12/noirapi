@@ -94,11 +94,20 @@ class Route {
 
         // Check for language, if found strip it from the uri
         foreach ($languages as $code => $lang) {
+            // Condition like /en,
+            if($uri === '/' . $code) {
+                $this->request->language = $code;
+                $uri = '/';
+                break;
+            }
+
+            // Condition like /en/
             if (str_starts_with($uri, '/' . $code . '/')) {
                 $this->request->language = $code;
                 $uri = substr($uri, strlen($code) + 1);
                 break;
             }
+
         }
 
         if(empty($this->request->language) && !empty($languages)) {

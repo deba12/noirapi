@@ -27,6 +27,12 @@ class EasyTranslator
      */
     public function translate(string $message, ?string $key = null): string {
 
+        // Condition is like /en,
+        if($message === '/') {
+            return '/' . $this->language;
+        }
+
+        // Condition for local url, we prepend the language
         if(str_starts_with($message, '/')) {
             return '/' . $this->language . $message;
         }

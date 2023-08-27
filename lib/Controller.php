@@ -110,7 +110,13 @@ class Controller {
         }
 
         if(!$skip_lang && !empty($this->request->language) && str_starts_with($location, '/')) {
-            return $this->response->withStatus($status)->withLocation('/' . $this->request->language . $location);
+            if($location === '/') {
+                $location = '/' . $this->request->language;
+            }
+            if($location !== '/' . $this->request->language) {
+                $location = '/' . $this->request->language . $location;
+            }
+            return $this->response->withStatus($status)->withLocation($location);
         }
 
         return $this->response->withStatus($status)->withLocation($location);
@@ -180,7 +186,25 @@ class Controller {
                 return $orig_url;
             }
 
-            if($same_domain && $url['host'] !== $this->server['HTTP_HOST']) {
+            if($url['host'] === $this->server['HTTP_HOST']) {
+
+                foreach(Config::get('languages') ?? [] as $code => $lang) {
+                    // Condition like /en
+                    if($url['path'] === '/' . $code) {
+                        return '/' . $code;
+                    }
+                    // Condition like /en
+                    if(str_starts_with($url['path'], '/' . $code . '/')) {
+                        $path = substr($url['path'], strlen($code) + 1);
+                        return $path . (empty($url['query']) ?  '' : '?' . ($url['query']));
+                    }
+
+                }
+
+                return (empty($this->request->language)  ? '' : '/' . $this->request->language) . $url['path'] . (empty($url['query']) ?  '' : '?' . ($url['query']));
+            }
+
+            if($same_domain) {
                 return '/';
             }
 
