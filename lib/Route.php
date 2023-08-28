@@ -138,6 +138,8 @@ class Route {
 
         }
 
+        $this->request->url_no_lang = $uri;
+
         $this->request->route = $route->process($this->request->method, $uri);
 
         switch ($this->request->route[0]) {

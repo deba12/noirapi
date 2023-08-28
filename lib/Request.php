@@ -13,6 +13,7 @@ class Request {
     public array $headers;
     public string $method;
     public string $uri;
+    public string $url_no_lang;
     public ?array $get;
     public ?array $post;
     public ?array $files;
