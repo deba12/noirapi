@@ -1,7 +1,7 @@
 {varType noirapi\helpers\Message $message}
 {ifset $message}
 
-    <div class="container fixed-top text-center mt-4">
+    <div class="container fixed-top text-center mt-4 alert-container">
 
         <div id="alert" class="alert alert-{$message->type|noescape} alert-dismissible fade show mt-4" role="alert">
 
@@ -21,15 +21,13 @@
 
         {if $message->timeout_ms > 0}
 
-        const alertElements = document.querySelectorAll(".alert");
+        const alertContainer = document.querySelector(".alert-container");
 
-        alertElements.forEach(function(alertElement) {
-            const timeout_ms = {=$message->timeout_ms};
+        const timeout_ms = {=$message->timeout_ms};
 
-            setTimeout(function() {
-                fadeOutAndClose(alertElement);
-            }, timeout_ms);
-        });
+        setTimeout(function() {
+            fadeOutAndClose(alertContainer);
+        }, timeout_ms);
 
         function fadeOutAndClose(element) {
             let opacity = 1;
@@ -39,10 +37,7 @@
                     element.style.opacity = opacity;
                 } else {
                     clearInterval(fadeOutInterval);
-                    let alert = bootstrap.Alert.getInstance(element);
-                    if(alert !== null) {
-                        alert.close()
-                    }
+                    element.remove();
                 }
             }, 50);
         }
