@@ -47,7 +47,7 @@ class EasyTranslator
             return $this->lookup(self::$cache[$this->language], $message, $key, ...$args);
         }
 
-        return $message;
+        return $this->lookup(self::$cache[$this->language] ?? [], $message, $key, ...$args);
 
     }
 
