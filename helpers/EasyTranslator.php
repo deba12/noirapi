@@ -22,10 +22,11 @@ class EasyTranslator
     /**
      * @param string $message
      * @param string|null $key
+     * @param mixed ...$args
      * @return string
      * @throws Exception
      */
-    public function translate(string $message, ?string $key = null): string {
+    public function translate(string $message, ?string $key = null, ...$args): string {
 
         // Condition is like /en,
         if($message === '/') {
@@ -38,20 +39,28 @@ class EasyTranslator
         }
 
         if(isset(self::$cache[$this->language])) {
-            return $this->lookup(self::$cache[$this->language], $message, $key);
+            return $this->lookup(self::$cache[$this->language], $message, $key, ...$args);
         }
 
         if(is_file($this->file)) {
             self::$cache[$this->language] = Neon::decodeFile($this->file);
-            return $this->lookup(self::$cache[$this->language], $message, $key);
+            return $this->lookup(self::$cache[$this->language], $message, $key, ...$args);
         }
 
         return $message;
 
     }
 
-    private function lookup(array $translations, string $message, ?string $key = null): string {
+    /**
+     * @param array $translations
+     * @param string $message
+     * @param string|null $key
+     * @param ...$args
+     * @return string
+     */
+    private function lookup(array $translations, string $message, ?string $key = null, ...$args): string {
 
+        //TODO remake this, it's ugly
         if($key !== null) {
 
             if(str_contains($key, '.')) {
@@ -64,25 +73,30 @@ class EasyTranslator
                 }
 
                 if(is_string($check)) {
-                    return $check;
+                    return str_contains($message, '%s') ? sprintf($check, ...$args) : $check;
                 }
 
             }
 
             if (isset($translations[$this->controller][$this->function][$key])) {
-                return $translations[$this->controller][$this->function][$key];
+                return str_contains($message, '%s') ? sprintf($translations[$this->controller][$this->function][$key], ...$args): $translations[$this->controller][$this->function][$key];
             }
 
             if (isset($translations[$this->controller][$key])) {
-                return $translations[$this->controller][$key];
+                return str_contains($message, '%s') ? sprintf($translations[$this->controller][$key], ...$args): $translations[$this->controller][$key];
             }
 
             if(isset($translations[$key])) {
-                return $translations[$key];
+                return str_contains($message, '%s') ? sprintf($translations[$key], ...$args) : $translations[$key];
             }
+
         }
 
-        return $translations[ $message ] ?? $message;
+        if(!empty($translations['message'])) {
+            return str_contains($message, '%s') ? sprintf($translations['message'], ...$args) : $translations['message'];
+        }
+
+        return str_contains($message, '%s') ? sprintf($message, ...$args) : $message;
 
     }
 
