@@ -117,6 +117,11 @@ class Mail {
 
     }
 
+    public function setReplyTo(string $email): Mail {
+        $this->message->replyTo($email);
+        return $this;
+    }
+
     /**
      * @param string $body
      * @return $this
