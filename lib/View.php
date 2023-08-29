@@ -321,7 +321,7 @@ class View {
                 if(!isset($this->params->$key)) {
                     $this->params->$key = $value;
                 } else {
-                    throw new RuntimeException("Duplicate key ain view params: $key");
+                    throw new RuntimeException("Duplicate key in view params: $key");
                 }
             }
 
