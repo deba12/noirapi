@@ -36,8 +36,8 @@ class SystemBarPanel implements IBarPanel {
     public function getTab(): string {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
-        $view = $this->view->getRenderInfo();
-        $html .= $this->view->request->method . ' [ ' . $this->view->request->controller . '=>' . $this->view->request->function . ' ] || [ ' . $view['layout_file'] . '->' . $view['view'] . ' ]';
+        $template = $this->view->getTemplate() === null ? 'None' : substr($this->view->getTemplate(), strpos($this->view->getTemplate(), '/app'));
+        $html .= $this->view->request->method . '[' . $this->view->request->controller . '::' . $this->view->request->function . '][' . basename($this->view->getLayout()) . '][' . $template . ']';
 
         return $html;
 
@@ -62,10 +62,8 @@ class SystemBarPanel implements IBarPanel {
             ]
         ]);
 
-        $view = array_merge(['template' => $this->view->getRenderInfo()], $this->view->getParams());
-
         $html .= $this->cell([
-            'View' => $view
+            'View' => $this->view->getParams()
         ]);
         $html .= '</div>';
 

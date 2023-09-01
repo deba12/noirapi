@@ -199,6 +199,16 @@ class View {
     }
 
     /**
+     * @return string|null
+     */
+    public function getTemplate(): ?string {
+
+        return $this->template;
+
+    }
+
+
+    /**
      * @return $this
      * @noinspection PhpUnused
      */
@@ -228,6 +238,17 @@ class View {
         }
 
         throw new FileNotFoundException('Unable to find layout_file: ' . $file);
+
+    }
+
+
+    /**
+     * @return string|null
+     * @noinspection GetSetMethodCorrectnessInspection
+     */
+    public function getLayout(): ?string {
+
+        return $this->layout_file;
 
     }
 
@@ -279,21 +300,6 @@ class View {
             return '?' . $param . '=' . $page;
         }
         return '?' . $param . '=' . $page;
-    }
-
-    /**
-     * @return array this is used by system panel
-     *
-     * this is used by system panel
-     */
-    #[ArrayShape(['layout_file' => "string", 'view' => "string"])]
-    public function getRenderInfo(): array {
-
-        return [
-            'layout_file'   => !empty($this->layout_file) ? basename($this->layout_file) : 'No layout',
-            'view'          => !empty($this->template) ? basename($this->template) : 'No view',
-        ];
-
     }
 
     /**
