@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use JetBrains\PhpStorm\ArrayShape;
 use Latte\Bridges\Tracy\BlueScreenPanel;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
