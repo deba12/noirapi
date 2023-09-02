@@ -60,7 +60,8 @@ class EasyTranslator
      */
     private function lookup(array $translations, string $message, ?string $key = null, ...$args): string {
 
-        //TODO remake this, it's ugly
+        $args = array_map(fn($arg) => $this->urlTranslate($arg), $args);
+
         if($key !== null) {
 
             if(str_contains($key, '.')) {
@@ -100,6 +101,18 @@ class EasyTranslator
 
         return str_contains($message, '%s') ? sprintf($message, ...$args) : $message;
 
+    }
+
+    /**
+     * @param string $message
+     * @return string
+     */
+    private function urlTranslate(string $message): string {
+        if(!str_starts_with($message, '/')) {
+            return $message;
+        }
+
+        return '/' . $this->language . $message;
     }
 
 }
