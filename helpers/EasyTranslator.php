@@ -92,8 +92,10 @@ class EasyTranslator
 
         }
 
-        if(!empty($translations['message'])) {
-            return str_contains($message, '%s') ? sprintf($translations['message'], ...$args) : $translations['message'];
+        $lookup = strtolower($message);
+
+        if(!empty($translations['strings'][$lookup])) {
+            return str_contains($message, '%s') ? sprintf($translations['strings'][$lookup], ...$args) : $translations['strings'][$lookup];
         }
 
         return str_contains($message, '%s') ? sprintf($message, ...$args) : $message;
