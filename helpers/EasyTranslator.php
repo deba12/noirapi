@@ -5,8 +5,9 @@ namespace noirapi\helpers;
 
 use Nette\Neon\Exception;
 use Nette\Neon\Neon;
+use noirapi\interfaces\Translator;
 
-class EasyTranslator
+class EasyTranslator implements Translator
 {
 
     private static array $cache = [];

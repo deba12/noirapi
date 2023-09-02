@@ -3,12 +3,21 @@ declare(strict_types=1);
 
 namespace noirapi\lib\View;
 
+use noirapi\interfaces\Translator;
+
 class Layout {
 
     public string $name         = '';
     public string $title        = '';
     public array $breadcrumbs   = [];
     public array $params        = [];
+    private ?Translator $translator = null;
+
+    public function __construct(
+        Translator $translator
+    ) {
+        $this->translator = $translator;
+    }
 
     public function setName(string $name): void {
         $this->name = $name;
@@ -23,7 +32,7 @@ class Layout {
         if(empty($title)) {
             $title = '';
         }
-        $this->title = $title;
+        $this->title = $this->translator->translate($title);
 
         return $this;
     }
@@ -34,7 +43,7 @@ class Layout {
      * @noinspection PhpUnused
      */
     public function appendTitle(string $title): static {
-        $this->title .= $title;
+        $this->title .= $this->translator->translate($title);
 
         return $this;
     }
@@ -51,8 +60,8 @@ class Layout {
         $key = md5($name);
 
         $this->breadcrumbs[$key] = [
-            'name'      => (string)$name,
-            'url'       => $url,
+            'name'      => is_string($name) ? $this->translator->translate($name) : (string)$name,
+            'url'       => $url !== null ? $this->translator->translate($url) : null,
             'active'    => $active
         ];
 
@@ -64,7 +73,7 @@ class Layout {
      * @return void
      */
     public function add(string $key, mixed $value): void {
-        $this->params[$key][] = $value;
+        $this->params[$key][] = $this->translator->translate($value);
     }
 
     /**
@@ -73,7 +82,7 @@ class Layout {
      * @return void
      */
     public function set(string $key, mixed $value): void {
-        $this->params[$key] = $value;
+        $this->params[$key] = $this->translator->translate($value);
     }
 
     /**

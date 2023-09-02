@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-class DummyTranslator
+use noirapi\interfaces\Translator;
+
+class DummyTranslator implements Translator
 {
 
     /**
@@ -11,7 +13,7 @@ class DummyTranslator
      * @param string|null $key
      * @return string
      */
-    public function translate(string $message, ?string $key = null): string {
+    public function translate(string $message, ?string $key = null, ...$args): string {
         return $message;
     }
 

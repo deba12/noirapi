@@ -69,25 +69,6 @@ class View {
             $this->latte->addExtension(new \app\lib\Macros());
         }
 
-        $this->layout = new Layout();
-
-        $layout_file = Config::get('layout');
-
-        if($layout_file) {
-            $this->setLayout($layout_file);
-        }
-
-        if($dev) {
-
-            BlueScreenPanel::initialize();
-
-            $panel = new SystemBarPanel($this);
-            Debugger::getBar()->addPanel($panel);
-
-        }
-
-        self::$uri = $request->uri;
-
         $languages = Config::get('languages') ?? [];
         if(empty($this->request->language)) {
             $this->request->language = Config::get('default_language') ?? 'en';
@@ -106,6 +87,25 @@ class View {
 
         $this->latte->addExtension($extension);
         $this->addParam('languages', $languages);
+
+        $this->layout = new Layout($translator);
+
+        $layout_file = Config::get('layout');
+
+        if($layout_file) {
+            $this->setLayout($layout_file);
+        }
+
+        if($dev) {
+
+            BlueScreenPanel::initialize();
+
+            $panel = new SystemBarPanel($this);
+            Debugger::getBar()->addPanel($panel);
+
+        }
+
+        self::$uri = $request->uri;
 
     }
 
