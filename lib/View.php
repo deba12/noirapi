@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use Latte\Bridges\Tracy\BlueScreenPanel;
+use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
 use noirapi\Config;
@@ -102,8 +103,12 @@ class View {
 
             $panel = new SystemBarPanel($this);
             Debugger::getBar()->addPanel($panel);
+            $this->latte->addExtension(new TracyExtension());
 
         }
+
+        $this->latte->setStrictParsing();
+        $this->latte->setStrictTypes();
 
         self::$uri = $request->uri;
 
