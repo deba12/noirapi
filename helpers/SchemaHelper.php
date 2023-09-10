@@ -17,6 +17,19 @@ class SchemaHelper {
     }
 
     /**
+     * @param string $code
+     * @param string $field
+     * @param string $message
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public static function addMessage(string $code, string $field, string $message): void {
+
+        self::$messages[$code][$field] = $message;
+
+    }
+
+    /**
      * @param ValidationException $exceptions
      * @return string
      */
@@ -26,6 +39,10 @@ class SchemaHelper {
             $path = array_shift($exception->path);
             if(isset(self::$messages[$path])) {
                 return (string)self::$messages[$path];
+            }
+
+            if(isset(self::$messages[$exception->code][$path])) {
+                return (string)self::$messages[$exception->code][$path];
             }
         }
 
