@@ -31,7 +31,6 @@ class PDOStatement extends NativePdoStatement {
      * @return bool
      */
     public function bindParam($param, &$var, $type = \PDO::PARAM_STR, $maxLength = null, $driverOptions = null): bool {
-
         $this->bindings[$param] = $var;
         return parent::bindParam($param, $var, $type, $maxLength, $driverOptions);
 
@@ -44,7 +43,6 @@ class PDOStatement extends NativePdoStatement {
      * @return bool
      */
     public function bindValue($param, $value, $type = \PDO::PARAM_STR): bool {
-
         $this->bindings[$param] = $value;
         return parent::bindValue($param, $value, $type);
 
@@ -80,12 +78,7 @@ class PDOStatement extends NativePdoStatement {
 
         foreach ($bindings as $param => $value) {
             $valueForPresentation = $this->translateValueForPresentationInsideStatement($value);
-
-            if ($indexed) {
-                $result = preg_replace('/\?/', $valueForPresentation, $result, 1);
-            } else {
-                $result = str_replace(":$param", $valueForPresentation, $result);
-            }
+            $result = preg_replace('/\?/', $valueForPresentation, $result, 1);
         }
 
         return $result;
