@@ -76,7 +76,7 @@ class PDOStatement extends NativePdoStatement {
 
         $result = $query;
 
-        foreach ($bindings as $param => $value) {
+        foreach ($bindings as $value) {
             $valueForPresentation = $this->translateValueForPresentationInsideStatement($value);
             $result = preg_replace('/\?/', $valueForPresentation, $result, 1);
         }
