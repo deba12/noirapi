@@ -11,6 +11,7 @@ class DummyTranslator implements Translator
     /**
      * @param string $message
      * @param string|null $key
+     * @param mixed ...$args
      * @return string
      */
     public function translate(string $message, ?string $key = null, ...$args): string {
