@@ -11,7 +11,7 @@ class Layout {
     public string $title        = '';
     public array $breadcrumbs   = [];
     public array $params        = [];
-    private ?Translator $translator = null;
+    private Translator $translator;
 
     public function __construct(
         Translator $translator
