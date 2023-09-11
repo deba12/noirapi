@@ -37,18 +37,17 @@ class PDO extends NativePdo {
 
     }
 
-
     /**
-     * @param $statement
-     * @param int $mode
-     * @param ...$ctorargs
+     * @param string $query
+     * @param int|null $fetchMode
+     * @param ...$fetch_mode_args
      * @return false|\PDOStatement
      */
-    public function query($statement, $mode = NativePdo::ATTR_DEFAULT_FETCH_MODE, ...$ctorargs): false|\PDOStatement {
+    public function query(string $query, ?int $fetchMode = NativePdo::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args): false|\PDOStatement {
         $start = microtime(true);
-        $result = parent::query($statement, $mode, ...$ctorargs);
+        $result = parent::query($query, $fetchMode, ...$fetch_mode_args);
 
-        $this->addLog($statement, microtime(true) - $start);
+        $this->addLog($query, microtime(true) - $start);
 
         return $result;
     }
