@@ -42,7 +42,7 @@ class View {
     /**
      * View constructor.
      * @param Request $request
-     * @param response $response
+     * @param Response $response
      * @param bool $dev
      * @throws FileNotFoundException
      */
@@ -119,7 +119,7 @@ class View {
 
     /**
      * @param array $params
-     * @return response
+     * @return Response
      * @throws FileNotFoundException
      */
     public function display(array $params = []): Response {
