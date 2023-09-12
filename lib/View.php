@@ -192,7 +192,7 @@ class View {
         if($controller === null) {
             $controller = $this->request->controller;
         }
-
+        /** @psalm-suppress UndefinedConstant */
         $file = PATH_VIEWS . $controller . DIRECTORY_SEPARATOR . $template . self::latte_ext;
 
         if(is_readable($file)) {
@@ -268,7 +268,7 @@ class View {
         if($controller === null) {
             $controller = $this->request->controller;
         }
-
+        /** @psalm-suppress UndefinedConstant */
         $file = PATH_VIEWS . $controller . DIRECTORY_SEPARATOR . $template . self::latte_ext;
 
         return is_readable($file);
@@ -280,6 +280,7 @@ class View {
      * @noinspection PhpUnused
      */
     public function layoutExists(string $layout): bool {
+        /** @psalm-suppress UndefinedConstant */
         $file = PATH_LAYOUTS . $layout . self::latte_ext;
 
         return is_readable($file);
