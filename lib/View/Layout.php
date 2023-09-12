@@ -73,7 +73,7 @@ class Layout {
      * @return void
      */
     public function add(string $key, mixed $value): void {
-        $this->params[$key][] = $this->translator->translate($value);
+        $this->params[$key][] = is_string($value) ? $this->translator->translate($value) : $value;
     }
 
     /**
@@ -82,7 +82,7 @@ class Layout {
      * @return void
      */
     public function set(string $key, mixed $value): void {
-        $this->params[$key] = $this->translator->translate($value);
+        $this->params[$key] = is_string($value) ? $this->translator->translate($value) : $value;
     }
 
     /**
