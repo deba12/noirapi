@@ -57,9 +57,11 @@ class Macros extends Extension {
      */
     public function pager(Tag $tag): Node {
 
+        /** @psalm-suppress UndefinedConstant */
         $file = ROOT . '/app/layouts/pager.latte';
 
         if(!is_readable($file)) {
+            /** @psalm-suppress UndefinedConstant */
             $file = ROOT . '/noirapi/templates/pager.latte';
         }
 
@@ -98,9 +100,11 @@ class Macros extends Extension {
      */
     public function breadcrumb(Tag $tag): Node {
 
+        /** @psalm-suppress UndefinedConstant */
         $file = ROOT . '/app/layouts/BreadCrumbs.latte';
 
         if(!is_readable($file)) {
+            /** @psalm-suppress UndefinedConstant */
             $file = ROOT . '/noirapi/templates/BreadCrumbs.latte';
         }
 
@@ -240,9 +244,11 @@ class Macros extends Extension {
     #[Pure(true)]
     public function message(Tag $tag): AuxiliaryNode {
 
+        /** @psalm-suppress UndefinedConstant */
         $file = ROOT . '/app/layouts/message.latte';
 
         if(!is_readable($file)) {
+            /** @psalm-suppress UndefinedConstant */
             $file = ROOT . '/noirapi/templates/message.latte';
         }
 

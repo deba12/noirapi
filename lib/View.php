@@ -53,6 +53,7 @@ class View {
         $this->params = new stdClass();
 
         $this->latte = new Engine;
+        /** @psalm-suppress UndefinedConstant */
         $this->latte->setTempDirectory(ROOT . '/temp');
 
         //enable regeneration of the template files
@@ -235,6 +236,7 @@ class View {
             return $this;
         }
 
+        /** @psalm-suppress UndefinedConstant */
         $file = PATH_LAYOUTS . $layout_file . self::latte_ext;
 
         if(is_readable($file)) {

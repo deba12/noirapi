@@ -104,12 +104,14 @@ class Mail {
      */
     public function setTemplate(string $template, array $params): Mail {
 
+        /** @psalm-suppress UndefinedConstant */
         $file = ROOT  . "/app/templates/$template.latte";
         if(!is_readable($file)){
             throw new RuntimeException('Unable to load template: ' . $file);
         }
 
         $latte = new Engine();
+        /** @psalm-suppress UndefinedConstant */
         $latte->setTempDirectory(ROOT . '/temp');
         $this->body = $latte->renderToString($file, $params);
 

@@ -18,7 +18,7 @@ class Config {
      * @throws ConfigException
      */
     public static function init(string $config): void {
-
+        /** @psalm-suppress UndefinedConstant */
         $file = ROOT . '/app/config/' . $config . '.neon';
 
         //TODO cache config in json with expiration

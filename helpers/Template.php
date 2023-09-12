@@ -16,6 +16,7 @@ class Template {
 
         $this->latte = new Latte\Engine;
         $this->latte->setAutoRefresh();
+        /** @psalm-suppress UndefinedConstant */
         $this->latte->setTempDirectory(ROOT . '/temp');
         $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
@@ -33,9 +34,11 @@ class Template {
      * @param string $template
      * @return $this
      * @throws FileNotFoundException
+     * @noinspection PhpUnused
      */
     public function setTemplate(string $template): Template {
 
+        /** @psalm-suppress UndefinedConstant */
         $file = PATH_TEMPLATES . DIRECTORY_SEPARATOR . $template . self::latte_ext;
 
         if(is_readable($file)) {

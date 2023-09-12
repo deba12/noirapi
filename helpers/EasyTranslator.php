@@ -17,6 +17,7 @@ class EasyTranslator implements Translator
         private readonly string $controller,
         private readonly string $function
     ) {
+        /** @psalm-suppress UndefinedConstant */
         $this->file = APPROOT . '/translations/' . $this->language . '.neon';
     }
 
