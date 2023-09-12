@@ -74,7 +74,7 @@ class View {
         }
 
         $languages = Config::get('languages') ?? [];
-        if(empty($this->request->language)) {
+        if(!empty($languages) && $this->request->language === null) {
             $this->request->language = Config::get('default_language') ?? 'en';
         }
 
