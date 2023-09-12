@@ -10,6 +10,7 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use JanDrabek\Tracy\GitVersionPanel;
+use Nette\Neon\Exception;
 use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
@@ -149,11 +150,26 @@ class Controller {
     /**
      * @param string|Message $text
      * @param string|null $type
+     * @param string|null $translation_key
+     * @param mixed ...$translation_args
      * @return $this
      */
-    public function message(string|Message $text, ?string $type = null): self {
+    public function message(string|Message $text, ?string $type = null, ?string $translation_key = null, ...$translation_args): self
+    {
 
         Session::remove('message');
+
+        if($translation_key !== null) {
+            try {
+                if($text instanceof Message) {
+                    $text->message = $this->view->translator->translate($text->message, $translation_key, $translation_args);
+                } else {
+                    $text = Message::new($this->view->translator->translate($text, $translation_key, $translation_args), $type ?? 'danger');
+                }
+            } catch (Exception) {
+                // Do nothing
+            }
+        }
 
         if($text instanceof Message) {
             Session::set('message', null, $text);

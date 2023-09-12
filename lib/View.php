@@ -14,6 +14,7 @@ use noirapi\helpers\DummyTranslator;
 use noirapi\helpers\EasyTranslator;
 use noirapi\helpers\Macros;
 use noirapi\helpers\Session;
+use noirapi\interfaces\Translator;
 use noirapi\lib\View\Layout;
 use noirapi\Tracy\SystemBarPanel;
 use RuntimeException;
@@ -36,6 +37,7 @@ class View {
     private static string $uri;
 
     public Layout $layout;
+    public Translator $translator;
 
     /**
      * View constructor.
@@ -76,20 +78,20 @@ class View {
         }
 
         if(!empty($languages)) {
-            $translator = new EasyTranslator($this->request->language, $this->request->controller, $this->request->function);
+            $this->translator = new EasyTranslator($this->request->language, $this->request->controller, $this->request->function);
         } else {
-            $translator = new DummyTranslator();
+            $this->translator = new DummyTranslator();
         }
 
         $extension = new TranslatorExtension(
-            [$translator, 'translate'],
+            [$this->translator, 'translate'],
             $this->request->language
         );
 
         $this->latte->addExtension($extension);
         $this->addParam('languages', $languages);
 
-        $this->layout = new Layout($translator);
+        $this->layout = new Layout($this->translator);
 
         $layout_file = Config::get('layout');
 
