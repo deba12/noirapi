@@ -159,9 +159,9 @@ class Route {
                 $this->request->controller = Utils::getCLassName($this->request->route[1][0]);
                 $this->request->function = $this->request->route[1][1];
 
-                /** @var $response response */
                 try{
 
+                    /** @var $response response */
                     $response = call_user_func_array(
                         [
                             new $this->request->route[1][0]($this->request, $this->server),
