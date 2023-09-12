@@ -15,7 +15,7 @@ class DummyTranslator implements Translator
      * @return string
      */
     public function translate(string $message, ?string $key = null, ...$args): string {
-        return $message;
+        return str_contains($message, '%s') ? sprintf($message, ...$args) : $message;
     }
 
 }
