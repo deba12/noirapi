@@ -34,10 +34,6 @@ class Response {
     public const TYPE_RAW   = 'application/octet-stream';
     public const TYPE_ZIP   = 'application/zip';
 
-    public function __toString(): string {
-        return $this->body;
-    }
-
     /**
      * @param $body
      * @return $this
