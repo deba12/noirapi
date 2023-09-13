@@ -20,9 +20,9 @@ class Tasks {
     /**
      * @param string $class
      * @param array $params
-     * @return Tasks
+     * @return self
      */
-    public function add(string $class, array $params): static {
+    public function add(string $class, array $params): self {
         $task = 'app\\tasks\\' . $class;
         if(!class_exists($task)) {
             throw new RuntimeException("Task class $class not found");
