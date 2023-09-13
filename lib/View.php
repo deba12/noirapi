@@ -77,7 +77,9 @@ class View {
 
         $languages = Config::get('languages') ?? [];
         if(!empty($languages)) {
-            $this->request->language = $this->request->language === null ? Config::get('default_language') : 'en';
+            if($this->request->language === null) {
+                $this->request->language = Config::get('default_language') ?? 'en';
+            }
             $this->translator = new EasyTranslator($this->request->language, $this->request->controller, $this->request->function);
         } else {
             $this->translator = new DummyTranslator();

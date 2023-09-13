@@ -26,10 +26,12 @@ class Controller {
 
     public Request $request;
     public array $server;
-    public $model;
+    /** @var Model|null */
+    public $model = null;
     public Response $response;
-    public View $view;
+    public ?View $view = null;
     public bool $dev;
+    /** @var mixed|non-empty-array<array-key, true>|null */
     public static $panels;
 
     /**
@@ -46,27 +48,29 @@ class Controller {
         $this->dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
 
         if($db && empty($this->model)) {
+
             $model = 'app\\models\\' . Utils::getClassName(get_class($this));
-            if(class_exists($model)) {
+            if(class_exists($model) && is_subclass_of($model, Model::class)) {
                 $this->model = new $model();
             } else {
                 $this->model = new Model();
             }
-        }
 
-        /**
-         * Tracy debug bar
-         */
-        if($this->dev && !empty($db)) {
+            /**
+             * Tracy debug bar
+             */
+            if($this->dev) {
 
-            foreach(Model::tracyGetPdo() as $driver => $pdo) {
+                foreach(Model::tracyGetPdo() as $driver => $pdo) {
 
-                if(!isset(self::$panels[$driver])) {
-                    self::$panels[$driver] = true;
+                    if(!isset(self::$panels[$driver])) {
+                        self::$panels[$driver] = true;
 
-                    $panel = new PDOBarPanel($pdo);
-                    $panel->title = $driver;
-                    Debugger::getBar()->addPanel($panel);
+                        $panel = new PDOBarPanel($pdo);
+                        $panel->title = $driver;
+                        Debugger::getBar()->addPanel($panel);
+                    }
+
                 }
 
             }
@@ -151,9 +155,9 @@ class Controller {
         if($translation_key !== null) {
             try {
                 if($text instanceof Message) {
-                    $text->message = $this->view->translator->translate($text->message, $translation_key, $translation_args);
+                    $text->message = $this->view?->translator->translate($text->message, $translation_key, $translation_args);
                 } else {
-                    $text = Message::new($this->view->translator->translate($text, $translation_key, $translation_args), $type ?? 'danger');
+                    $text = Message::new($this->view?->translator->translate($text, $translation_key, $translation_args), $type ?? 'danger');
                 }
             } catch (Exception) {
                 // Do nothing
@@ -180,10 +184,18 @@ class Controller {
         if(isset($this->server['HTTP_REFERER'])) {
 
             $url = str_replace('@', '', $this->server['HTTP_REFERER']);
-            $orig_url = filter_var($url, FILTER_SANITIZE_URL);
-            $url = parse_url(preg_replace('/\s+/', '', $orig_url));
+            if(empty($url)) {
+                return '/';
+            }
 
-            if(!$url) {
+            $orig_url = filter_var($url, FILTER_SANITIZE_URL);
+            if(empty($orig_url)) {
+                return '/';
+            }
+
+            /** @psalm-suppress PossiblyInvalidCast */
+            $url = parse_url((string)preg_replace('/\s+/', '', $orig_url));
+            if(empty($url)) {
                 return '/';
             }
 
@@ -193,7 +205,10 @@ class Controller {
 
             if($url['host'] === $this->server['HTTP_HOST']) {
 
+                $url['path'] = empty($url['path']) ? '/' : $url['path'];
+
                 foreach(Config::get('languages') ?? [] as $code => $_) {
+
                     // Condition like /en
                     if($url['path'] === '/' . $code) {
                         return '/' . $code;
@@ -207,13 +222,16 @@ class Controller {
                 }
 
                 return (empty($this->request->language)  ? '' : '/' . $this->request->language) . $url['path'] . (empty($url['query']) ?  '' : '?' . ($url['query']));
+
             }
 
             if($same_domain) {
                 return '/';
             }
 
-            if($url['scheme'] === 'http' || $url['scheme'] === 'https') {
+            if(isset($url['scheme']) && ($url['scheme'] === 'http' || $url['scheme'] === 'https')) {
+
+                $url['path'] = empty($url['path']) ? '/' : $url['path'];
 
                 /** @noinspection BypassedUrlValidationInspection */
                 if(filter_var($url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . ($url['query'] ?? ''), FILTER_VALIDATE_URL)) {

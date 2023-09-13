@@ -13,6 +13,9 @@ use Opis\Database\Database;
 
 use RuntimeException;
 
+/**
+ * @psalm-consistent-constructor
+ */
 class Model {
 
     public string $driver = 'mysql';
