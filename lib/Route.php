@@ -257,6 +257,7 @@ class Route {
 
         //force calling destructor
         $response = null;
+        unset($response);
 
         /** @noinspection PhpUndefinedVariableInspection */
         return $res;
