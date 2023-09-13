@@ -102,9 +102,7 @@ class Response {
                 $this->body = $this->body->toArray();
             }
 
-            if (is_array($this->body)) {
-                return Array2XML::createXML('root', $this->body)->saveXML();
-            }
+            return Array2XML::createXML('root', $this->body)->saveXML();
 
         }
 

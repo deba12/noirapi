@@ -31,7 +31,7 @@ class RestMessage {
 
             $static->params['message'] = $message;
 
-        } elseif(is_array($message) || is_object($message)) {
+        } else {
 
             foreach($message as $key => $value) {
 
