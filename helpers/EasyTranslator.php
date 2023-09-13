@@ -57,7 +57,7 @@ class EasyTranslator implements Translator
      * @param array $translations
      * @param string $message
      * @param string|null $key
-     * @param ...$args
+     * @param mixed ...$args
      * @return string
      */
     private function lookup(array $translations, string $message, ?string $key = null, ...$args): string {
