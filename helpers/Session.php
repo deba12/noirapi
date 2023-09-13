@@ -106,11 +106,16 @@ class Session {
 
     /**
      * @return array<non-empty-string, mixed>
+     * @psalm-suppress InvalidReturnType
      */
     public static function all(): array {
+        /** @psalm-suppress InvalidReturnStatement */
         return $_SESSION;
     }
 
+    /**
+     * @return void
+     */
     public static function clear(): void {
         $_SESSION = [];
     }
