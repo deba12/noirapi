@@ -14,7 +14,7 @@ include(__DIR__ . '/include.php');
 $listen_ip = Config::get('swoole.listen_ip') ?? '127.0.0.1';
 $listen_port = Config::get('swoole.listen_port') ?? 9400;
 
-$server = new Swoole\HTTP\Server($listen_ip, $listen_port);
+$server = new Swoole\Http\Server($listen_ip, $listen_port);
 $static_files = Config::get('swoole.static_files');
 $server->set([
     'worker_num'        => Config::get('swoole.workers') ?? 1,
@@ -28,7 +28,7 @@ if(!empty($static_files)) {
     ]);
 }
 
-$server->on('start', function (Swoole\Http\Server $server) use($listen_ip, $listen_port) {
+$server->on('start', function () use($listen_ip, $listen_port) {
     /** @noinspection HttpUrlsUsage */
     echo "Swoole http server is started at http://$listen_ip:$listen_port\n";
 });
@@ -71,7 +71,8 @@ $server->on('Task', static function(Server $server, $task_id, $reactorId, $data)
 
     if(isset($data[ 'class' ], $data[ 'params' ])) {
         echo "Begin task: \t" . $task_id . "\t" . $data['class'] . "\n";
-        $class = new $data['class'];
+        $class = new $data['class']();
+        /** @psalm-suppress InvalidFunctionCall $class */
         $res = $class($data['params']);
         $server->finish($res);
         echo "End task: \t" . $task_id . "\t" . $data['class'] . "\n";
