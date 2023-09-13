@@ -60,15 +60,25 @@ class Response {
      */
     public function getBody(): string {
 
-        if($this->body instanceof RestMessage) {
-            return $this->body->toJson();
-        }
-
         if($this->contentType === self::TYPE_HTML) {
+
+            if($this->body instanceof RestMessage) {
+                $this->body = $this->body->toArray();
+            }
+
+            if(is_array($this->body)) {
+                return implode(PHP_EOL, $this->body);
+            }
+
             return $this->body;
+
         }
 
         if($this->contentType === self::TYPE_JSON) {
+
+            if($this->body instanceof RestMessage) {
+                return $this->body->toJson();
+            }
 
             if(is_array($this->body)){
                 return json_encode($this->body, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
@@ -80,29 +90,45 @@ class Response {
 
         if($this->contentType === self::TYPE_XML) {
 
-            if(is_array($this->body)) {
+            if(is_string($this->body)) {
+                return $this->body;
+            }
 
-                if(class_exists(Array2XML::class)) {
+            if(!class_exists(Array2XML::class)) {
+                throw new RuntimeException('Array2XML class not found');
+            }
 
-                    return Array2XML::createXML('root', $this->body)->saveXML();
+            if($this->body instanceof RestMessage) {
+                $this->body = $this->body->toArray();
+            }
 
-                }
+            if (is_array($this->body)) {
+                return Array2XML::createXML('root', $this->body)->saveXML();
+            }
 
-                throw new RuntimeException('Class LaLit\Array2XML is required');
+        }
 
+        if(($this->contentType === self::TYPE_CSV)) {
+
+            if($this->body instanceof RestMessage) {
+                $this->body = $this->body->toArray();
+            }
+
+            if(is_array($this->body)){
+                $this->body = $this->toCsv($this->body);
             }
 
             return $this->body;
 
         }
 
-        if(($this->contentType === self::TYPE_CSV) && is_array($this->body)) {
+        if($this->body instanceof RestMessage) {
 
-            $this->body = $this->toCsv($this->body);
+            return $this->body->toJson();
 
         }
 
-        return $this->body;
+        throw new RuntimeException('Invalid body type: ' . gettype($this->body) . ' for content type: ' . $this->contentType);
 
     }
 
@@ -274,7 +300,11 @@ class Response {
         return $this;
     }
 
-    private function toCsv($data): bool|string {
+    /**
+     * @param $data
+     * @return string
+     */
+    private function toCsv($data): string {
 
         $fh = fopen('php://temp', 'rwb');
         fputcsv($fh, array_keys(current($data)));
@@ -284,7 +314,13 @@ class Response {
         }
 
         rewind($fh);
+
         $csv = stream_get_contents($fh);
+
+        if($csv === false) {
+            throw new RuntimeException('stream_get_contents failed');
+        }
+
         fclose($fh);
 
         return $csv;

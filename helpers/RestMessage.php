@@ -60,6 +60,13 @@ class RestMessage {
     }
 
     /**
+     * @return array
+     */
+    public function toArray(): array {
+        return $this->params;
+    }
+
+    /**
      * @param string $name
      * @return mixed|null
      */
