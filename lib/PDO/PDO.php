@@ -15,7 +15,7 @@ class PDO extends NativePdo {
     /**
      * @inheritDoc
      */
-    public function __construct($dsn, $username = null, $passwd = null, $options = null) {
+    public function __construct(string $dsn, ?string $username = null, ?string $passwd = null, ?array $options = null) {
 
         parent::__construct($dsn, $username, $passwd, $options);
         $this->setAttribute(self::ATTR_STATEMENT_CLASS, [PDOStatement::class, [$this]]);
@@ -24,10 +24,10 @@ class PDO extends NativePdo {
 
 
     /**
-     * @param $statement
+     * @param string $statement
      * @return false|int
      */
-    public function exec($statement): false|int {
+    public function exec(string $statement): false|int {
 
         $start = microtime(true);
         $result = parent::exec($statement);

@@ -25,14 +25,15 @@ class PDOStatement extends NativePdoStatement {
     }
 
     /**
-     * @param $param
-     * @param $var
-     * @param $type
-     * @param $maxLength
-     * @param $driverOptions
+     * @param int|string $param
+     * @param mixed $var
+     * @param int $type
+     * @param int|null $maxLength
+     * @param mixed $driverOptions
      * @return bool
+     * @psalm-suppress PossiblyNullArgument
      */
-    public function bindParam($param, &$var, $type = \PDO::PARAM_STR, $maxLength = null, $driverOptions = null): bool
+    public function bindParam(int|string $param, mixed &$var, int $type = \PDO::PARAM_STR, int $maxLength = null, mixed $driverOptions = null): bool
     {
         $this->bindings[$param] = $var;
         return parent::bindParam($param, $var, $type, $maxLength, $driverOptions);
@@ -40,12 +41,12 @@ class PDOStatement extends NativePdoStatement {
     }
 
     /**
-     * @param $param
-     * @param $value
-     * @param $type
+     * @param int|string $param
+     * @param mixed $value
+     * @param int $type
      * @return bool
      */
-    public function bindValue($param, $value, $type = \PDO::PARAM_STR): bool
+    public function bindValue(int|string $param, mixed $value, int $type = \PDO::PARAM_STR): bool
     {
         $this->bindings[$param] = $value;
         return parent::bindValue($param, $value, $type);
@@ -53,10 +54,10 @@ class PDOStatement extends NativePdoStatement {
     }
 
     /**
-     * @param $params
+     * @param array|null $params
      * @return bool
      */
-    public function execute($params = null): bool
+    public function execute(?array $params = null): bool
     {
 
         if (is_array($params)) {
