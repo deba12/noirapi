@@ -57,7 +57,7 @@ class Layout {
      */
     public function addBreadCrumb(int|string $name, ?string $url = null, ?bool $active = null): void {
 
-        $key = md5($name);
+        $key = md5(!is_string($name) ? (string)$name : $name);
 
         $this->breadcrumbs[$key] = [
             'name'      => is_string($name) ? $this->translator->translate($name) : (string)$name,

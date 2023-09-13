@@ -76,11 +76,8 @@ class View {
         }
 
         $languages = Config::get('languages') ?? [];
-        if(!empty($languages) && $this->request->language === null) {
-            $this->request->language = Config::get('default_language') ?? 'en';
-        }
-
         if(!empty($languages)) {
+            $this->request->language = $this->request->language === null ? Config::get('default_language') : 'en';
             $this->translator = new EasyTranslator($this->request->language, $this->request->controller, $this->request->function);
         } else {
             $this->translator = new DummyTranslator();
@@ -130,10 +127,10 @@ class View {
             $this->setTemplate($this->request->function);
         }
 
-        $layout = $this->layout_file ?? $this->template;
+        $layout = $this->layout_file ?? $this->template ?? throw new RuntimeException('No layout|template set for display');
 
         if($this->request->ajax) {
-            $layout = $this->template;
+            $layout = $this->template ?? throw new RuntimeException('No template set for ajax request');
         }
 
         $this->mergeParams($this->request, 'request');
@@ -174,10 +171,16 @@ class View {
             $this->setLayout($layout);
             $this->setTemplate($view);
 
-            return $this->latte->renderToString($this->layout_file, $this->params);
+            $layout_file = $this->layout_file ?? $this->template ?? throw new RuntimeException('No layout|template set for display');
+
+            return $this->latte->renderToString($layout_file, $this->params);
         }
 
         $this->setTemplate($view);
+
+        if($this->template === null) {
+            throw new RuntimeException('No template set for display');
+        }
 
         return $this->latte->renderToString($this->template, $this->params);
 
@@ -291,12 +294,11 @@ class View {
     }
 
     /**
-     * @param $param
-     * @param $page
+     * @param string $param
+     * @param int|string $page
      * @return string
-     * @noinspection PhpUnused
      */
-    public static function add_url_var($param, $page): string {
+    public static function add_url_var(string $param, int|string $page): string {
 
         $params = parse_url(self::$uri, PHP_URL_QUERY);
 
