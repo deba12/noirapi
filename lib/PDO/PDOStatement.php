@@ -5,6 +5,7 @@ namespace noirapi\PDO;
 
 use PDOStatement as NativePdoStatement;
 
+/** @psalm-suppress MissingTemplateParam */
 class PDOStatement extends NativePdoStatement {
     /**
      * PDO instance.
@@ -16,7 +17,8 @@ class PDOStatement extends NativePdoStatement {
      */
     protected array $bindings = [];
 
-    protected function __construct(PDO $pdo) {
+    protected function __construct(PDO $pdo)
+    {
 
         $this->pdo = $pdo;
 
@@ -30,7 +32,8 @@ class PDOStatement extends NativePdoStatement {
      * @param $driverOptions
      * @return bool
      */
-    public function bindParam($param, &$var, $type = \PDO::PARAM_STR, $maxLength = null, $driverOptions = null): bool {
+    public function bindParam($param, &$var, $type = \PDO::PARAM_STR, $maxLength = null, $driverOptions = null): bool
+    {
         $this->bindings[$param] = $var;
         return parent::bindParam($param, $var, $type, $maxLength, $driverOptions);
 
@@ -42,7 +45,8 @@ class PDOStatement extends NativePdoStatement {
      * @param $type
      * @return bool
      */
-    public function bindValue($param, $value, $type = \PDO::PARAM_STR): bool {
+    public function bindValue($param, $value, $type = \PDO::PARAM_STR): bool
+    {
         $this->bindings[$param] = $value;
         return parent::bindValue($param, $value, $type);
 
@@ -52,7 +56,8 @@ class PDOStatement extends NativePdoStatement {
      * @param $params
      * @return bool
      */
-    public function execute($params = null): bool {
+    public function execute($params = null): bool
+    {
 
         if (is_array($params)) {
             $this->bindings = $params;
@@ -70,9 +75,8 @@ class PDOStatement extends NativePdoStatement {
 
     }
 
-    private function produceStatementWithBindingsInForLogging(array $bindings, string $query): string {
-
-        $indexed = (array_is_list($bindings));
+    private function produceStatementWithBindingsInForLogging(array $bindings, string $query): string
+    {
 
         $result = $query;
 
@@ -85,7 +89,8 @@ class PDOStatement extends NativePdoStatement {
 
     }
 
-    private function translateValueForPresentationInsideStatement(mixed $value): string {
+    private function translateValueForPresentationInsideStatement(mixed $value): string
+    {
 
         $result = $value;
 

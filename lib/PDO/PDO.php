@@ -25,7 +25,7 @@ class PDO extends NativePdo {
 
     /**
      * @param $statement
-     * @return bool|int
+     * @return false|int
      */
     public function exec($statement): false|int {
 
@@ -40,11 +40,12 @@ class PDO extends NativePdo {
     /**
      * @param string $query
      * @param int|null $fetchMode
-     * @param ...$fetch_mode_args
+     * @param mixed ...$fetch_mode_args
      * @return false|\PDOStatement
      */
     public function query(string $query, ?int $fetchMode = NativePdo::ATTR_DEFAULT_FETCH_MODE, ...$fetch_mode_args): false|\PDOStatement {
         $start = microtime(true);
+        /** @psalm-suppress TooManyArguments $result */
         $result = parent::query($query, $fetchMode, ...$fetch_mode_args);
 
         $this->addLog($query, microtime(true) - $start);
