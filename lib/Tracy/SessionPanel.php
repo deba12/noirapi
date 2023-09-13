@@ -81,7 +81,7 @@ class SessionPanel implements IBarPanel {
                 $value = "<span $this->value_mod_attributes>" . substr($value, 0, 3) . '...' . substr($value, -3) . "</span>";
             } elseif($value === true) {
                 $value = "<span $this->value_mod_attributes>true</span>";
-            } elseif(is_bool($value) && $value === false) {
+            } elseif($value === false) {
                 $value = "<span $this->value_mod_attributes>false</span>";
             } elseif($value === null) {
                 $value = "<span $this->value_mod_attributes>null</span>";
