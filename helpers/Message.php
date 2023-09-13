@@ -2,7 +2,6 @@
 declare(strict_types=1);
 
 namespace noirapi\helpers;
-use JetBrains\PhpStorm\Pure;
 use Nette\Schema\ValidationException;
 
 class Message {
@@ -17,7 +16,6 @@ class Message {
      * @param string|null $type
      * @return Message
      */
-    #[Pure]
     public static function new(string $message, ?string $type = null): Message {
 
         $static = new self();
