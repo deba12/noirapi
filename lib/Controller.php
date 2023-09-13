@@ -204,7 +204,7 @@ class Controller {
 
             if($url['host'] === $this->server['HTTP_HOST']) {
 
-                foreach(Config::get('languages') ?? [] as $code => $lang) {
+                foreach(Config::get('languages') ?? [] as $code => $_) {
                     // Condition like /en
                     if($url['path'] === '/' . $code) {
                         return '/' . $code;
