@@ -105,7 +105,7 @@ class Session {
     }
 
     /**
-     * @return array
+     * @return array<non-empty-string, mixed>
      */
     public static function all(): array {
         return $_SESSION;
