@@ -161,7 +161,7 @@ class Route {
 
                 try{
 
-                    /** @var $response response */
+                    /** @var Response $response */
                     $response = call_user_func_array(
                         [
                             new $this->request->route[1][0]($this->request, $this->server),
