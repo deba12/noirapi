@@ -9,7 +9,6 @@ namespace noirapi\helpers;
 
 use DateTimeZone;
 use Exception;
-use JetBrains\PhpStorm\Pure;
 use Nette;
 use Nette\Schema\Elements\Type;
 use Nette\Schema\Schema;
@@ -61,42 +60,53 @@ final class Expect2 {
         return new Time($format, $timeZone);
     }
 
-    #[Pure]
+    /**
+     * @return Ip
+     */
     public static function Ip(): Ip {
         return new Ip();
     }
 
-    #[Pure]
+
     public static function Ips(): Ips {
         return new Ips();
     }
 
-    #[Pure]
+    /**
+     * @return Domain
+     */
     public static function Domain(): Domain {
         return new Domain();
     }
 
-    #[Pure]
     public static function Numeric(): Numeric {
         return new Numeric();
     }
 
-    #[Pure]
+    /**
+     * @return Ascii
+     */
     public function Ascii(): Ascii {
         return new Ascii();
     }
 
-    #[Pure]
+    /**
+     * @return Url
+     */
     public static function Url(): Url {
         return new Url();
     }
 
-    #[Pure]
+    /**
+     * @return Json
+     */
     public static function Json(): Json {
         return new Json();
     }
 
-    #[Pure]
+    /**
+     * @return Recaptcha
+     */
     public static function Recaptcha(): Recaptcha {
         return new Recaptcha();
     }
@@ -105,14 +115,13 @@ final class Expect2 {
      * @param bool $multiple
      * @return Cidr
      */
-    #[Pure]
     public static function Cidr(bool $multiple = false): Cidr {
         return new Cidr($multiple);
     }
 
     /**
      * @param $callable
-     * @param ...$params
+     * @param mixed ...$params
      * @return Schema|null
      */
     public static function custom($callable, ...$params): ?Schema {
