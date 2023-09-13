@@ -29,10 +29,6 @@ class Users {
             $this->secret = '';
         }
 
-        if(isset($model::$table)) {
-            $this->table = $model::$table;
-        }
-
     }
 
     /**
