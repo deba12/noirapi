@@ -12,6 +12,7 @@ use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\DummyTranslator;
 use noirapi\helpers\EasyTranslator;
+use noirapi\helpers\Filters;
 use noirapi\helpers\Macros;
 use noirapi\helpers\Session;
 use noirapi\interfaces\Translator;
@@ -58,9 +59,10 @@ class View {
 
         //enable regeneration of the template files
         $this->latte->setAutoRefresh();
-        $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
+        $this->latte->addFilterLoader(Filters::class . '::init');
         $this->latte->addExtension(new Macros());
+
         /**
          * @noinspection PhpUndefinedClassInspection
          * @noinspection RedundantSuppression
