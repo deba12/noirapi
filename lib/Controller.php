@@ -45,17 +45,6 @@ class Controller {
         $db = Config::get('db');
         $this->dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
 
-        /**
-         * @noinspection PhpUndefinedClassInspection
-         * @noinspection RedundantSuppression
-         *
-         * Tracy debug bar
-         */
-        if($this->dev && class_exists(GitVersionPanel::class) && !isset(self::$panels[ 'git' ])) {
-            self::$panels['git'] = true;
-            Debugger::getBar()->addPanel(new GitVersionPanel());
-        }
-
         if($db && empty($this->model)) {
             $model = 'app\\models\\' . Utils::getClassName(get_class($this));
             if(class_exists($model)) {
