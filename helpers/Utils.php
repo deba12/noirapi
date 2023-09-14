@@ -6,7 +6,10 @@ namespace noirapi\helpers;
 
 use Exception;
 use Nette\StaticClass;
+use ReflectionClass;
+use ReflectionException;
 use RuntimeException;
+use stdClass;
 use function array_pop;
 use function array_splice;
 use function bin2hex;
@@ -193,6 +196,58 @@ class Utils {
     public static function mb_ucfirst(string $string): string {
 
         return mb_strtoupper(mb_substr($string, 0, 1)).mb_substr($string, 1);
+
+    }
+
+    /**
+     * @param array|object $input
+     * @param string|null $className
+     * @param bool $remove_missing
+     * @return object
+     */
+    public static function toObject(array|object $input, ?string $className = null, bool $remove_missing = true): object {
+
+        if($className === null) {
+
+            $class = new stdClass();
+
+            foreach($input as $key => $value) {
+                $class->$key = $value;
+            }
+
+            return $class;
+
+        }
+
+        $class = new $className();
+
+        try {
+            $properties = (new ReflectionClass($class))->getProperties(\ReflectionProperty::IS_PUBLIC);
+        } catch (ReflectionException) {
+            return (object) $input;
+        }
+
+        foreach($properties as $property) {
+
+            $name = $property->getName();
+
+            if(is_array($input)) {
+                if(isset($input[$name])) {
+                    $class->$name = $input[$name];
+                } else if($remove_missing) {
+                    unset($class->$name);
+                }
+            } else if(is_object($input)) {
+                if(isset($input->$name)) {
+                    $class->$name = $input->$name;
+                } else if($remove_missing) {
+                    unset($class->$name);
+                }
+            }
+
+        }
+
+        return $class;
 
     }
 
