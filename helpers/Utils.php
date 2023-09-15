@@ -8,6 +8,7 @@ use Exception;
 use Nette\StaticClass;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionProperty;
 use RuntimeException;
 use stdClass;
 use function array_pop;
@@ -222,7 +223,7 @@ class Utils {
         $class = new $className();
 
         try {
-            $properties = (new ReflectionClass($class))->getProperties(\ReflectionProperty::IS_PUBLIC);
+            $properties = (new ReflectionClass($class))->getProperties(ReflectionProperty::IS_PUBLIC);
         } catch (ReflectionException) {
             return (object) $input;
         }
@@ -248,6 +249,40 @@ class Utils {
         }
 
         return $class;
+
+    }
+
+    /**
+     * @param mixed $class
+     * @param bool $public_only
+     * @return array
+     * @throws ReflectionException
+     */
+    public static function getClassProperties(mixed $class, bool $public_only = true): array {
+
+        $properties = (new ReflectionClass($class))->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
+
+        $result = [];
+
+        foreach($properties as $property) {
+            $result[] = $property->getName();
+        }
+
+        return $result;
+
+    }
+
+    /**
+     * @param mixed $var
+     * @param mixed $scope
+     * @return int|string|void
+     */
+    public static function var_name(mixed &$var, mixed $scope=false)
+    {
+        $old = $var;
+        if (($key = array_search($var = 'unique' . mt_rand() . 'value', !$scope ? $GLOBALS : $scope, true)) && $var = $old) {
+            return $key;
+        }
 
     }
 
