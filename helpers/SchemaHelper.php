@@ -24,9 +24,7 @@ class SchemaHelper {
      * @noinspection PhpUnused
      */
     public static function addMessage(string $code, string $field, string $message): void {
-
         self::$messages[$code][$field] = $message;
-
     }
 
     /**
@@ -46,7 +44,7 @@ class SchemaHelper {
             }
         }
 
-        return $exceptions->getMessage();
+        return self::$messages['_default'] ?? $exceptions->getMessage();
 
     }
 
