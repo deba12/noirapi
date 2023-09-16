@@ -6,19 +6,29 @@ namespace noirapi\helpers;
 use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use noirapi\interfaces\Translator;
+use RuntimeException;
 
 class EasyTranslator implements Translator
 {
 
     private static array $cache = [];
-    private string $file;
+
+    /**
+     * @throws Exception
+     */
     public function __construct(
         private readonly string $language,
         private readonly string $controller,
         private readonly string $function
     ) {
         /** @psalm-suppress UndefinedConstant */
-        $this->file = APPROOT . '/translations/' . $this->language . '.neon';
+        $file = APPROOT . '/translations/' . $this->language . '.neon';
+        if(is_file($file)) {
+            self::$cache[$this->language] = Neon::decodeFile($file);
+        } else {
+            self::$cache[$this->language] = [];
+        }
+
     }
 
     /**
@@ -26,7 +36,6 @@ class EasyTranslator implements Translator
      * @param string|null $key
      * @param mixed ...$args
      * @return string
-     * @throws Exception
      */
     public function translate(string $message, ?string $key = null, ...$args): string {
 
@@ -38,15 +47,6 @@ class EasyTranslator implements Translator
         // Condition for local url, we prepend the language
         if(str_starts_with($message, '/')) {
             return '/' . $this->language . $message;
-        }
-
-        if(isset(self::$cache[$this->language])) {
-            return $this->lookup(self::$cache[$this->language], $message, $key, ...$args);
-        }
-
-        if(is_file($this->file)) {
-            self::$cache[$this->language] = Neon::decodeFile($this->file);
-            return $this->lookup(self::$cache[$this->language], $message, $key, ...$args);
         }
 
         return $this->lookup(self::$cache[$this->language] ?? [], $message, $key, ...$args);
