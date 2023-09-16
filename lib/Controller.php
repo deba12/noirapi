@@ -10,7 +10,6 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use JanDrabek\Tracy\GitVersionPanel;
-use Nette\Neon\Exception;
 use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
@@ -18,6 +17,7 @@ use noirapi\helpers\RestMessage;
 use noirapi\helpers\Session;
 use noirapi\helpers\Utils;
 use noirapi\Tracy\PDOBarPanel;
+use Throwable;
 use Tracy\Debugger;
 use function get_class;
 use function in_array;
@@ -27,7 +27,7 @@ class Controller {
     public Request $request;
     public array $server;
     /** @var Model|null */
-    public $model = null;
+    public $model;
     public Response $response;
     public ?View $view = null;
     public bool $dev;
@@ -49,7 +49,7 @@ class Controller {
 
         if($db) {
 
-            if($this->model === null) {
+            if(empty($this->model)) {
 
                 $model = 'app\\models\\' . Utils::getClassName(get_class($this));
                 if(class_exists($model) && is_subclass_of($model, Model::class)) {
@@ -163,7 +163,7 @@ class Controller {
                 } else {
                     $text = Message::new($this->view?->translator->translate($text, $translation_key, $translation_args), $type ?? 'danger');
                 }
-            } catch (Exception) {
+            } catch (Throwable) {
                 // Do nothing
             }
         }
