@@ -299,15 +299,15 @@ class Response {
     }
 
     /**
-     * @param $data
+     * @param array $data
      * @return string
      */
-    private function toCsv($data): string {
+    private function toCsv(array $data): string {
 
         $fh = fopen('php://temp', 'rwb');
         fputcsv($fh, array_keys(current($data)));
 
-        foreach ( $data as $row ) {
+        foreach ($data as $row) {
             fputcsv($fh, $row);
         }
 
