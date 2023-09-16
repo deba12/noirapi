@@ -47,13 +47,17 @@ class Controller {
         $db = Config::get('db');
         $this->dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
 
-        if($db && empty($this->model)) {
+        if($db) {
 
-            $model = 'app\\models\\' . Utils::getClassName(get_class($this));
-            if(class_exists($model) && is_subclass_of($model, Model::class)) {
-                $this->model = new $model();
-            } else {
-                $this->model = new Model();
+            if($this->model === null) {
+
+                $model = 'app\\models\\' . Utils::getClassName(get_class($this));
+                if(class_exists($model) && is_subclass_of($model, Model::class)) {
+                    $this->model = new $model();
+                } else {
+                    $this->model = new Model();
+                }
+
             }
 
             /**
@@ -61,7 +65,7 @@ class Controller {
              */
             if($this->dev) {
 
-                foreach(Model::tracyGetPdo() as $driver => $pdo) {
+                foreach($this->model::tracyGetPdo() as $driver => $pdo) {
 
                     if(!isset(self::$panels[$driver])) {
                         self::$panels[$driver] = true;
