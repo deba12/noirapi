@@ -1,8 +1,10 @@
 <?php
-/** @noinspection UnknownInspectionInspection */
-/** @noinspection PhpUndefinedClassInspection */
-/** @noinspection PhpUndefinedNamespaceInspection */
-/** @noinspection PhpUnused */
+/**
+ * @noinspection UnknownInspectionInspection
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpUndefinedNamespaceInspection
+ * @noinspection PhpUnused
+ */
 declare(strict_types = 1);
 
 namespace noirapi\lib;
