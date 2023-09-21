@@ -33,21 +33,21 @@ final class Expect2 {
     /**
      * @param string $format
      * @param DateTimeZone|null $timeZone
-     * @return Date
-     * @throws Exception
-     */
-    public static function date(string $format = 'Y-m-d', ?DateTimeZone $timeZone = null): Date {
-        return new Date($format, $timeZone);
-    }
-
-    /**
-     * @param string $format
-     * @param DateTimeZone|null $timeZone
      * @return DateTime
      * @throws Exception
      */
     public static function dateTime(string $format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null): DateTime {
         return new DateTime($format, $timeZone);
+    }
+
+    /**
+     * @param string $format
+     * @param DateTimeZone|null $timeZone
+     * @return Date
+     * @throws Exception
+     */
+    public static function date(string $format = 'Y-m-d', ?DateTimeZone $timeZone = null): Date {
+        return new Date($format, $timeZone);
     }
 
     /**
