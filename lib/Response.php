@@ -15,6 +15,8 @@ use function is_array;
 
 class Response {
 
+    // 1mb
+    private int $csv_maxmem = 1024 * 1024;
     private string|array|RestMessage $body = '';
     private int $status = 200;
     private string $contentType = self::TYPE_HTML;
@@ -304,19 +306,35 @@ class Response {
      */
     private function toCsv($data): string {
 
+        $written = 0;
+
+        $csv = '';
+
         $fh = fopen('php://temp', 'rwb');
         fputcsv($fh, array_keys((array)current($data)));
 
         foreach ( $data as $row ) {
-            fputcsv($fh, (array)$row);
+            $w = fputcsv($fh, (array)$row);
+            if($w === false) {
+                throw new RuntimeException('fputcsv failed');
+            }
+            $written += $w;
+            if($written > $this->csv_maxmem) {
+                rewind($fh);
+                $csv .= stream_get_contents($fh);
+                $written = 0;
+                ftruncate($fh, 0);
+                // Important in order to avoid memory leaks
+                rewind($fh);
+            }
         }
 
         rewind($fh);
 
-        $csv = stream_get_contents($fh);
+        $csv .= stream_get_contents($fh);
 
-        if($csv === false) {
-            throw new RuntimeException('stream_get_contents failed');
+        if(empty($csv)) {
+            throw new RuntimeException('no csv data found');
         }
 
         fclose($fh);
