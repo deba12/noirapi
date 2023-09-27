@@ -305,10 +305,10 @@ class Response {
     private function toCsv($data): string {
 
         $fh = fopen('php://temp', 'rwb');
-        fputcsv($fh, array_keys(current($data)));
+        fputcsv($fh, array_keys((array)current($data)));
 
         foreach ( $data as $row ) {
-            fputcsv($fh, $row);
+            fputcsv($fh, (array)$row);
         }
 
         rewind($fh);
