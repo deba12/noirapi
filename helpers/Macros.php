@@ -70,21 +70,21 @@ class Macros extends Extension {
                     throw new RuntimeException("Pager is not setup");
                 }
 
-                if($pager->getPageCount() == 1) { $idxl = 0; $idxr = 0; }
+                if($pager->getPageCount() == 1) { $index_left = 0; $index_right = 0; }
                 else if($pager->getPageCount() < 5) {
-                    $idxl = round($pager->getPageCount() / $pager->getPage(), 0, PHP_ROUND_HALF_UP) + $pager->getPage();
-                    $idxr = $pager->getPageCount()-$pager->getPage();
+                    $index_left = round($pager->getPageCount() / $pager->getPage(), 0, PHP_ROUND_HALF_UP) + $pager->getPage();
+                    $index_right = $pager->getPageCount()-$pager->getPage();
                 }
-                else if($pager->getPage() == 1) { $idxl = 0; $idxr = 4; }
-                else if($pager->getPage() == 2) { $idxl = 1; $idxr = 3; }
-                else if($pager->getPage() == $pager->getLastPage()) { $idxl = 4; $idxr = 0; }
-                else if($pager->getPage() == $pager->getLastPage() -1 ) { $idxl = 3; $idxr = 1; }
-                else { $idxl = 2; $idxr = 2; }
+                else if($pager->getPage() == 1) { $index_left = 0; $index_right = 4; }
+                else if($pager->getPage() == 2) { $index_left = 1; $index_right = 3; }
+                else if($pager->getPage() == $pager->getLastPage()) { $index_left = 4; $index_right = 0; }
+                else if($pager->getPage() == $pager->getLastPage() -1 ) { $index_left = 3; $index_right = 1; }
+                else { $index_left = 2; $index_right = 2; }
 
                 $this->createTemplate(\'%raw\', [
                     \'pager\' => $pager,
-                    \'idxl\' => $idxl,
-                    \'idxr\' => $idxr,
+                    \'index_left\' => $index_left,
+                    \'index_right\' => $index_right,
                  ], \'include\')->renderToContentType(\'html\');',
                 $file
             )
