@@ -9,21 +9,23 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use Exception;
 use JsonException;
 use LaLit\Array2XML;
 use noirapi\helpers\RestMessage;
 use RuntimeException;
+use SimpleXMLElement;
 use function is_array;
 
 class Response {
 
-    // 1mb
-    private int $csv_maxmem = 1024 * 1024;
-    private string|array|RestMessage $body = '';
+    private int $csv_maxmem = 1024 * 1024; //1 MB
+    private string|array|object $body = '';
     private int $status = 200;
     private string $contentType = self::TYPE_HTML;
     private array $headers = [];
     private array $cookies = [];
+    private string $xml_root = '<root/>';
 
     private array $headersCallback = [];
 
@@ -46,6 +48,7 @@ class Response {
         if(is_float($body) || is_int($body)) {
             $body = (string)$body;
         }
+
         $this->body = $body;
         return $this;
     }
@@ -56,6 +59,11 @@ class Response {
      * @return $this
      */
     public function appendBody(mixed $body): Response {
+
+        if(gettype($body) !== gettype($this->body)) {
+            throw new RuntimeException('Invalid body type: ' . gettype($body) . ' for response->body type: ' . gettype($this->body));
+        }
+
         if (is_array($this->body)) {
             $this->body += $body;
             return $this;
@@ -74,74 +82,49 @@ class Response {
      * @return string
      * @throws JsonException
      * @throws RuntimeException
+     * @throws Exception
      * @noinspection PhpUndefinedClassInspection
      */
     public function getBody(): string {
 
-        if($this->contentType === self::TYPE_HTML) {
-
-            if($this->body instanceof RestMessage) {
-                $this->body = $this->body->toArray();
-            }
-
-            if(is_array($this->body)) {
-                return implode(PHP_EOL, $this->body);
-            }
-
+        if(is_string($this->body)) {
             return $this->body;
-
         }
 
-        if($this->contentType === self::TYPE_JSON) {
+        if(is_object($this->body)) {
+            if (method_exists($this->body, '__toString')) {
+                return $this->body->__toString();
+            }
 
-            if($this->body instanceof RestMessage) {
+            if(method_exists($this->body, 'toJson')) {
                 return $this->body->toJson();
             }
 
-            if(is_array($this->body)){
-                return json_encode($this->body, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
+            if (method_exists($this->body, 'toArray')) {
+                $this->body = $this->body->toArray();
+            } else {
+                $this->body = $this->object2array($this->body);
             }
+        }
 
-            return $this->body;
+        if($this->contentType === self::TYPE_HTML && is_array($this->body)) {
+            return implode(PHP_EOL, $this->body);
+        }
 
+        if($this->contentType === self::TYPE_JSON) {
+            return json_encode($this->body, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
         }
 
         if($this->contentType === self::TYPE_XML) {
-
-            if(is_string($this->body)) {
-                return $this->body;
+            if(class_exists(Array2XML::class)) {
+                return Array2XML::createXML($this->xml_root, $this->body)->saveXML();
             }
 
-            if(!class_exists(Array2XML::class)) {
-                throw new RuntimeException('Array2XML class not found');
-            }
-
-            if($this->body instanceof RestMessage) {
-                $this->body = $this->body->toArray();
-            }
-
-            return Array2XML::createXML('root', $this->body)->saveXML();
-
+            return $this->array2xml($this->body)->saveXML();
         }
 
-        if(($this->contentType === self::TYPE_CSV)) {
-
-            if($this->body instanceof RestMessage) {
-                $this->body = $this->body->toArray();
-            }
-
-            if(is_array($this->body)){
-                $this->body = $this->toCsv($this->body);
-            }
-
-            return $this->body;
-
-        }
-
-        if($this->body instanceof RestMessage) {
-
-            return $this->body->toJson();
-
+        if($this->contentType === self::TYPE_CSV) {
+            return $this->toCsv($this->body);
         }
 
         throw new RuntimeException('Invalid body type: ' . gettype($this->body) . ' for content type: ' . $this->contentType);
@@ -151,7 +134,7 @@ class Response {
     /**
      * @return string|array|RestMessage
      */
-    public function getRawBody(): string|array|RestMessage {
+    public function getRawBody(): string|array|object {
         return $this->body;
     }
 
@@ -171,6 +154,7 @@ class Response {
      */
     public function withStatus(int $status): Response {
         $this->status = $status;
+
         return $this;
     }
 
@@ -317,46 +301,13 @@ class Response {
     }
 
     /**
-     * @param $data
-     * @return string
+     * @param string $root
+     * @return $this
      */
-    private function toCsv($data): string {
+    public function setXmlRoot(string $root): Response {
+        $this->xml_root = $root;
 
-        $written = 0;
-
-        $csv = '';
-
-        $fh = fopen('php://temp', 'rwb');
-        fputcsv($fh, array_keys((array)current($data)));
-
-        foreach ( $data as $row ) {
-            $w = fputcsv($fh, (array)$row);
-            if($w === false) {
-                throw new RuntimeException('fputcsv failed');
-            }
-            $written += $w;
-            if($written > $this->csv_maxmem) {
-                rewind($fh);
-                $csv .= stream_get_contents($fh);
-                $written = 0;
-                ftruncate($fh, 0);
-                // Important in order to avoid memory leaks
-                rewind($fh);
-            }
-        }
-
-        rewind($fh);
-
-        $csv .= stream_get_contents($fh);
-
-        if(empty($csv)) {
-            throw new RuntimeException('no csv data found');
-        }
-
-        fclose($fh);
-
-        return $csv;
-
+        return $this;
     }
 
     /**
@@ -386,6 +337,80 @@ class Response {
 
         return $object;
 
+    }
+
+    /**
+     * @param array|object $data
+     * @return string
+     */
+    private function toCsv(array|object $data): string {
+
+        $csv = '';
+        $written = 0;
+
+        $fh = fopen('php://temp', 'rwb');
+        fputcsv($fh, array_keys((array)current($data)));
+
+        foreach($data as $key => $row) {
+            $w = fputcsv($fh, (array)$row);
+            if($w === false) {
+                throw new RuntimeException('fputcsv failed on key: ' . $key . ' with error: ' . error_get_last()['message']);
+            }
+            $written += $w;
+            if($written > $this->csv_maxmem) {
+                rewind($fh);
+                $csv .= stream_get_contents($fh);
+                $written = 0;
+                ftruncate($fh, 0);
+                // Important in order to avoid memory leaks
+                rewind($fh);
+            }
+        }
+
+        rewind($fh);
+
+        $csv .= stream_get_contents($fh);
+
+        if(empty($csv)) {
+            throw new RuntimeException('no csv data found');
+        }
+
+        fclose($fh);
+
+        return $csv;
+
+    }
+
+    /**
+     * @param array $array
+     * @param SimpleXMLElement|null $xml
+     * @return SimpleXMLElement
+     * @throws Exception
+     */
+    private function array2xml(array $array, ?SimpleXMLElement $xml = null): SimpleXMLElement {
+        $xml ?? ($xml = new SimpleXMLElement($this->xml_root));
+
+        foreach ($array as $k => $v) {
+            is_array($v)
+                ? $this->array2xml($v, $xml->addChild($k))
+                : $xml->addChild($k, $v);
+        }
+
+        return $xml;
+    }
+
+    /**
+     * @param object $object
+     * @return array
+     */
+    private function object2array(object $object): array {
+        $result = [];
+
+        foreach ($object as $key => $value) {
+            $result[$key] = (is_array($value) || is_object($value)) ? $this->object2array($value) : $value;
+        }
+
+        return $result;
     }
 
 }
