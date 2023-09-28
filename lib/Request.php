@@ -25,7 +25,7 @@ class Request {
     public bool $https;
     public bool $ajax;
     public $swoole = null;
-    public string $host;
+    public string $hostname;
     public ?string $language = null;
 
     /**
@@ -37,55 +37,33 @@ class Request {
      * @return static
      */
     public static function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): static {
-
-        $static = new static();
-
-        $static->globalsRequestHeaders($server);
-        $static->host       = $server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? '';
-        $static->method     = $server['REQUEST_METHOD'];
-        $static->uri        = $server['REQUEST_URI'];
-        $static->get        = $get;
-        $static->post       = $post;
-        $static->files      = $files;
-        $static->cookies    = $cookies;
-
-        $static->https = self::is_https($server);
-        $static->ajax = self::is_ajax($server);
+        $static = self::transform($server, $get, $post, $files, $cookies);
+        $static->headers = self::globalsRequestHeaders($server);
 
         return $static;
-
     }
 
     public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): static {
-
-        $static = new static();
+        $static = self::transform($server, $get, $post, $files, $cookies);
         $static->headers = self::swooleUpperCase($server['headers']);
-        $static->method = $server['request_method'];
-        $static->uri = $server['request_uri'];
-        $static->get = $get;
-        $static->post = $post;
-        $static->files = $files;
-        $static->cookies = $cookies;
-
-        $static->https = self::is_https($server);
-        $static->ajax = self::is_ajax($server);
 
         return $static;
-
     }
 
-    private function globalsRequestHeaders(array $server): void {
+    private static function globalsRequestHeaders(array $server): array {
+        $headers = [];
 
-        foreach ($server as $name => $value) {
+        foreach($server as $name => $value) {
 
             if (str_starts_with($name, 'HTTP_')) {
                 //get Header key w/o HTTP_
                 $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
-                $this->headers[$key] = $value;
+                $headers[$key] = $value;
             }
 
         }
 
+        return $headers;
     }
 
     /**
@@ -93,7 +71,6 @@ class Request {
      * @return array
      */
     public static function swooleUpperCase(array $headers): array {
-
         $res = [];
         array_walk($headers, static function($value, $key) use(&$res) {
             if(is_string($key)) {
@@ -103,7 +80,6 @@ class Request {
         });
 
         return $res;
-
     }
 
     /**
@@ -111,9 +87,7 @@ class Request {
      * @return bool
      */
     private static function is_https(array $server): bool {
-
         if (isset($_SERVER['HTTPS'])) {
-
             if (strtolower($server['HTTPS'])  === 'on') {
                 return true;
             }
@@ -121,21 +95,15 @@ class Request {
             if ($server['HTTPS'] === "1") {
                 return true;
             }
-
         } elseif (isset($server['SERVER_PORT']) && ($server['SERVER_PORT'] === 443)) {
-
             return true;
-
         }
 
         return false;
-
     }
 
     private static function is_ajax(array $server): bool {
-
         return isset($server[ 'HTTP_X_REQUESTED_WITH' ]) && strtolower($server[ 'HTTP_X_REQUESTED_WITH' ]) === 'xmlhttprequest';
-
     }
 
     /**
@@ -158,6 +126,23 @@ class Request {
         $this->ajax = $ajax;
 
         return $this;
+    }
+
+    private static function transform(array $server, array $get, array $post, array $files, array $cookies): static {
+        $static = new static();
+
+        $static->hostname   = $server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? '';
+        $static->method     = $server['REQUEST_METHOD'];
+        $static->uri        = $server['REQUEST_URI'];
+        $static->get        = $get;
+        $static->post       = $post;
+        $static->files      = $files;
+        $static->cookies    = $cookies;
+
+        $static->https = self::is_https($server);
+        $static->ajax = self::is_ajax($server);
+
+        return $static;
     }
 
 }
