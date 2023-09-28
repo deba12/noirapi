@@ -45,8 +45,19 @@ class Response {
      * @return $this
      */
     public function setBody(mixed $body): Response {
-        if(is_float($body) || is_int($body)) {
+
+        if($body === null) {
+            $body = '';
+        } elseif(is_float($body) || is_int($body)) {
             $body = (string)$body;
+        } elseif($body === true) {
+            $body = 'true';
+        } elseif($body === false) {
+            $body = 'false';
+        } elseif(is_resource($body)) {
+            throw new RuntimeException('Invalid body type: resource');
+        } elseif(is_callable($body)) {
+            throw new RuntimeException('Invalid body type: callable');
         }
 
         $this->body = $body;
