@@ -1,4 +1,5 @@
-<?php
+<?php /** @noinspection PhpUndefinedNamespaceInspection */
+/** @noinspection PhpUndefinedClassInspection */
 declare(strict_types=1);
 
 use noirapi\Config;
@@ -34,12 +35,13 @@ $server->on('start', function () use($listen_ip, $listen_port) {
 });
 
 $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) use($server) {
-
     $route = new Route();
 
     $request->server['headers'] = $request->header;
     $route->fromSwoole($request->server, $request->get ?? [], $request->post ?? [], $request->files ?? [], $request->cookie ?? []);
     $route->setSwoole($server);
+
+    /** @noinspection PhpUnhandledExceptionInspection */
     $res = $route->serve();
 
     $response->setStatusCode($res['status']);
