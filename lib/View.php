@@ -8,6 +8,7 @@ use Latte\Bridges\Tracy\BlueScreenPanel;
 use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
+use Nette\Neon\Exception;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\DummyTranslator;
@@ -46,9 +47,9 @@ class View {
      * @param Response $response
      * @param bool $dev
      * @throws FileNotFoundException
+     * @throws Exception
      */
     public function __construct(Request $request, Response $response, bool $dev = false) {
-
         $this->request = $request;
         $this->response = $response;
         $this->params = new stdClass();
@@ -115,7 +116,6 @@ class View {
         $this->latte->setStrictTypes();
 
         self::$uri = $request->uri;
-
     }
 
     /**
@@ -124,7 +124,6 @@ class View {
      * @throws FileNotFoundException
      */
     public function display(array $params = []): Response {
-
         if($this->template === null) {
             $this->setTemplate($this->request->function);
         }
@@ -153,7 +152,6 @@ class View {
         $this->mergeParams($this->layout, 'layout');
 
         return $this->response->setBody($this->latte->renderToString($layout, $this->params));
-
     }
 
     /**
@@ -164,7 +162,6 @@ class View {
      * @throws FileNotFoundException
      */
     public function print(?string $layout, string $view, array $params = []): string {
-
         $this->setTemplate($view);
         $params['template'] = $this->template;
         $this->mergeParams($params);
@@ -185,7 +182,6 @@ class View {
         }
 
         return $this->latte->renderToString($this->template, $this->params);
-
     }
 
     /**
@@ -196,7 +192,6 @@ class View {
      * @throws FileNotFoundException
      */
     public function setTemplate(string $template, string $controller = null): View {
-
         if($controller === null) {
             $controller = $this->request->controller;
         }
@@ -209,16 +204,13 @@ class View {
         }
 
         throw new FileNotFoundException('Unable to find template: ' . $file);
-
     }
 
     /**
      * @return string|null
      */
     public function getTemplate(): ?string {
-
         return $this->template;
-
     }
 
 
@@ -253,7 +245,6 @@ class View {
         }
 
         throw new FileNotFoundException('Unable to find layout_file: ' . $file);
-
     }
 
 
@@ -262,9 +253,7 @@ class View {
      * @noinspection GetSetMethodCorrectnessInspection
      */
     public function getLayout(): ?string {
-
         return $this->layout_file;
-
     }
 
     /**
@@ -301,7 +290,6 @@ class View {
      * @return string
      */
     public static function add_url_var(string $param, int|string $page): string {
-
         $params = parse_url(self::$uri, PHP_URL_QUERY);
 
         if(!empty($params)) {
@@ -314,6 +302,7 @@ class View {
             }
             return '?' . $param . '=' . $page;
         }
+
         return '?' . $param . '=' . $page;
     }
 
@@ -324,9 +313,7 @@ class View {
      * this is used by system panel
      */
     public function getParams(): array {
-
         return get_object_vars($this);
-
     }
 
     /**
@@ -335,7 +322,6 @@ class View {
      * @return void
      */
     public function mergeParams(array|object $params, ?string $namespace = null): void {
-
         if($namespace === null) {
 
             foreach($params as $key => $value) {
@@ -351,7 +337,6 @@ class View {
         } else {
             throw new RuntimeException("Duplicate key ain view params: $namespace");
         }
-
     }
 
     /**
