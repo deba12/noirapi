@@ -19,14 +19,13 @@ use function is_array;
 
 class Response {
 
+    private int $status = 200;
     private int $csv_maxmem = 1024 * 1024; //1 MB
     private string|array|object $body = '';
-    private int $status = 200;
     private string $contentType = self::TYPE_HTML;
+    private string $xml_root = '<root/>';
     private array $headers = [];
     private array $cookies = [];
-    private string $xml_root = '<root/>';
-
     private array $headerCallback = [];
 
     public const TYPE_JSON  = 'application/json';
@@ -45,7 +44,6 @@ class Response {
      * @return $this
      */
     public function setBody(mixed $body): Response {
-
         if($body === null) {
             $body = '';
         } elseif(is_float($body) || is_int($body)) {
@@ -70,7 +68,6 @@ class Response {
      * @return $this
      */
     public function appendBody(mixed $body): Response {
-
         if(gettype($body) !== gettype($this->body)) {
             throw new RuntimeException('Invalid body type: ' . gettype($body) . ' for response->body type: ' . gettype($this->body));
         }
@@ -97,7 +94,6 @@ class Response {
      * @noinspection PhpUndefinedClassInspection
      */
     public function getBody(): string {
-
         if(is_string($this->body)) {
             return $this->body;
         }
@@ -139,7 +135,6 @@ class Response {
         }
 
         throw new RuntimeException('Invalid body type: ' . gettype($this->body) . ' for content type: ' . $this->contentType);
-
     }
 
     /**
@@ -150,13 +145,11 @@ class Response {
     }
 
     public function getRestMessage(): RestMessage {
-
         if($this->body instanceof RestMessage) {
             return $this->body;
         }
 
         throw new RuntimeException('Response body is not a RestMessage');
-
     }
 
     /**
@@ -236,7 +229,6 @@ class Response {
      * @return array
      */
     public function getHeaders(): array {
-
         $headers = array_merge([], $this->headers);
 
         foreach($this->headerCallback as $callback) {
@@ -248,7 +240,6 @@ class Response {
         }
 
         return $headers;
-
     }
 
     /**
@@ -257,6 +248,7 @@ class Response {
      */
     public function downloadFile(string $filename): Response {
         $this->addHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
+
         return $this;
     }
 
@@ -267,6 +259,7 @@ class Response {
     public function inlineFile(string $filename): Response {
         $this->addHeader('Content-Disposition', 'inline; filename="' . $filename . '"');
         $this->addHeader('Content-Transfer-Encoding', 'binary');
+
         return $this;
     }
 
@@ -287,6 +280,7 @@ class Response {
             'httponly'  => true,
             'samesite'  => 'strict'
         ];
+
         return $this;
     }
 
@@ -317,7 +311,6 @@ class Response {
      */
     public function setXmlRoot(string $root): Response {
         $this->xml_root = $root;
-
         return $this;
     }
 
@@ -327,7 +320,6 @@ class Response {
      * @return stdClass
      */
     private function objectMerge(object $class1, object $class2): stdClass {
-
         $object = new stdClass();
 
         foreach($class1 as $key => $value) {
@@ -347,7 +339,6 @@ class Response {
         }
 
         return $object;
-
     }
 
     /**
@@ -355,7 +346,6 @@ class Response {
      * @return string
      */
     private function toCsv(array|object $data): string {
-
         $csv = '';
         $written = 0;
 
@@ -389,7 +379,6 @@ class Response {
         fclose($fh);
 
         return $csv;
-
     }
 
     /**
