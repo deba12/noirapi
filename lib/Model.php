@@ -27,7 +27,6 @@ class Model {
      * @throws ConfigException
      */
     public function __construct(array $params = []) {
-
         if(empty($params)) {
 
             if(empty(self::$pdo[$this->driver])) {
@@ -63,17 +62,14 @@ class Model {
             $this->db = new Database(Connection::fromPDO($pdo));
 
         }
-
     }
 
     public static function tracyGetPdo(): array {
-
         if(!empty(self::$pdo)) {
             return self::$pdo;
         }
 
         return [];
-
     }
 
     /**
@@ -107,6 +103,7 @@ class Model {
         if($this->driver === 'mysql') {
             $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 0);
         }
+
         $this->db->getConnection()->getPDO()->beginTransaction();
     }
 
@@ -116,6 +113,7 @@ class Model {
      */
     public function commit(): void {
         $this->db->getConnection()->getPDO()->commit();
+
         if($this->driver === 'mysql') {
             $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 1);
         }
@@ -126,6 +124,7 @@ class Model {
      */
     public function rollback(): void {
         $this->db->getConnection()->getPDO()->rollBack();
+
         if($this->driver === 'mysql') {
             $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 1);
         }
@@ -139,7 +138,6 @@ class Model {
      * @noinspection PhpUnused
      */
     public function paginator(int $itemCount, int $itemsPerPage = 20, ?int $page = null): Paginator {
-
         if(!class_exists(Paginator::class)) {
             throw new RuntimeException('Unable to find nette/paginator');
         }
@@ -152,7 +150,6 @@ class Model {
         }
 
         return $paginator;
-
     }
 
     /**
@@ -172,33 +169,6 @@ class Model {
      */
     public function unlock(): void {
         $this->db->getConnection()->query('UNLOCK TABLES');
-    }
-
-    /**
-     * @param string $text
-     * @return bool
-     * @noinspection PhpUnused
-     */
-    public function shouldRetry(string $text): bool {
-
-        $errors = [
-            'server has gone away',
-            'no connection to the server',
-            'Lost connection',
-            'is dead or not enabled',
-            'Error while sending',
-            'decryption failed or bad record mac',
-            'SSL connection has been closed unexpectedly',
-        ];
-
-        foreach($errors as $error) {
-            if(str_contains($text, $error)) {
-                return true;
-            }
-        }
-
-        return false;
-
     }
 
 }
