@@ -1,8 +1,10 @@
 <?php
-/** @noinspection UnknownInspectionInspection */
-/** @noinspection PhpUndefinedClassInspection */
-/** @noinspection PhpUndefinedNamespaceInspection */
-/** @noinspection PhpUnused */
+/**
+ * @noinspection UnknownInspectionInspection
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpUndefinedNamespaceInspection
+ * @noinspection PhpUnused
+ */
 declare(strict_types = 1);
 
 namespace noirapi\lib;
@@ -37,19 +39,33 @@ class Response {
     public const TYPE_ZIP   = 'application/zip';
 
     /**
-     * @param $body
+     * @param mixed $body
      * @return $this
      */
-    public function setBody($body): Response {
+    public function setBody(mixed $body): Response {
+        if(is_float($body) || is_int($body)) {
+            $body = (string)$body;
+        }
         $this->body = $body;
         return $this;
     }
 
+
     /**
-     * @param $body
+     * @param mixed $body
      * @return $this
      */
-    public function appendBody($body): Response {
+    public function appendBody(mixed $body): Response {
+        if (is_array($this->body)) {
+            $this->body += $body;
+            return $this;
+        }
+
+        if(is_object($this->body)) {
+            $this->body = $this->objectMerge($this->body, $body);
+            return $this;
+        }
+
         $this->body .= $body;
         return $this;
     }
@@ -295,7 +311,7 @@ class Response {
         return $this->cookies;
     }
 
-    public function addHeadersCallback(callable $callback): Response {
+    public function addHeaderCallback(callable $callback): Response {
         $this->headersCallback[] = $callback;
         return $this;
     }
@@ -340,6 +356,35 @@ class Response {
         fclose($fh);
 
         return $csv;
+
+    }
+
+    /**
+     * @param object $class1
+     * @param object $class2
+     * @return stdClass
+     */
+    private function objectMerge(object $class1, object $class2): stdClass {
+
+        $object = new stdClass();
+
+        foreach($class1 as $key => $value) {
+            if(is_object($value)) {
+                $object->$key = $this->objectMerge($object->$key, $value);
+            } else {
+                $object->$key = $value;
+            }
+        }
+
+        foreach($class2 as $key => $value) {
+            if(is_object($value)) {
+                $object->$key = $this->objectMerge($object->$key, $value);
+            } else {
+                $object->$key = $value;
+            }
+        }
+
+        return $object;
 
     }
 
