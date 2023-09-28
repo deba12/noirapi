@@ -72,6 +72,7 @@ class Message {
 
     /**
      * @return $this
+     * @noinspection PhpUnused
      */
     public function light(): Message {
         $this->type = 'light';

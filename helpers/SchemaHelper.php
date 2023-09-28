@@ -32,7 +32,6 @@ class SchemaHelper {
      * @return string
      */
     public static function message(ValidationException $exceptions): string {
-
         foreach($exceptions->getMessageObjects() as $exception) {
             $path = array_shift($exception->path);
             if(isset(self::$messages[$path])) {
@@ -45,7 +44,6 @@ class SchemaHelper {
         }
 
         return self::$messages['_default'] ?? $exceptions->getMessage();
-
     }
 
 }

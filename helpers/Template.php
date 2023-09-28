@@ -37,7 +37,6 @@ class Template {
      * @noinspection PhpUnused
      */
     public function setTemplate(string $template): Template {
-
         /** @psalm-suppress UndefinedConstant */
         $file = PATH_TEMPLATES . DIRECTORY_SEPARATOR . $template . self::latte_ext;
 
@@ -47,7 +46,6 @@ class Template {
         }
 
         throw new FileNotFoundException('Unable to find template: ' . $file);
-
     }
 
 }

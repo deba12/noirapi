@@ -37,6 +37,7 @@ class Utils {
      * @throws Exception
      */
     public static function random(int $len = 16): string {
+        /** @noinspection SpellCheckingInspection */
         $chars = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $res = '';
 
@@ -86,6 +87,7 @@ class Utils {
      * @throws Exception
      */
     public static function randomString(int $len= 8): string {
+        /** @noinspection SpellCheckingInspection */
         $chars = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $res = '';
 
@@ -131,7 +133,7 @@ class Utils {
         // Set bits 6-7 to 10
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
-        // Output the 36 character UUID.
+        // Output the 36-character UUID.
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 
     }
@@ -184,9 +186,7 @@ class Utils {
      * @return bool
      */
     public static function is_tty(): bool {
-
         return posix_isatty(defined('STDOUT') ? STDOUT : null);
-
     }
 
     /**
@@ -195,9 +195,7 @@ class Utils {
      * @noinspection SpellCheckingInspection
      */
     public static function mb_ucfirst(string $string): string {
-
         return mb_strtoupper(mb_substr($string, 0, 1)).mb_substr($string, 1);
-
     }
 
     /**
@@ -207,7 +205,6 @@ class Utils {
      * @return object
      */
     public static function toObject(array|object $input, ?string $className = null, bool $remove_missing = true): object {
-
         if($className === null) {
 
             $class = new stdClass();
@@ -249,7 +246,6 @@ class Utils {
         }
 
         return $class;
-
     }
 
     /**
@@ -259,17 +255,15 @@ class Utils {
      * @throws ReflectionException
      */
     public static function getClassProperties(mixed $class, bool $public_only = true): array {
+        $result = [];
 
         $properties = (new ReflectionClass($class))->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
-
-        $result = [];
 
         foreach($properties as $property) {
             $result[] = $property->getName();
         }
 
         return $result;
-
     }
 
     /**
