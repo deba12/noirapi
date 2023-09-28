@@ -27,7 +27,7 @@ class Response {
     private array $cookies = [];
     private string $xml_root = '<root/>';
 
-    private array $headersCallback = [];
+    private array $headerCallback = [];
 
     public const TYPE_JSON  = 'application/json';
     public const TYPE_XML   = 'text/xml';
@@ -228,7 +228,7 @@ class Response {
 
         $headers = array_merge([], $this->headers);
 
-        foreach($this->headersCallback as $callback) {
+        foreach($this->headerCallback as $callback) {
             $res = $callback($this);
             if(is_array($res)) {
                 /** @noinspection SlowArrayOperationsInLoopInspection */
@@ -296,7 +296,7 @@ class Response {
     }
 
     public function addHeaderCallback(callable $callback): Response {
-        $this->headersCallback[] = $callback;
+        $this->headerCallback[] = $callback;
         return $this;
     }
 
