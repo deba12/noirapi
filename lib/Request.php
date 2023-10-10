@@ -125,6 +125,7 @@ class Request {
      * @param bool $https
      * @return $this
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function setHttps(bool $https): static {
         $this->https = $https;
@@ -136,6 +137,7 @@ class Request {
      * @param bool $ajax
      * @return $this
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function setAjax(bool $ajax): static {
         $this->ajax = $ajax;

@@ -60,6 +60,7 @@ class Route {
      * @param array $files
      * @param array $cookies
      * @return self
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): self {
         $self = new self();
@@ -74,6 +75,7 @@ class Route {
      * @param Server $server
      * @return void
      * @noinspection PhpUndefinedClassInspection
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function setSwoole(Server $server): void {
         $this->request->swoole = $server;

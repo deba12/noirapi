@@ -160,6 +160,7 @@ class View {
      * @param array $params
      * @return string
      * @throws FileNotFoundException
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function print(?string $layout, string $view, array $params = []): string {
         $this->setTemplate($view);
@@ -187,11 +188,12 @@ class View {
     /**
      * @param string $template
      * @param string|null $controller
-     * @return View
+     * @return self
      * @noinspection PhpUnused
      * @throws FileNotFoundException
+     * @psalm-suppress PossiblyUnusedReturnValue
      */
-    public function setTemplate(string $template, string $controller = null): View {
+    public function setTemplate(string $template, string $controller = null): self {
         if($controller === null) {
             $controller = $this->request->controller;
         }
@@ -208,6 +210,7 @@ class View {
 
     /**
      * @return string|null
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getTemplate(): ?string {
         return $this->template;
@@ -217,6 +220,7 @@ class View {
     /**
      * @return $this
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function noLayout(): View {
         $this->layout_file = null;
@@ -225,11 +229,13 @@ class View {
 
     /**
      * @param string|null $layout_file
-     * @return View
+     * @return self
      * @throws FileNotFoundException
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress PossiblyUnusedReturnValue
      */
-    public function setLayout(?string $layout_file = null): View {
+    public function setLayout(?string $layout_file = null): self {
         if($layout_file === null) {
             $this->layout_file = null;
             return $this;
@@ -251,6 +257,7 @@ class View {
     /**
      * @return string|null
      * @noinspection GetSetMethodCorrectnessInspection
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getLayout(): ?string {
         return $this->layout_file;
@@ -261,6 +268,7 @@ class View {
      * @param string|null $controller
      * @return bool
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function templateExists(string $template, string $controller = null): bool {
         if($controller === null) {
@@ -276,6 +284,7 @@ class View {
      * @param string $layout
      * @return bool
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function layoutExists(string $layout): bool {
         /** @psalm-suppress UndefinedConstant */
@@ -288,6 +297,7 @@ class View {
      * @param string $param
      * @param int|string $page
      * @return string
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public static function add_url_var(string $param, int|string $page): string {
         $params = parse_url(self::$uri, PHP_URL_QUERY);
@@ -309,6 +319,7 @@ class View {
     /**
      * @return array
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      *
      * this is used by system panel
      */

@@ -67,6 +67,7 @@ class Response {
     /**
      * @param mixed $body
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function appendBody(mixed $body): Response {
         if(gettype($body) !== gettype($this->body)) {
@@ -140,11 +141,16 @@ class Response {
 
     /**
      * @return string|array|object
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getRawBody(): string|array|object {
         return $this->body;
     }
 
+    /**
+     * @return RestMessage
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function getRestMessage(): RestMessage {
         if($this->body instanceof RestMessage) {
             return $this->body;
@@ -182,6 +188,7 @@ class Response {
 
     /**
      * @return string
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getContentType(): string {
         return $this->contentType;
@@ -198,6 +205,7 @@ class Response {
 
     /**
      * @return string
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getLocation(): string {
         if(empty($this->location)) {
@@ -211,6 +219,7 @@ class Response {
      * @param string $key
      * @param string $value
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function addHeader(string $key, string $value): Response {
         $this->headers[$key] = $value;
@@ -220,6 +229,7 @@ class Response {
     /**
      * @param string $key
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function removeHeader(string $key): Response {
         unset($this->headers[$key]);
@@ -246,6 +256,7 @@ class Response {
     /**
      * @param string $filename
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function downloadFile(string $filename): Response {
         $this->addHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
@@ -256,6 +267,7 @@ class Response {
     /**
      * @param string $filename
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function inlineFile(string $filename): Response {
         $this->addHeader('Content-Disposition', 'inline; filename="' . $filename . '"');
@@ -288,6 +300,7 @@ class Response {
     /**
      * @param string $key
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function clearCookie(string $key): Response {
         $this->addCookie($key, '', 0);
@@ -301,6 +314,11 @@ class Response {
         return $this->cookies;
     }
 
+    /**
+     * @param callable $callback
+     * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function addHeaderCallback(callable $callback): Response {
         $this->headerCallback[] = $callback;
         return $this;
@@ -309,6 +327,7 @@ class Response {
     /**
      * @param string $root
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function setXmlRoot(string $root): Response {
         $this->xml_root = $root;
