@@ -351,12 +351,13 @@ class Response {
         $written = 0;
 
         $fh = fopen('php://temp', 'rwb');
-        fputcsv($fh, array_keys((array)current($data)));
+        fputcsv($fh, array_keys(current((array)$data)));
 
         foreach($data as $key => $row) {
             $w = fputcsv($fh, (array)$row);
             if($w === false) {
-                throw new RuntimeException('fputcsv failed on key: ' . $key . ' with error: ' . error_get_last()['message']);
+                $error = error_get_last();
+                throw new RuntimeException('fputcsv failed on key: ' . $key . ' with error: ' . ($error === null ? 'unknown' : $error['message']));
             }
             $written += $w;
             if($written > $this->csv_maxmem) {
@@ -401,10 +402,10 @@ class Response {
     }
 
     /**
-     * @param object $object
+     * @param object|array $object
      * @return array
      */
-    private function object2array(object $object): array {
+    private function object2array(object|array $object): array {
         $result = [];
 
         foreach ($object as $key => $value) {
