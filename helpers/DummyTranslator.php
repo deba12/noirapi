@@ -5,6 +5,7 @@ namespace noirapi\helpers;
 
 use noirapi\interfaces\Translator;
 
+/** @psalm-api  */
 class DummyTranslator implements Translator
 {
 

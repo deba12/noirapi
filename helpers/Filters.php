@@ -6,14 +6,15 @@ namespace noirapi\helpers;
 use JsonException;
 use noirapi\Exceptions\FilterNotFoundException;
 
+/** @psalm-api  */
 class Filters {
 
     /**
-     * @param $filter
+     * @param string $filter
      * @return array
      * @throws FilterNotFoundException
      */
-    public static function init($filter): array {
+    public static function init(string $filter): array {
 
         if(class_exists(\app\lib\Filters::class) && method_exists(\app\lib\Filters::class, $filter)) {
             return [\app\lib\Filters::class, $filter];
@@ -28,47 +29,45 @@ class Filters {
     }
 
     /**
-     * @param $string
+     * @param string $string
      * @return string
-     * @noinspection SpellCheckingInspection
      */
-    public static function urlencode($string): string {
+    public static function urlencode(string $string): string {
         return urlencode($string);
     }
 
     /**
-     * @param $string
+     * @param string $string
      * @return string
-     * @noinspection SpellCheckingInspection
      */
-    public static function urldecode($string): string {
+    public static function urldecode(string $string): string {
         return urldecode($string);
     }
 
     /**
-     * @param $string
+     * @param string $string
      * @return string
      */
-    public static function html_entity_decode($string): string {
+    public static function html_entity_decode(string $string): string {
         return html_entity_decode($string);
     }
 
     /**
-     * @param $date
-     * @param $format
+     * @param string $date
+     * @param string $format
      * @return string
      */
-    public static function date_format($date, $format): string {
+    public static function date_format(string $date, string $format): string {
         return date($format, strtotime($date));
     }
 
     /**
-     * @param $bool
+     * @param int|bool|string $bool
      * @return int
-     * @noinspection TypeUnsafeComparisonInspection
      */
-    public static function inverse($bool):int {
-        if($bool == 1 || $bool === true) {
+    public static function inverse(int|bool|string $bool):int {
+        /** @noinspection InArrayCanBeUsedInspection */
+        if($bool === 1 || $bool === true || $bool === "1") {
             return 0;
         }
         return 1;

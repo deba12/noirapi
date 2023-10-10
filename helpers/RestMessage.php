@@ -13,6 +13,7 @@ use function is_string;
  * @property string|object|array $message
  * @property string|null $next
  * @property string|null $message_tag
+ * @psalm-api
  */
 class RestMessage {
 

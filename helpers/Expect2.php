@@ -26,6 +26,7 @@ use noirapi\helpers\Schema\Time;
 use noirapi\helpers\Schema\Url;
 use RuntimeException;
 
+/** @psalm-api  */
 final class Expect2 {
 
     use Nette\SmartObject;

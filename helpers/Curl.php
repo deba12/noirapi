@@ -8,6 +8,7 @@ use noirapi\lib\Controller;
 use noirapi\Tracy\CurlBarPanel;
 use Tracy\Debugger;
 
+/** @psalm-api  */
 class Curl extends \Curl\Curl {
 
     private static array $requests = [];
@@ -27,6 +28,10 @@ class Curl extends \Curl\Curl {
 
     }
 
+    /**
+     * @param mixed $ch
+     * @return mixed
+     */
     public function exec($ch = null): mixed {
 
         $start = microtime(true);
@@ -39,7 +44,7 @@ class Curl extends \Curl\Curl {
             url: ($method ?? 'POST') . ' ' . $this->getUrl(),
             info: $info['http_code'] . ' ' . $info['content_type'],
             time: microtime(true) - $start,
-            request: $this->getOpt(CURLOPT_POSTFIELDS) ?? 'none',
+            request: $this->getOpt(CURLOPT_POSTFIELDS) ?? [],
             response: is_object($this->response) ? $this->response : substr((string)$this->response, 0 ,128));
 
         return $res;
@@ -50,16 +55,11 @@ class Curl extends \Curl\Curl {
      * @param string $url
      * @param string $info
      * @param float $time
-     * @param array|string $request
+     * @param array $request
      * @param object|string|null $response
      * @return void
      */
-    public function addLog(string $url, string $info, float $time, array|string $request, object|string $response = null): void {
-
-        try {
-            $request = json_decode($request, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException) {
-        }
+    public function addLog(string $url, string $info, float $time, array $request, object|string $response = null): void {
 
         self::$requests[] = [
             'url'       => $url,

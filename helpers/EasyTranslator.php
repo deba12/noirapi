@@ -7,6 +7,7 @@ use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use noirapi\interfaces\Translator;
 
+/** @psalm-api  */
 class EasyTranslator implements Translator
 {
 

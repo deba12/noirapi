@@ -14,6 +14,7 @@ use Latte\Compiler\PrintContext;
 use Latte\Compiler\Tag;
 use Latte\Extension;
 
+/** @psalm-api  */
 class Macros extends Extension {
 
     public function getTags(): array {
@@ -36,6 +37,7 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function title(Tag $tag): Node {
 
@@ -53,6 +55,7 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function pager(Tag $tag): Node {
 
@@ -96,6 +99,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function breadcrumb(Tag $tag): Node {
 
@@ -120,6 +124,7 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function topCss(Tag $tag): Node {
         return new AuxiliaryNode(
@@ -139,6 +144,7 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function bottomCss(Tag $tag): Node {
         return new AuxiliaryNode(
@@ -159,6 +165,7 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
      * @noinspection JSUnresolvedVariable
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function topJs(Tag $tag): Node {
         return new AuxiliaryNode(
@@ -183,6 +190,7 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
      * @noinspection JSUnresolvedVariable
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function bottomJs(Tag $tag): Node {
         return new AuxiliaryNode(
@@ -205,6 +213,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @throws CompileException
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function active(Tag $tag): Node {
 
@@ -235,6 +244,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return AuxiliaryNode
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function message(Tag $tag): AuxiliaryNode {
 
@@ -261,6 +271,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return AuxiliaryNode
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function nonce(Tag $tag): AuxiliaryNode {
         return new AuxiliaryNode(
