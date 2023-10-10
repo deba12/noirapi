@@ -17,7 +17,7 @@ use Nette\Schema\Schema;
 class Domain implements Schema {
 
     private bool $wildcard = false;
-    private bool $required;
+    private bool $required = false;
 
     /**
      * @param bool $required
@@ -37,7 +37,13 @@ class Domain implements Schema {
         return $this;
     }
 
-    public function normalize($value, Context $context) {
+    /**
+     * @param $value
+     * @param Context $context
+     * @return mixed|string|null
+     * @psalm-suppress MissingParamType
+     */
+    public function normalize($value, Context $context): mixed {
 
         $value = trim($value);
 
@@ -70,6 +76,7 @@ class Domain implements Schema {
      * @param $value
      * @param $base
      * @return mixed
+     * @psalm-suppress MissingParamType
      */
     public function merge($value, $base): mixed {
         return $value;
@@ -79,6 +86,7 @@ class Domain implements Schema {
      * @param $value
      * @param Context $context
      * @return mixed
+     * @psalm-suppress MissingParamType
      */
     public function complete($value, Context $context): mixed {
         return $value;

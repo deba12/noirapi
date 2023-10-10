@@ -9,7 +9,7 @@ use DateTimeZone;
 /** @psalm-api  */
 class Date extends DateTime {
 
-    public function __construct($format = 'Y-m-d', ?DateTimeZone $timeZone = null) {
+    public function __construct(string $format = 'Y-m-d', ?DateTimeZone $timeZone = null) {
         parent::__construct($format, $timeZone, 'date');
     }
 

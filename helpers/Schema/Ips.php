@@ -32,7 +32,7 @@ class Ips implements Schema {
 
     public function normalize($value, Context $context) {
 
-        if($this->required && empty($value)) {
+        if($this->required && empty($value) && !$this->nullable) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is empty.', Message::MISSING_ITEM);
             return null;

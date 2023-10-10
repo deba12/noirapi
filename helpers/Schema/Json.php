@@ -18,24 +18,35 @@ use Nette\Schema\Schema;
 /** @psalm-api  */
 class Json implements Schema {
 
-    /** @var bool */
     private bool $required = false;
-
-    /** @var bool */
     private bool $nullable = false;
 
+    /**
+     * @param bool $state
+     * @return $this
+     */
     public function required(bool $state = true): self
     {
         $this->required = $state;
         return $this;
     }
 
+    /**
+     * @param bool $state
+     * @return $this
+     */
     public function nullable(bool $state = true): self
     {
         $this->nullable = $state;
         return $this;
     }
 
+    /**
+     * @param $value
+     * @param Context $context
+     * @return false|mixed|null
+     * @psalm-suppress MissingParamType
+     */
     public function normalize($value, Context $context)
     {
 
@@ -61,17 +72,33 @@ class Json implements Schema {
 
     }
 
+    /**
+     * @param $value
+     * @param $base
+     * @return mixed
+     * @psalm-suppress MissingParamType
+     */
     public function merge($value, $base)
     {
         return $value;
     }
 
+    /**
+     * @param $value
+     * @param Context $context
+     * @return mixed
+     * @psalm-suppress MissingParamType
+     */
     public function complete($value, Context $context)
     {
         return $value;
     }
 
-    /** @noinspection ReturnTypeCanBeDeclaredInspection */
+
+    /**
+     * @param Context $context
+     * @return null
+     */
     public function completeDefault(Context $context)
     {
         if ($this->required) {

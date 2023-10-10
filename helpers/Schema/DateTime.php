@@ -25,6 +25,7 @@ class DateTime implements Schema {
     protected bool $nullable = false;
     protected string $format;
     protected ?DateTimeZone $timeZone;
+    /** @psalm-suppress PropertyNotSetInConstructor  */
     protected string $output_format;
 
     protected \DateTime|null $date = null;
@@ -48,22 +49,39 @@ class DateTime implements Schema {
         return $this;
     }
 
+    /**
+     * @param string $date
+     * @param string $format
+     * @return $this
+     */
     public function setDate(string $date, string $format): self {
         $this->date = \DateTime::createFromFormat($format, $date, $this->timeZone);
 
         return $this;
     }
 
+    /**
+     * @param bool $state
+     * @return $this
+     */
     public function required(bool $state = true): self {
         $this->required = $state;
         return $this;
     }
 
+    /**
+     * @param bool $state
+     * @return $this
+     */
     public function nullable(bool $state = true): self {
         $this->nullable = $state;
         return $this;
     }
 
+    /**
+     * @param string $format
+     * @return $this
+     */
     public function format(string $format): self {
         $this->output_format = $format;
         return $this;
@@ -73,6 +91,7 @@ class DateTime implements Schema {
      * @param $value
      * @param Context $context
      * @return string|\DateTime|null
+     * @psalm-suppress MissingParamType
      */
     public function normalize($value, Context $context): string|null|\DateTime {
 
@@ -127,11 +146,23 @@ class DateTime implements Schema {
         return $normalized;
     }
 
-    public function merge($value, $base) {
+    /**
+     * @param $value
+     * @param $base
+     * @return mixed
+     * @psalm-suppress MissingParamType
+     */
+    public function merge($value, $base): mixed {
         return $value;
     }
 
-    public function complete($value, Context $context) {
+    /**
+     * @param $value
+     * @param Context $context
+     * @return mixed
+     * @psalm-suppress MissingParamType
+     */
+    public function complete($value, Context $context): mixed {
         return $value;
     }
 

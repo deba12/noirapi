@@ -12,13 +12,11 @@ use Nette\Schema\Schema;
 /** @psalm-api  */
 class Port implements Schema {
 
-    /** @var bool */
-    private $required = false;
-    /** @var bool */
-    private $nullable = false;
+    private bool $required = false;
+    private bool $nullable = false;
 
     /** @var array{?int, ?int} */
-    private $range = [null, null];
+    private array $range = [null, null];
 
     public function required(bool $state = true): self {
         $this->required = $state;
@@ -50,6 +48,7 @@ class Port implements Schema {
 
     /**
      * @inheritDoc
+     * @psalm-suppress MissingParamType
      */
     public function normalize($value, Context $context) {
 
@@ -88,6 +87,7 @@ class Port implements Schema {
 
     /**
      * @inheritDoc
+     * @psalm-suppress MissingParamType
      */
     public function merge($value, $base) {
         return $value;
@@ -95,6 +95,7 @@ class Port implements Schema {
 
     /**
      * @inheritDoc
+     * @psalm-suppress MissingParamType
      */
     public function complete($value, Context $context) {
         return $value;
@@ -102,6 +103,7 @@ class Port implements Schema {
 
     /**
      * @inheritDoc
+     *
      */
     public function completeDefault(Context $context) {
         if ($this->required) {
