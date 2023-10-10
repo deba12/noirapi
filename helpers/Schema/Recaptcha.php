@@ -1,5 +1,8 @@
-<?php /** @noinspection ContractViolationInspection */
-/** @noinspection PhpUnused */
+<?php
+/**
+ * @noinspection ContractViolationInspection
+ * @noinspection PhpUnused
+ */
 declare(strict_types=1);
 
 namespace noirapi\helpers\Schema;
@@ -118,8 +121,11 @@ class Recaptcha implements Schema {
 
     }
 
-    /** @noinspection ReturnTypeCanBeDeclaredInspection */
-    public function completeDefault(Context $context) {
+    /**
+     * @param Context $context
+     * @return null
+     */
+    public function completeDefault(Context $context): null {
 
         if ($this->required) {
             /** @noinspection UnusedFunctionResultInspection */
