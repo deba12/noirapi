@@ -59,7 +59,7 @@ if($dev === true || (!empty($dev_ips) && isset($_SERVER['REMOTE_ADDR']) && in_ar
     if(session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
-    Debugger::enable(Debugger::DEVELOPMENT, PATH_LOGS);
+    Debugger::enable(Debugger::Development, PATH_LOGS);
 } else {
-    Debugger::enable(Debugger::PRODUCTION, PATH_LOGS, Config::get('dev_email'));
+    Debugger::enable(Debugger::Production, PATH_LOGS, Config::get('dev_email'));
 }
