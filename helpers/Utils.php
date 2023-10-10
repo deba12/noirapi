@@ -235,12 +235,10 @@ class Utils {
                 } else if($remove_missing) {
                     unset($class->$name);
                 }
-            } else if(is_object($input)) {
-                if(isset($input->$name)) {
-                    $class->$name = $input->$name;
-                } else if($remove_missing) {
-                    unset($class->$name);
-                }
+            } else if(isset($input->$name)) {
+                $class->$name = $input->$name;
+            } else if($remove_missing) {
+                unset($class->$name);
             }
 
         }

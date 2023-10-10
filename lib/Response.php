@@ -15,6 +15,7 @@ use LaLit\Array2XML;
 use noirapi\helpers\RestMessage;
 use RuntimeException;
 use SimpleXMLElement;
+use stdClass;
 use function is_array;
 
 class Response {
@@ -138,7 +139,7 @@ class Response {
     }
 
     /**
-     * @return string|array|RestMessage
+     * @return string|array|object
      */
     public function getRawBody(): string|array|object {
         return $this->body;

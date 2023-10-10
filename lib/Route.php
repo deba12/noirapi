@@ -275,6 +275,7 @@ class Route {
 
         $function = 'e' . $error;
 
+        /** @psalm-suppress UndefinedClass */
         if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
             $this->request->controller = 'errors';
             $this->request->function = $function;
