@@ -46,7 +46,15 @@ class Curl extends \Curl\Curl {
 
     }
 
-    public function addLog(string $url, $info, float $time, array|string $request, object|string $response = null): void {
+    /**
+     * @param string $url
+     * @param string $info
+     * @param float $time
+     * @param array|string $request
+     * @param object|string|null $response
+     * @return void
+     */
+    public function addLog(string $url, string $info, float $time, array|string $request, object|string $response = null): void {
 
         try {
             $request = json_decode($request, true, 512, JSON_THROW_ON_ERROR);

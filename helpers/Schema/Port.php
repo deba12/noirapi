@@ -110,8 +110,14 @@ class Port implements Schema {
         return null;
     }
 
-    private function isInRange($value, array $range): bool
+    /**
+     * @param int|string $value
+     * @param array{?int, ?int} $range
+     * @return bool
+     */
+    private function isInRange(int|string $value, array $range): bool
     {
+        $value = (int) $value;
         return ($range[0] === null || $value >= $range[0])
             && ($range[1] === null || $value <= $range[1]);
     }

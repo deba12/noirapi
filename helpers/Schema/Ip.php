@@ -21,37 +21,40 @@ class Ip implements Schema {
     private string $from = 'string';
     private string $to = 'string';
 
-    public function fromBin()
+    public function fromBin(): self
     {
         $this->from = 'bin';
         return $this;
     }
 
-    public function fromString()
+    /**
+     * @return self
+     */
+    public function fromString() :self
     {
         $this->from = 'string';
         return $this;
     }
 
-    public function fromLong()
+    public function fromLong(): self
     {
         $this->from = 'long';
         return $this;
     }
 
-    public function toBin()
+    public function toBin(): self
     {
         $this->to = 'bin';
         return $this;
     }
 
-    public function toString()
+    public function toString(): self
     {
         $this->to = 'string';
         return $this;
     }
 
-    public function toLong()
+    public function toLong(): self
     {
         $this->to = 'long';
         return $this;
@@ -72,7 +75,7 @@ class Ip implements Schema {
     public function normalize($value, Context $context)
     {
 
-        // 0 is valid long ip address
+        // '0' is a valid long ip address
         /** @noinspection TypeUnsafeComparisonInspection */
         if($this->nullable && (empty($value) && $value != '0')) {
             return null;

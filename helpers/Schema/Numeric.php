@@ -11,13 +11,10 @@ use Nette\Schema\Schema;
 
 class Numeric implements Schema {
 
-    /** @var bool */
-    private $required = false;
-    /** @var bool */
-    private $nullable = false;
-
+    private bool $required = false;
+    private bool $nullable = false;
     /** @var array{?int, ?int} */
-    private $range = [null, null];
+    private array $range = [null, null];
 
     public function required(bool $state = true): self {
         $this->required = $state;
@@ -30,20 +27,20 @@ class Numeric implements Schema {
     }
 
     /**
-     * @param int $min
+     * @param int|string $min
      * @return $this
      */
-    public function min(int $min): Numeric {
-        $this->range[0] = $min;
+    public function min(int|string $min): Numeric {
+        $this->range[0] = is_string($min) ? (int)$min : $min;
         return $this;
     }
 
     /**
-     * @param int $max
+     * @param int|string $max
      * @return $this
      */
-    public function max(int $max): Numeric {
-        $this->range[1] = $max;
+    public function max(int|string $max): Numeric {
+        $this->range[1] = is_string($max) ? (int)$max : $max;
         return $this;
     }
 
@@ -110,8 +107,14 @@ class Numeric implements Schema {
         return null;
     }
 
-    private function isInRange($value, array $range): bool
+    /**
+     * @param int|string $value
+     * @param array{?int, ?int} $range
+     * @return bool
+     */
+    private function isInRange(int|string $value, array $range): bool
     {
+        $value = (int) $value;
         return ($range[0] === null || $value >= $range[0])
             && ($range[1] === null || $value <= $range[1]);
     }

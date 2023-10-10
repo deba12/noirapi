@@ -275,6 +275,9 @@ class Users {
      * @return string|bool
      * @noinspection PhpUnusedPrivateMethodInspection
      * @noinspection PhpSameParameterValueInspection
+     * @deprecated use PasswordHash instead
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress UnusedMethod
      */
     private function PasswordSha1(string $password, ?string $hash = null): string|bool {
         if($hash === null) {
