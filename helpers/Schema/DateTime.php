@@ -33,12 +33,13 @@ class DateTime implements Schema {
     /**
      * @param string $format
      * @param DateTimeZone|null $timeZone
+     * @param string $name
      * @throws Exception
      */
-    public function __construct(string $format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null) {
+    public function __construct(string $format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null, string $name = 'DateTime') {
         $this->format = $format;
         $this->timeZone = $timeZone ?? new DateTimeZone(date_default_timezone_get());
-        $this->name = $this->name ?? 'DateTime';
+        $this->name = $name;
     }
 
     public function setTime(string $time, string $format): self {

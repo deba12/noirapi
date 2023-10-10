@@ -20,8 +20,7 @@ class Time extends DateTime {
      *
      */
     public function __construct(string $format = 'H:i:s', ?DateTimeZone $timeZone = null) {
-        $this->name = 'Time';
-        parent::__construct($format, $timeZone);
+        parent::__construct($format, $timeZone, 'time');
     }
 
 }
