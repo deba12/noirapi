@@ -9,7 +9,6 @@ use Nette\StaticClass;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
-use RuntimeException;
 use stdClass;
 use function array_pop;
 use function array_splice;
@@ -19,7 +18,6 @@ use function count;
 use function defined;
 use function get_class;
 use function is_object;
-use function is_string;
 use function ord;
 use function proc_close;
 use function proc_open;
@@ -149,13 +147,7 @@ class Utils {
         }
 
         $path = explode('\\', $class);
-        $res = array_pop($path);
-
-        if(!is_string($res)) {
-            throw new RuntimeException('Unable to get class name');
-        }
-
-        return $res;
+        return array_pop($path);
 
     }
 
@@ -186,7 +178,7 @@ class Utils {
      * @return bool
      */
     public static function is_tty(): bool {
-        return posix_isatty(defined('STDOUT') ? STDOUT : null);
+        return defined('STDOUT') && posix_isatty(STDOUT);
     }
 
     /**
