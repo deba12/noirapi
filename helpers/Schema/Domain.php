@@ -13,6 +13,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+/** @psalm-api  */
 class Domain implements Schema {
 
     private bool $wildcard = false;

@@ -14,6 +14,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+/** @psalm-api  */
 class Ip implements Schema {
 
     private bool $required = false;

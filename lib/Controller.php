@@ -123,6 +123,7 @@ class Controller {
     /**
      * @return Response
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function ok(): Response {
         return $this->response->withStatus(200);
@@ -131,6 +132,7 @@ class Controller {
     /**
      * @return Response
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function notFound(): Response {
         return $this->response->withStatus(404);
@@ -139,6 +141,7 @@ class Controller {
     /**
      * @return Response
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function internalServerError(): Response {
         return $this->response->withStatus(500);

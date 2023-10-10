@@ -25,6 +25,7 @@ use function str_split;
 use function strlen;
 use function vsprintf;
 
+/** @psalm-api  */
 class Utils {
 
     use StaticClass;

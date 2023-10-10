@@ -10,6 +10,7 @@ use noirapi\lib\Model;
 use function call_user_func;
 use function is_string;
 
+/** @psalm-api  */
 class Users {
 
     private Model $model;

@@ -6,6 +6,7 @@ namespace noirapi\lib;
 use RuntimeException;
 use Swoole\Http\Server;
 
+/** @psalm-api  */
 class Tasks {
 
     private array $tasks = [];

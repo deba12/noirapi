@@ -4,9 +4,11 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use Nette\SmartObject;
-use function is_string;
 
-/** @psalm-suppress MissingConstructor */
+/**
+ * @psalm-suppress MissingConstructor
+ * @psalm-api
+ */
 class Request {
 
     use SmartObject;

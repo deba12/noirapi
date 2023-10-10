@@ -17,6 +17,7 @@ use Nette\Schema\Schema;
 use function gettype;
 use function is_string;
 
+/** @psalm-api  */
 class DateTime implements Schema {
 
     protected bool $required = false;

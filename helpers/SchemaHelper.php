@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace noirapi\helpers;
 use Nette\Schema\ValidationException;
 
+/** @psalm-api  */
 class SchemaHelper {
 
     public static array $messages;

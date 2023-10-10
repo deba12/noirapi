@@ -6,6 +6,7 @@ namespace noirapi\helpers;
 use Latte;
 use noirapi\Exceptions\FileNotFoundException;
 
+/** @psalm-api  */
 class Template {
 
     private string $template;

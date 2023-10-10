@@ -9,6 +9,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+/** @psalm-api  */
 class Recaptcha implements Schema {
 
     private bool $required = false;
@@ -61,6 +62,7 @@ class Recaptcha implements Schema {
      * @param $value
      * @param Context $context
      * @return bool|null
+     * @psalm-suppress MissingParamType
      */
     public function normalize($value, Context $context): ?bool {
 
@@ -96,6 +98,7 @@ class Recaptcha implements Schema {
      * @param $value
      * @param $base
      * @return mixed
+     * @psalm-suppress MissingParamType
      */
     public function merge($value, $base): mixed {
 
@@ -107,6 +110,7 @@ class Recaptcha implements Schema {
      * @param $value
      * @param Context $context
      * @return mixed
+     * @psalm-suppress MissingParamType
      */
     public function complete($value, Context $context): mixed {
 

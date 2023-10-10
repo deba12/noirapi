@@ -7,6 +7,7 @@ namespace noirapi\helpers;
 use function is_array;
 use function is_object;
 
+/** @psalm-api  */
 class Session {
 
     /**

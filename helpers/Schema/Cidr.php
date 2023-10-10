@@ -7,6 +7,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Schema;
 use Nette\Schema\Message;
 
+/** @psalm-api  */
 class Cidr implements Schema {
 
     private bool $required = false;
