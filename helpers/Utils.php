@@ -271,4 +271,36 @@ class Utils {
 
     }
 
+    /**
+     * @param array $a1
+     * @param array $a2
+     * @return array
+     * @noinspection TypeUnsafeComparisonInspection
+     */
+    public static function array_diff_recursive(array $a1, array $a2): array {
+        $r = [];
+
+        foreach ($a1 as $k => $v) {
+
+            if (array_key_exists($k, $a2)) {
+
+                if (is_array($v)) {
+                    $rad = self::array_diff_recursive($v, $a2[$k]);
+                    if (count($rad)) {
+                        $r[$k] = $rad;
+                    }
+
+                } else if ($v != $a2[$k]) {
+                    $r[$k] = $v;
+                }
+            } else {
+                $r[$k] = $v;
+
+            }
+
+        }
+
+        return $r;
+    }
+
 }
