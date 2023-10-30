@@ -75,7 +75,7 @@ class Macros extends Extension {
 
                 if($pager->getPageCount() == 1) { $index_left = 0; $index_right = 0; }
                 else if($pager->getPageCount() < 5) {
-                    $index_left = round($pager->getPageCount() / $pager->getPage(), 0, PHP_ROUND_HALF_UP) + $pager->getPage();
+                    $index_left = (int)round($pager->getPageCount() / $pager->getPage(), 0, PHP_ROUND_HALF_UP) + $pager->getPage();
                     $index_right = $pager->getPageCount()-$pager->getPage();
                 }
                 else if($pager->getPage() == 1) { $index_left = 0; $index_right = 4; }
