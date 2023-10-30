@@ -294,12 +294,12 @@ class View {
     }
 
     /**
-     * @param string $param
-     * @param int|string $page
+     * @param string $key
+     * @param int|float|string|null $value
      * @return string
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public static function add_url_var(string $param, int|string $page): string {
+    public static function add_url_var(string $key, int|float|string|null $value): string {
         $params = parse_url(self::$uri, PHP_URL_QUERY);
 
         if(!empty($params)) {
@@ -307,13 +307,13 @@ class View {
             parse_str($params, $array);
 
             if(count($array) > 0) {
-                $array[$param] = $page;
+                $array[$key] = (string)$value;
                 return '?' . http_build_query($array);
             }
-            return '?' . $param . '=' . $page;
+            return '?' . $key . '=' . $value;
         }
 
-        return '?' . $param . '=' . $page;
+        return '?' . $key . '=' . $value;
     }
 
     /**
