@@ -10,7 +10,12 @@ class Layout {
     public string $name         = '';
     public string $title        = '';
     public array $breadcrumbs   = [];
-    public array $params        = [];
+    public array $params        = [
+        'top-css'   => [],
+        'top-js'    => [],
+        'bottom-css'=> [],
+        'bottom-js' => [],
+    ];
     private Translator $translator;
 
     /**

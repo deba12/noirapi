@@ -129,13 +129,10 @@ class Macros extends Extension {
     public function topCss(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                if($layout->exists(\'top-css\')) {
-                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
-                    foreach($layout->get(\'top-css\') as $css) {
-                        echo "<link rel=\"stylesheet\" href=\"$css\" $nonce_inline>" . PHP_EOL;
-                    }
-                }'
-            )
+                foreach($layout->get(\'top-css\') as $css) {
+                    echo "<link rel=\"stylesheet\" href=\"$css\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">" . PHP_EOL;
+                }
+            ')
         );
     }
 
@@ -149,13 +146,10 @@ class Macros extends Extension {
     public function bottomCss(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                if($layout->exists(\'bottom-css\')) {
-                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
-                    foreach($layout->get(\'bottom-css\') as $css) {
-                        echo "<link rel=\"stylesheet\" href=\"$css\" $nonce_inline>" . PHP_EOL;
-                    }
-                }'
-            )
+                foreach($layout->get(\'bottom-css\') as $css) {
+                    echo "<link rel=\"stylesheet\" href=\"$css\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">" . PHP_EOL;
+                }
+            ')
         );
     }
 
@@ -170,17 +164,14 @@ class Macros extends Extension {
     public function topJs(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                if($layout->exists(\'top-js\')) {
-                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
-                    foreach($layout->get(\'top-js\') as $js) {
-                        if(\str_starts_with($js, \'/\')) {
-                            echo "<script type=\"text/javascript\" src=\"$js\" $nonce_inline></script>" . PHP_EOL;
-                        } else {
-                            echo "<script type=\"text/javascript\" $nonce_inline>$js</script>" . PHP_EOL;
-                        }
+                foreach($layout->get(\'top-js\') as $js) {
+                    if(\str_starts_with($js, \'/\')) {
+                        echo "<script type=\"text/javascript\" src=\"$js\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . "></script>" . PHP_EOL;
+                    } else {
+                        echo "<script type=\"text/javascript\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">$js</script>" . PHP_EOL;
                     }
-                }'
-            )
+               }
+            ')
         );
     }
 
@@ -195,17 +186,14 @@ class Macros extends Extension {
     public function bottomJs(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                if($layout->exists(\'bottom-js\')) {
-                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
-                    foreach($layout->get(\'bottom-js\') as $js) {
-                        if(\str_starts_with($js, \'/\')) {
-                            echo "<script type=\"text/javascript\" src=\"$js\" $nonce_inline></script>" . PHP_EOL;
-                        } else {
-                            echo "<script type=\"text/javascript\" $nonce>$js</script>" . PHP_EOL;
-                        }
+                foreach($layout->get(\'bottom-js\') as $js) {
+                    if(\str_starts_with($js, \'/\')) {
+                        echo "<script type=\"text/javascript\" src=\"$js\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . "></script>" . PHP_EOL;
+                    } else {
+                        echo "<script type=\"text/javascript\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">$js</script>" . PHP_EOL;
                     }
-                }'
-            )
+                }
+            ')
         );
     }
 
