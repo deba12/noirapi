@@ -26,8 +26,6 @@ use function http_response_code;
 /** @psalm-suppress PropertyNotSetInConstructor */
 class Route {
 
-    use StaticClass;
-
     public const type_swoole = 'swoole';
     public const type_globals = 'globals';
 
