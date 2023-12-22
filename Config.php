@@ -13,6 +13,13 @@ class Config {
     public static string $config;
 
     /**
+     * @return bool
+     */
+    public static function defaultConfigAvailable(): bool {
+        return is_file(ROOT . '/app/config/default.neon');
+    }
+
+    /**
      * @param string $config
      * @return void
      * @throws ConfigException

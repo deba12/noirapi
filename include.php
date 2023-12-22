@@ -36,7 +36,10 @@ if(empty($config)) {
 }
 
 if(empty($config)) {
-    throw new RuntimeException('CONFIG environment must be set');
+    if(!Config::defaultConfigAvailable()) {
+        throw new RuntimeException('CONFIG environment must be set');
+    }
+    $config = 'default';
 }
 
 /** @noinspection PhpUnhandledExceptionInspection */
