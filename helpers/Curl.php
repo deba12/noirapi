@@ -40,11 +40,16 @@ class Curl extends \Curl\Curl {
 
         $info = $this->getInfo();
         $method = $this->getOpt(CURLOPT_CUSTOMREQUEST);
+
+        $post_fields = $this->getOpt(CURLOPT_POSTFIELDS);
+        if(!empty($post_fields) && is_string($post_fields)) {
+            parse_str($post_fields, $post);
+        }
         $this->addLog(
             url: ($method ?? 'POST') . ' ' . $this->getUrl(),
             info: $info['http_code'] . ' ' . $info['content_type'],
             time: microtime(true) - $start,
-            request: $this->getOpt(CURLOPT_POSTFIELDS) ?? [],
+            request: $post ?? [],
             response: is_object($this->response) ? $this->response : substr((string)$this->response, 0 ,128));
 
         return $res;
