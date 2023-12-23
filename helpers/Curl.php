@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-use JsonException;
 use noirapi\lib\Controller;
 use noirapi\Tracy\CurlBarPanel;
 use Tracy\Debugger;
