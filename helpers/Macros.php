@@ -7,7 +7,6 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-use Latte\CompileException;
 use Latte\Compiler\Node;
 use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\PrintContext;
