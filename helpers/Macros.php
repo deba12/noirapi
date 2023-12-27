@@ -1,48 +1,68 @@
-<?php /** @noinspection UnknownInspectionInspection */
+<?php
+/**
+ * @noinspection HtmlUnknownAttribute
+ * @noinspection UnknownInspectionInspection
+ */
 declare(strict_types=1);
 
 namespace noirapi\helpers;
 
 use Latte\CompileException;
-use Latte\Engine;
-use Latte\MacroNode;
-use Latte\Macros\MacroSet;
-use Latte\PhpWriter;
-use RuntimeException;
+use Latte\Compiler\Node;
+use Latte\Compiler\Nodes\AuxiliaryNode;
+use Latte\Compiler\PrintContext;
+use Latte\Compiler\Tag;
+use Latte\Extension;
 
-class Macros {
+class Macros extends Extension {
 
-    public function __construct(Engine $latte) {
-
-        $compiler = new MacroSet($latte->getCompiler());
-        $compiler->addMacro('pager', [$this, 'pager']);
-
-        if(class_exists(\app\lib\Macros::class)) {
-            /** @noinspection PhpExpressionResultUnusedInspection */
-            new \app\lib\Macros($latte);
-        }
-
+    public function getTags(): array {
+        return [
+            'pager'         => [$this, 'pager'],
+        ];
     }
 
     /**
-     * @param MacroNode $node
-     * @param PhpWriter $writer
-     * @return string
-     * @throws CompileException
+     * @param Tag $tag
+     * @return Node
      * @noinspection PhpUnused
+     * @noinspection PhpUnusedParameterInspection
      */
-    public function pager(MacroNode $node, PhpWriter $writer): string {
+    public function pager(Tag $tag): Node {
 
-        if ($node->empty = ($node->args !== '')) {
+        /** @psalm-suppress UndefinedConstant */
+        $file = ROOT . '/app/layouts/pager.latte';
 
-            return $writer->write('
-				$latte = new Latte\Engine;
-				$latte->setTempDirectory(dirname(__DIR__) . \'/temp\');
-				echo %modify(($latte->render(dirname(__DIR__) . \'/noirapi/templates/pager.latte\', [%node.args])))');
-
+        if(!is_readable($file)) {
+            /** @psalm-suppress UndefinedConstant */
+            $file = ROOT . '/noirapi/templates/pager.latte';
         }
 
-        throw new RuntimeException('No arguments provided');
+        return new AuxiliaryNode(
+            fn(PrintContext $context) => $context->format('
+                if(empty($pager)) {
+                    throw new RuntimeException("Pager is not setup");
+                }
+
+                if($pager->getPageCount() == 1) { $idxl = 0; $idxr = 0; }
+                else if($pager->getPageCount() < 5) {
+                    $idxl = round($pager->getPageCount() / $pager->getPage(), 0, PHP_ROUND_HALF_UP) + $pager->getPage();
+                    $idxr = $pager->getPageCount()-$pager->getPage();
+                }
+                else if($pager->getPage() == 1) { $idxl = 0; $idxr = 4; }
+                else if($pager->getPage() == 2) { $idxl = 1; $idxr = 3; }
+                else if($pager->getPage() == $pager->getLastPage()) { $idxl = 4; $idxr = 0; }
+                else if($pager->getPage() == $pager->getLastPage() -1 ) { $idxl = 3; $idxr = 1; }
+                else { $idxl = 2; $idxr = 2; }
+
+                $this->createTemplate(\'%raw\', [
+                    \'pager\' => $pager,
+                    \'idxl\' => $idxl,
+                    \'idxr\' => $idxr,
+                 ], \'include\')->renderToContentType(\'html\');',
+                $file
+            )
+        );
 
     }
 

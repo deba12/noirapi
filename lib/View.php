@@ -7,6 +7,7 @@ namespace noirapi\lib;
 use core\Exceptions\FileNotFoundException;
 use Latte\Engine;
 use noirapi\helpers\Macros;
+use noirapi\helpers\Filters;
 use stdClass;
 
 class View {
@@ -40,10 +41,21 @@ class View {
         $this->latte->setTempDirectory(ROOT . '/temp');
 
         //enable regeneration of the template files
-        $this->latte->setAutoRefresh(true);
-        $this->latte->addFilter(null, '\\noirapi\\helpers\\Filters::init');
+        $this->latte->setAutoRefresh();
+        $this->latte->addFilterLoader(Filters::class . '::init');
+        $this->latte->addExtension(new Macros());
 
-        new Macros($this->latte);
+        /**
+         * @noinspection PhpUndefinedClassInspection
+         * @noinspection RedundantSuppression
+         */
+        if(class_exists(\app\lib\Macros::class)) {
+            /**
+             * @noinspection PhpParamsInspection
+             * @noinspection RedundantSuppression
+             */
+            $this->latte->addExtension(new \app\lib\Macros());
+        }
 
         $this->response = $response;
 
