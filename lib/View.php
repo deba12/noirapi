@@ -5,6 +5,7 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use core\Exceptions\FileNotFoundException;
+use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use noirapi\helpers\Macros;
 use noirapi\helpers\Filters;
@@ -44,6 +45,7 @@ class View {
         $this->latte->setAutoRefresh();
         $this->latte->addFilterLoader(Filters::class . '::init');
         $this->latte->addExtension(new Macros());
+        $this->latte->addExtension(new TracyExtension);
 
         /**
          * @noinspection PhpUndefinedClassInspection
