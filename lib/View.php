@@ -47,17 +47,17 @@ class View {
         $this->latte->addExtension(new Macros());
         $this->latte->addExtension(new TracyExtension);
 
-        /**
-         * @noinspection PhpUndefinedClassInspection
-         * @noinspection RedundantSuppression
-         */
-        if(class_exists(\app\lib\Macros::class)) {
-            /**
-             * @noinspection PhpParamsInspection
-             * @noinspection RedundantSuppression
-             */
-            $this->latte->addExtension(new \app\lib\Macros());
-        }
+//        /**
+//         * @noinspection PhpUndefinedClassInspection
+//         * @noinspection RedundantSuppression
+//         */
+//        if(class_exists(\app\lib\Macros::class)) {
+//            /**
+//             * @noinspection PhpParamsInspection
+//             * @noinspection RedundantSuppression
+//             */
+//            $this->latte->addExtension(new \app\lib\Macros());
+//        }
 
         $this->response = $response;
 
