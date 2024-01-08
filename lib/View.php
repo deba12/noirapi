@@ -23,6 +23,7 @@ use RuntimeException;
 use stdClass;
 use Tracy\Debugger;
 use function count;
+use function in_array;
 
 class View {
 
@@ -103,13 +104,7 @@ class View {
         }
 
         if($dev) {
-
-            BlueScreenPanel::initialize();
-
-            $panel = new SystemBarPanel($this);
-            Debugger::getBar()->addPanel($panel);
             $this->latte->addExtension(new TracyExtension());
-
         }
 
         $this->latte->setStrictParsing();
