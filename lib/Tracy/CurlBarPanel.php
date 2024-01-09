@@ -164,13 +164,8 @@ class CurlBarPanel implements IBarPanel {
         $html .= <<<EOT
 <script $nonce>
 
-	let request = document.getElementById("tracy-curl-request-$this->rnd-click");
-	request.addEventListener("click",function(){
-		toggle("tracy-curl-request-$this->rnd");
-	},false);
-
 	let response = document.getElementById("tracy-curl-response-$this->rnd-click");
-	request.addEventListener("click",function(){
+	response.addEventListener("click",function(){
 		toggle("tracy-curl-response-$this->rnd");
 	},false);
 
