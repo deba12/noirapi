@@ -6,6 +6,7 @@ namespace noirapi\helpers;
 
 use Exception;
 use Nette\StaticClass;
+use Random\Randomizer;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
@@ -159,19 +160,7 @@ class Utils {
      */
     public static function array_shuffle(array $array): array {
 
-        $random = [];
-        $length = count($array);
-
-        if($length < 2) {
-            return $array;
-        }
-
-        while($length > 0) {
-            $random[] = array_splice($array, random_int(0, $length - 1), 1)[0];
-            $length--;
-        }
-
-        return $random;
+        return (new Randomizer())->shuffleArray($array);
 
     }
 
