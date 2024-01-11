@@ -45,6 +45,7 @@ class Ips implements Schema {
                 continue;
             }
             if(!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                /** @noinspection UnusedFunctionResultInspection */
                 $context->addError("Value: ($ip) is not valid ipv4 address", Message::TYPE_MISMATCH);
                 return null;
             }

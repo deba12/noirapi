@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use Latte\Bridges\Tracy\BlueScreenPanel;
 use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
@@ -18,12 +17,9 @@ use noirapi\helpers\Macros;
 use noirapi\helpers\Session;
 use noirapi\interfaces\Translator;
 use noirapi\lib\View\Layout;
-use noirapi\Tracy\SystemBarPanel;
 use RuntimeException;
 use stdClass;
-use Tracy\Debugger;
 use function count;
-use function in_array;
 
 class View {
 
@@ -331,17 +327,17 @@ class View {
         if($namespace === null) {
 
             foreach($params as $key => $value) {
-                if(!isset($this->params->$key)) {
-                    $this->params->$key = $value;
-                } else {
+                if(isset($this->params->$key)) {
                     throw new RuntimeException("Duplicate key in view params: $key");
                 }
+
+                $this->params->$key = $value;
             }
 
-        } else if(!isset($this->params->$namespace)) {
-            $this->params->$namespace = $params;
-        } else {
+        } else if(isset($this->params->$namespace)) {
             throw new RuntimeException("Duplicate key ain view params: $namespace");
+        } else {
+            $this->params->$namespace = $params;
         }
     }
 
