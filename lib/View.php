@@ -28,6 +28,7 @@ class View {
 
     private stdClass $params;
     private ?string $template = null;
+    private bool $dev;
 
     public Engine $latte;
     private ?string $layout_file = null;
@@ -50,6 +51,7 @@ class View {
         $this->request = $request;
         $this->response = $response;
         $this->params = new stdClass();
+        $this->dev = $dev;
 
         $this->latte = new Engine;
         /** @psalm-suppress UndefinedConstant */
@@ -115,6 +117,18 @@ class View {
      * @throws FileNotFoundException
      */
     public function display(array $params = []): Response {
+
+        if($this->dev) {
+
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+
+            $this->response->initiator_class = $caller['class'];
+            $this->response->initiator_method = $caller['function'];
+            $this->response->initiator_line = $caller['line'];
+
+        }
+
         if($this->template === null) {
             $this->setTemplate($this->request->function);
         }
@@ -154,6 +168,18 @@ class View {
      * @psalm-suppress PossiblyUnusedMethod
      */
     public function print(?string $layout, string $view, array $params = []): string {
+
+        if($this->dev) {
+
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+
+            $this->response->initiator_class = $caller['class'];
+            $this->response->initiator_method = $caller['function'];
+            $this->response->initiator_line = $caller['line'];
+
+        }
+
         $this->setTemplate($view);
         $params['template'] = $this->template;
         $this->mergeParams($params);
@@ -349,6 +375,14 @@ class View {
      */
     public function addParam(string $key, mixed $value): void {
         $this->params->$key = $value;
+    }
+
+    /**
+     * @return Response
+     * @note this is used by the system panel
+     */
+    public function getResponse(): Response {
+        return $this->response;
     }
 
 }

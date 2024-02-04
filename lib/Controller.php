@@ -177,6 +177,17 @@ class Controller {
             Session::set('message', null, Message::new($text, $type ?? 'danger'));
         }
 
+        if($this->dev) {
+
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+
+            $this->response->initiator_class = $caller['class'];
+            $this->response->initiator_method = $caller['function'];
+            $this->response->initiator_line = $caller['line'];
+
+        }
+
         return $this;
 
     }

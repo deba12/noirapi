@@ -47,6 +47,10 @@ class Response {
     public const TYPE_RAW   = 'application/octet-stream';
     public const TYPE_ZIP   = 'application/zip';
 
+    public ?string $initiator_class = null;
+    public ?string $initiator_method = null;
+    public ?int $initiator_line = null;
+
     /**
      * @param mixed $body
      * @return $this
