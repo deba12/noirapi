@@ -75,19 +75,17 @@ class Recaptcha implements Schema {
 
         if(!$this->nullable && empty($value)) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid recaptcha response", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid recaptcha response', Message::PATTERN_MISMATCH);
             return false;
         }
 
         if(empty($this->secret)) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid recaptcha secret", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid recaptcha secret', Message::PATTERN_MISMATCH);
             return false;
         }
 
-        $res = $this->verify($value, $this->secret);
-
-        if($res === false) {
+        if(!$this->verify($value, $this->secret)) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('Captcha verification failed', Message::PATTERN_MISMATCH);
             return false;
