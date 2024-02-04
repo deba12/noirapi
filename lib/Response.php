@@ -16,7 +16,14 @@ use noirapi\helpers\RestMessage;
 use RuntimeException;
 use SimpleXMLElement;
 use stdClass;
+use function gettype;
 use function is_array;
+use function is_callable;
+use function is_float;
+use function is_int;
+use function is_object;
+use function is_resource;
+use function is_string;
 
 class Response {
 
@@ -384,7 +391,7 @@ class Response {
                 $csv .= stream_get_contents($fh);
                 $written = 0;
                 ftruncate($fh, 0);
-                // Important in order to avoid memory leaks
+                // Important to avoid memory leaks
                 rewind($fh);
             }
         }
