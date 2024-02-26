@@ -9,7 +9,10 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use Laminas\Permissions\Acl\Acl;
 use noirapi\Config;
+use noirapi\Exceptions\LoginException;
+use noirapi\Exceptions\MessageException;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
 use noirapi\helpers\RestMessage;
@@ -83,7 +86,7 @@ class Controller {
         $this->response = new Response();
 
         // We need this when we are moving across domains
-        if(isset($this->request->get['message'], $this->request->get[ 'type' ])) {
+        if(isset($this->request->get['message'], $this->request->get['type'])) {
             $this->message($this->request->get['message'], $this->request->get['type']);
         }
 
@@ -288,6 +291,56 @@ class Controller {
                 message_tag: $message_tag
             )
         );
+
+    }
+
+    /**
+     * @param Acl $acl
+     * @return void
+     * @throws LoginException
+     * @throws MessageException
+     */
+    public function hasResource(Acl $acl): void {
+
+        if(!$acl->hasResource($this->request->controller)){
+
+            if($this->request->ajax) {
+                throw new MessageException('Page not Found', 403);
+            }
+
+            $this->message('Page not found', 'danger');
+            throw new LoginException('/');
+
+        }
+
+    }
+
+    /**
+     * @param Acl $acl
+     * @return void
+     * @throws LoginException
+     * @throws MessageException
+     */
+    public function isAllowed(Acl $acl): void {
+
+        if(!$acl->isAllowed($this->request->role, $this->request->controller)) {
+
+            if($this->request->ajax) {
+                throw new MessageException('Please Login', 403);
+            }
+
+            if($this->request->method === 'POST') {
+                $login = $this->referer();
+            } else {
+                $login = $this->request->uri;
+            }
+
+            Session::set('login', null, $login);
+
+            $this->message('Please login', 'success');
+            throw new LoginException('/');
+
+        }
 
     }
 
