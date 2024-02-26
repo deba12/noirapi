@@ -9,7 +9,6 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use JanDrabek\Tracy\GitVersionPanel;
 use noirapi\Config;
 use noirapi\Exceptions\UnableToForwardException;
 use noirapi\helpers\Message;
