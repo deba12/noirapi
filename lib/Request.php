@@ -120,7 +120,15 @@ class Request {
     }
 
     private static function is_ajax(array $server): bool {
-        return isset($server[ 'HTTP_X_REQUESTED_WITH' ]) && strtolower($server[ 'HTTP_X_REQUESTED_WITH' ]) === 'xmlhttprequest';
+        if(isset($server['HTTP_X_REQUESTED_WITH']) && strtolower($server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+            return true;
+        }
+
+        if(isset($server['HTTP_SEC_FETCH_MODE']) && strtolower($server['HTTP_SEC_FETCH_MODE']) !== 'navigate') {
+            return true;
+        }
+
+        return false;
     }
 
     /**
