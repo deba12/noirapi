@@ -231,7 +231,6 @@ class Mail {
         }
 
         if($this->debug) {
-            /** @noinspection NullPointerExceptionInspection */
             $this->debug_data = $res->getDebug();
         }
 
