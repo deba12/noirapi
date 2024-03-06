@@ -1,5 +1,8 @@
-{if $pager->getPageCount() > 1}
+{varType Nette\Utils\Paginator $pager}
+{varType int $index_left}
+{varType int $index_right}
 
+{if $pager->getPageCount() > 1}
 <nav>
 
     <ul class="pagination pg-blue justify-content-center">
@@ -16,8 +19,8 @@
 
         </li>
 
-        {var $iterator = 1}
-        {for $p = $pager->getPage() - $idxl; $p <= $pager->getPage() + $idxr; $p++}
+        {var $page_iterrator = 1}
+        {for $p = $pager->getPage() - $index_left; $p <= $pager->getPage() + $index_right; $p++}
 
             {continueIf $p < 1}
 
@@ -27,7 +30,7 @@
 
             </li>
 
-        {php $iterator++}
+        {php $page_iterrator++}
         {/for}
 
         <li class="page-item {if $pager->isLast()}disabled{/if}">
@@ -45,9 +48,7 @@
     </ul>
 
 </nav>
-
 {else}
-
 <nav>
 
     <ul class="pagination pg-blue justify-content-center p-0 m-0">
@@ -57,5 +58,4 @@
     </ul>
 
 </nav>
-
 {/if}

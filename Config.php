@@ -13,6 +13,13 @@ class Config {
     public static string $config;
 
     /**
+     * @return bool
+     */
+    public static function defaultConfigAvailable(): bool {
+        return is_file(ROOT . '/app/config/default.neon');
+    }
+
+    /**
      * @param string $config
      * @return void
      * @throws ConfigException
@@ -49,7 +56,6 @@ class Config {
         }
 
         self::$config = $config;
-
     }
 
     /**
@@ -58,7 +64,6 @@ class Config {
      * @return mixed
      */
     public static function get(string $option, mixed $default = null): mixed {
-
         if(str_contains($option, '.')) {
 
             $parts = explode('.', $option);
@@ -89,7 +94,6 @@ class Config {
         }
 
         return self::$options[$option] ?? $default ?? null;
-
     }
 
     /**
@@ -98,9 +102,7 @@ class Config {
      * @return void
      */
     public static function set(string $option, mixed $data): void {
-
         self::$options[$option] = $data;
-
     }
 
     /**

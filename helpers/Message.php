@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace noirapi\helpers;
 use Nette\Schema\ValidationException;
 
+/** @psalm-api  */
 class Message {
 
     public string $message;
@@ -72,6 +73,7 @@ class Message {
 
     /**
      * @return $this
+     * @noinspection PhpUnused
      */
     public function light(): Message {
         $this->type = 'light';

@@ -5,15 +5,20 @@ namespace noirapi\Tracy;
 
 use noirapi\lib\View;
 use Tracy\IBarPanel;
+use function in_array;
+use function is_array;
+use function is_object;
+use function is_string;
 
 class SystemBarPanel implements IBarPanel {
 
     /**
-     * Base64 icon for Tracy panel.
+     * Base64 icon for the Tracy panel.
      * @var string
      * @see https://www.flaticon.com/free-icons/barrier
      * @author Freepik.com
      * @license http://file000.flaticon.com/downloads/license/license.pdf
+     * @noinspection SpellCheckingInspection
      */
     public string $icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAbwAAAG8B8aLcQwAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAACiSURBVDiN7dI9aoJhEATgZ1+rVEHQLs1XfTYewNKcwltYpEvlFTxD7iEIEm9hZZUqZQgJa+EK9jYWLgwMw+zA/kRmuqXaTd2PgHPVFSaZeeE9WvERRsUb+ivf5HLBFb7xjgUO+MAc28K8tEN5lljjreEPz/jFER2G2GNa2JfWladhh0GU4R+BL7zgKTM/I+K1xtxExAw/FTCuDQzi8Yl3EHACaEg66Cf0iAkAAAAASUVORK5CYII=';
     public string $title = 'System Panel';
@@ -37,7 +42,11 @@ class SystemBarPanel implements IBarPanel {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
         $template = $this->view->getTemplate() === null ? 'None' : substr($this->view->getTemplate(), strpos($this->view->getTemplate(), '/app'));
-        $html .= $this->view->request->method . '[' . $this->view->request->controller . '::' . $this->view->request->function . '][' . basename($this->view->getLayout()) . '][' . $template . ']';
+        $called =  $this->view->request->controller . '::' . $this->view->request->function;
+        if(isset($this->view->getResponse()->initiator_line)) {
+            $called .= '::<strong>' . $this->view->getResponse()->initiator_line . '</strong>';
+        }
+        $html .= $this->view->request->method . '[' . $called . '][' . basename($this->view->getLayout() ?? 'None') . '][' . $template . ']';
 
         return $html;
 
@@ -91,7 +100,7 @@ class SystemBarPanel implements IBarPanel {
         foreach ($data as $key => $value) {
 
             if(is_string($value) && in_array($key, $hidden, true)) {
-                $value = "<span $this->value_mod_attributes>" . substr($value, 0, 3) . '...' . substr($value, -3) . "</span>";
+                $value = "<span $this->value_mod_attributes>" . substr($value, 0, 3) . '...' . substr($value, -3) . '</span>';
             } elseif($value === true) {
                 $value = "<span $this->value_mod_attributes>true</span>";
             } elseif($value === false) {
@@ -108,11 +117,11 @@ class SystemBarPanel implements IBarPanel {
                 $return .= $value;
             }
 
-            $return .= "</td><tr>";
+            $return .= '</td><tr>';
 
         }
 
-        $return .= "</tr></table>";
+        $return .= '</tr></table>';
 
         return $return;
 

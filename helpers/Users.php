@@ -10,6 +10,7 @@ use noirapi\lib\Model;
 use function call_user_func;
 use function is_string;
 
+/** @psalm-api  */
 class Users {
 
     private Model $model;
@@ -44,6 +45,7 @@ class Users {
     /**
      * @param callable $hash
      * @return $this
+     * @noinspection PhpUnused
      */
     public function setHash(callable $hash): Users {
         $this->hash = $hash;
@@ -89,6 +91,7 @@ class Users {
      * @param string $email
      * @param string $password
      * @return $this
+     * @noinspection PhpUnused
      */
     public function loginWithEmail(string $email, string $password): mixed {
         return $this->login('email', $email, $password);
@@ -132,6 +135,7 @@ class Users {
      * @param string $password
      * @param string|null $ip
      * @return int|null
+     * @noinspection PhpUnused
      */
     public function newUserWithEmail(string $email, string $password, ?string $ip = null):? int {
 
@@ -162,6 +166,7 @@ class Users {
      * @param int $user_id
      * @param string $password
      * @return bool
+     * @noinspection PhpUnused
      */
     public function checkPassword(int $user_id, string $password): bool {
 
@@ -208,6 +213,7 @@ class Users {
      * @param int|string $id
      * @param string $password
      * @return bool
+     * @noinspection PhpUnused
      */
     public function changePassword(int|string $id, string $password): bool {
 
@@ -249,11 +255,10 @@ class Users {
 
     /**
      * @return void
+     * @noinspection PhpUnused
      */
     public function logout(): void {
-
         session_destroy();
-
     }
 
     /**
@@ -271,6 +276,9 @@ class Users {
      * @return string|bool
      * @noinspection PhpUnusedPrivateMethodInspection
      * @noinspection PhpSameParameterValueInspection
+     * @deprecated use PasswordHash instead
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress UnusedMethod
      */
     private function PasswordSha1(string $password, ?string $hash = null): string|bool {
         if($hash === null) {

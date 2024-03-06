@@ -10,6 +10,7 @@ namespace noirapi\lib;
 
 use FastRoute\Dispatcher;
 use JsonException;
+use Nette\StaticClass;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\Exceptions\InternalServerError;
@@ -22,6 +23,7 @@ use Swoole\Http\Server;
 use function call_user_func_array;
 use function http_response_code;
 
+/** @psalm-suppress PropertyNotSetInConstructor */
 class Route {
 
     public const type_swoole = 'swoole';
@@ -37,13 +39,16 @@ class Route {
      * @param array $post
      * @param array $files
      * @param array $cookies
-     * @return void
+     * @return self
      */
-    public function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): void {
-        $this->request = Request::fromGlobals($server, $get, $post, $files, $cookies);
-        $this->server = $server;
+    public static function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): self {
+        $self = new self();
 
-        $this->type = self::type_globals;
+        $self->request = Request::fromGlobals($server, $get, $post, $files, $cookies);
+        $self->server = $server;
+        $self->type = self::type_globals;
+
+        return $self;
     }
 
     /**
@@ -52,20 +57,23 @@ class Route {
      * @param array $post
      * @param array $files
      * @param array $cookies
-     * @return void
+     * @return self
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): void {
-        $this->request = Request::fromSwoole($server, $get, $post, $files, $cookies);
-        $this->server = Request::swooleUpperCase($server);
-        $this->request->swoole = $this->swoole_server ?? null;
+    public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): self {
+        $self = new self();
+        $self->request = Request::fromSwoole($server, $get, $post, $files, $cookies);
+        $self->server = Request::swooleUpperCase($server);
+        $self->type = self::type_swoole;
 
-        $this->type = self::type_swoole;
+        return $self;
     }
 
     /**
      * @param Server $server
      * @return void
      * @noinspection PhpUndefinedClassInspection
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function setSwoole(Server $server): void {
         $this->request->swoole = $server;
@@ -161,7 +169,7 @@ class Route {
 
                 try{
 
-                    /** @var Response $response */
+                    /** @var Response|null $response */
                     $response = call_user_func_array(
                         [
                             new $this->request->route[1][0]($this->request, $this->server),
@@ -259,7 +267,10 @@ class Route {
         $response = null;
         unset($response);
 
-        /** @noinspection PhpUndefinedVariableInspection */
+        /**
+         * @noinspection PhpUndefinedVariableInspection
+         * @psalm-suppress PossiblyUndefinedVariable
+         */
         return $res;
 
     }
@@ -275,6 +286,7 @@ class Route {
 
         $function = 'e' . $error;
 
+        /** @psalm-suppress UndefinedClass */
         if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
             $this->request->controller = 'errors';
             $this->request->function = $function;

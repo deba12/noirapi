@@ -6,10 +6,10 @@ namespace noirapi\helpers;
 
 use Exception;
 use Nette\StaticClass;
+use Random\Randomizer;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
-use RuntimeException;
 use stdClass;
 use function array_pop;
 use function array_splice;
@@ -19,7 +19,6 @@ use function count;
 use function defined;
 use function get_class;
 use function is_object;
-use function is_string;
 use function ord;
 use function proc_close;
 use function proc_open;
@@ -27,6 +26,7 @@ use function str_split;
 use function strlen;
 use function vsprintf;
 
+/** @psalm-api  */
 class Utils {
 
     use StaticClass;
@@ -37,6 +37,7 @@ class Utils {
      * @throws Exception
      */
     public static function random(int $len = 16): string {
+        /** @noinspection SpellCheckingInspection */
         $chars = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $res = '';
 
@@ -86,6 +87,7 @@ class Utils {
      * @throws Exception
      */
     public static function randomString(int $len= 8): string {
+        /** @noinspection SpellCheckingInspection */
         $chars = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $res = '';
 
@@ -131,7 +133,7 @@ class Utils {
         // Set bits 6-7 to 10
         $data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
-        // Output the 36 character UUID.
+        // Output the 36-character UUID.
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 
     }
@@ -147,13 +149,7 @@ class Utils {
         }
 
         $path = explode('\\', $class);
-        $res = array_pop($path);
-
-        if(!is_string($res)) {
-            throw new RuntimeException('Unable to get class name');
-        }
-
-        return $res;
+        return array_pop($path);
 
     }
 
@@ -164,19 +160,7 @@ class Utils {
      */
     public static function array_shuffle(array $array): array {
 
-        $random = [];
-        $length = count($array);
-
-        if($length < 2) {
-            return $array;
-        }
-
-        while($length > 0) {
-            $random[] = array_splice($array, random_int(0, $length - 1), 1)[0];
-            $length--;
-        }
-
-        return $random;
+        return (new Randomizer())->shuffleArray($array);
 
     }
 
@@ -184,9 +168,7 @@ class Utils {
      * @return bool
      */
     public static function is_tty(): bool {
-
-        return posix_isatty(defined('STDOUT') ? STDOUT : null);
-
+        return defined('STDOUT') && posix_isatty(STDOUT);
     }
 
     /**
@@ -195,9 +177,7 @@ class Utils {
      * @noinspection SpellCheckingInspection
      */
     public static function mb_ucfirst(string $string): string {
-
         return mb_strtoupper(mb_substr($string, 0, 1)).mb_substr($string, 1);
-
     }
 
     /**
@@ -207,7 +187,6 @@ class Utils {
      * @return object
      */
     public static function toObject(array|object $input, ?string $className = null, bool $remove_missing = true): object {
-
         if($className === null) {
 
             $class = new stdClass();
@@ -238,18 +217,15 @@ class Utils {
                 } else if($remove_missing) {
                     unset($class->$name);
                 }
-            } else if(is_object($input)) {
-                if(isset($input->$name)) {
-                    $class->$name = $input->$name;
-                } else if($remove_missing) {
-                    unset($class->$name);
-                }
+            } else if(isset($input->$name)) {
+                $class->$name = $input->$name;
+            } else if($remove_missing) {
+                unset($class->$name);
             }
 
         }
 
         return $class;
-
     }
 
     /**
@@ -259,17 +235,15 @@ class Utils {
      * @throws ReflectionException
      */
     public static function getClassProperties(mixed $class, bool $public_only = true): array {
+        $result = [];
 
         $properties = (new ReflectionClass($class))->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
-
-        $result = [];
 
         foreach($properties as $property) {
             $result[] = $property->getName();
         }
 
         return $result;
-
     }
 
     /**
@@ -284,6 +258,38 @@ class Utils {
             return $key;
         }
 
+    }
+
+    /**
+     * @param array $a1
+     * @param array $a2
+     * @return array
+     * @noinspection TypeUnsafeComparisonInspection
+     */
+    public static function array_diff_recursive(array $a1, array $a2): array {
+        $r = [];
+
+        foreach ($a1 as $k => $v) {
+
+            if (array_key_exists($k, $a2)) {
+
+                if (is_array($v)) {
+                    $rad = self::array_diff_recursive($v, $a2[$k]);
+                    if (count($rad)) {
+                        $r[$k] = $rad;
+                    }
+
+                } else if ($v != $a2[$k]) {
+                    $r[$k] = $v;
+                }
+            } else {
+                $r[$k] = $v;
+
+            }
+
+        }
+
+        return $r;
     }
 
 }

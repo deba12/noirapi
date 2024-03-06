@@ -14,6 +14,7 @@ use Latte\Compiler\PrintContext;
 use Latte\Compiler\Tag;
 use Latte\Extension;
 
+/** @psalm-api  */
 class Macros extends Extension {
 
     public function getTags(): array {
@@ -36,6 +37,7 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function title(Tag $tag): Node {
 
@@ -53,6 +55,7 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnused
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function pager(Tag $tag): Node {
 
@@ -70,21 +73,21 @@ class Macros extends Extension {
                     throw new RuntimeException("Pager is not setup");
                 }
 
-                if($pager->getPageCount() == 1) { $idxl = 0; $idxr = 0; }
+                if($pager->getPageCount() == 1) { $index_left = 0; $index_right = 0; }
                 else if($pager->getPageCount() < 5) {
-                    $idxl = round($pager->getPageCount() / $pager->getPage(), 0, PHP_ROUND_HALF_UP) + $pager->getPage();
-                    $idxr = $pager->getPageCount()-$pager->getPage();
+                    $index_left = (int)round($pager->getPageCount() / $pager->getPage(), 0, PHP_ROUND_HALF_UP) + $pager->getPage();
+                    $index_right = $pager->getPageCount()-$pager->getPage();
                 }
-                else if($pager->getPage() == 1) { $idxl = 0; $idxr = 4; }
-                else if($pager->getPage() == 2) { $idxl = 1; $idxr = 3; }
-                else if($pager->getPage() == $pager->getLastPage()) { $idxl = 4; $idxr = 0; }
-                else if($pager->getPage() == $pager->getLastPage() -1 ) { $idxl = 3; $idxr = 1; }
-                else { $idxl = 2; $idxr = 2; }
+                else if($pager->getPage() == 1) { $index_left = 0; $index_right = 4; }
+                else if($pager->getPage() == 2) { $index_left = 1; $index_right = 3; }
+                else if($pager->getPage() == $pager->getLastPage()) { $index_left = 4; $index_right = 0; }
+                else if($pager->getPage() == $pager->getLastPage() -1 ) { $index_left = 3; $index_right = 1; }
+                else { $index_left = 2; $index_right = 2; }
 
                 $this->createTemplate(\'%raw\', [
                     \'pager\' => $pager,
-                    \'idxl\' => $idxl,
-                    \'idxr\' => $idxr,
+                    \'index_left\' => $index_left,
+                    \'index_right\' => $index_right,
                  ], \'include\')->renderToContentType(\'html\');',
                 $file
             )
@@ -96,6 +99,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function breadcrumb(Tag $tag): Node {
 
@@ -120,17 +124,15 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function topCss(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                if($layout->exists(\'top-css\')) {
-                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
-                    foreach($layout->get(\'top-css\') as $css) {
-                        echo "<link rel=\"stylesheet\" href=\"$css\" $nonce_inline>" . PHP_EOL;
-                    }
-                }'
-            )
+                foreach($layout->get(\'top-css\') as $css) {
+                    echo "<link rel=\"stylesheet\" href=\"$css\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">" . PHP_EOL;
+                }
+            ')
         );
     }
 
@@ -139,17 +141,15 @@ class Macros extends Extension {
      * @return Node
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function bottomCss(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                if($layout->exists(\'bottom-css\')) {
-                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
-                    foreach($layout->get(\'bottom-css\') as $css) {
-                        echo "<link rel=\"stylesheet\" href=\"$css\" $nonce_inline>" . PHP_EOL;
-                    }
-                }'
-            )
+                foreach($layout->get(\'bottom-css\') as $css) {
+                    echo "<link rel=\"stylesheet\" href=\"$css\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">" . PHP_EOL;
+                }
+            ')
         );
     }
 
@@ -159,21 +159,19 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
      * @noinspection JSUnresolvedVariable
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function topJs(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                if($layout->exists(\'top-js\')) {
-                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
-                    foreach($layout->get(\'top-js\') as $js) {
-                        if(\str_starts_with($js, \'/\')) {
-                            echo "<script type=\"text/javascript\" src=\"$js\" $nonce_inline></script>" . PHP_EOL;
-                        } else {
-                            echo "<script type=\"text/javascript\" $nonce_inline>$js</script>" . PHP_EOL;
-                        }
+                foreach($layout->get(\'top-js\') as $js) {
+                    if(\str_starts_with($js, \'/\')) {
+                        echo "<script type=\"text/javascript\" src=\"$js\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . "></script>" . PHP_EOL;
+                    } else {
+                        echo "<script type=\"text/javascript\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">$js</script>" . PHP_EOL;
                     }
-                }'
-            )
+               }
+            ')
         );
     }
 
@@ -183,21 +181,19 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @noinspection HtmlUnknownTarget
      * @noinspection JSUnresolvedVariable
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function bottomJs(Tag $tag): Node {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
-                if($layout->exists(\'bottom-js\')) {
-                    $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
-                    foreach($layout->get(\'bottom-js\') as $js) {
-                        if(\str_starts_with($js, \'/\')) {
-                            echo "<script type=\"text/javascript\" src=\"$js\" $nonce_inline></script>" . PHP_EOL;
-                        } else {
-                            echo "<script type=\"text/javascript\" $nonce>$js</script>" . PHP_EOL;
-                        }
+                foreach($layout->get(\'bottom-js\') as $js) {
+                    if(\str_starts_with($js, \'/\')) {
+                        echo "<script type=\"text/javascript\" src=\"$js\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . "></script>" . PHP_EOL;
+                    } else {
+                        echo "<script type=\"text/javascript\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">$js</script>" . PHP_EOL;
                     }
-                }'
-            )
+                }
+            ')
         );
     }
 
@@ -205,6 +201,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return Node
      * @throws CompileException
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function active(Tag $tag): Node {
 
@@ -235,6 +232,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return AuxiliaryNode
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function message(Tag $tag): AuxiliaryNode {
 
@@ -261,6 +259,7 @@ class Macros extends Extension {
      * @param Tag $tag
      * @return AuxiliaryNode
      * @noinspection PhpUnusedParameterInspection
+     * @psalm-suppress PossiblyUnusedParam
      */
     public function nonce(Tag $tag): AuxiliaryNode {
         return new AuxiliaryNode(

@@ -6,8 +6,8 @@ namespace noirapi\helpers;
 use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use noirapi\interfaces\Translator;
-use RuntimeException;
 
+/** @psalm-api  */
 class EasyTranslator implements Translator
 {
 
@@ -28,7 +28,6 @@ class EasyTranslator implements Translator
         } else {
             self::$cache[$this->language] = [];
         }
-
     }
 
     /**
@@ -38,7 +37,6 @@ class EasyTranslator implements Translator
      * @return string
      */
     public function translate(string $message, ?string $key = null, ...$args): string {
-
         // Condition is like /en,
         if($message === '/') {
             return '/' . $this->language;
@@ -50,7 +48,6 @@ class EasyTranslator implements Translator
         }
 
         return $this->lookup(self::$cache[$this->language] ?? [], $message, $key, ...$args);
-
     }
 
     /**
@@ -61,7 +58,6 @@ class EasyTranslator implements Translator
      * @return string
      */
     private function lookup(array $translations, string $message, ?string $key = null, ...$args): string {
-
         $args = array_map(fn($arg) => $this->urlTranslate($arg), $args);
 
         if($key !== null) {
@@ -102,7 +98,6 @@ class EasyTranslator implements Translator
         }
 
         return str_contains($message, '%s') ? sprintf($message, ...$args) : $message;
-
     }
 
     /**

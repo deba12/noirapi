@@ -17,6 +17,7 @@ use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
+/** @psalm-api  */
 class Mail {
 
     public string $message_id;

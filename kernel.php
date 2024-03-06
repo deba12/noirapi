@@ -11,11 +11,13 @@ use noirapi\lib\Route;
 
 include(__DIR__ . '/include.php');
 
-if($_SERVER['PHP_SELF'] === '/index.php') {
+// If the request is for the index.php, use the router
+if(isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
     Config::set('https', isset($_SERVER['HTTPS']));
-    Config::set('domain', $_SERVER[ 'SERVER_NAME' ]);
-    /** @noinspection PhpUnhandledExceptionInspection */
-    $route = new Route();
-    $route->fromGlobals($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE);
-    echo $route->serve();
+    Config::set('domain', $_SERVER[ 'SERVER_NAME' ] ?? 'default');
+    /**
+     * @noinspection PhpUnhandledExceptionInspection
+     * @psalm-suppress PossiblyInvalidArgument
+     */
+    echo Route::fromGlobals($_SERVER, $_GET, $_POST, $_FILES, $_COOKIE)->serve();
 }

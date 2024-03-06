@@ -5,16 +5,22 @@ declare(strict_types=1);
 namespace noirapi\Tracy;
 
 use Tracy\IBarPanel;
+use function count;
+use function in_array;
+use function is_array;
+use function is_object;
+use function is_string;
 
 class SessionPanel implements IBarPanel {
 
 
     /**
-     * Base64 icon for Tracy panel.
+     * Base64 icon for the Tracy panel.
      * @var string
      * @see https://www.flaticon.com/free-icons/session
      * @author Freepik.com
      * @license http://file000.flaticon.com/downloads/license/license.pdf
+     * @noinspection SpellCheckingInspection
      */
     public string $icon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAdgAAAHYBTnsmCAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAEmSURBVDiNpdLNKoRxFAbw35ghIhYaST4ixQ0oZeMGFGsbSik7IlkoCytNcgesZO8epNwAu1GmlBJRPhofi/eIXu+IPPWv0/885znnOR3+iVyN/1bMoA31uMIe7tLEuoziHmzhBR1oRxWb6K41QR6jaMJUdLzBfuSn0YhOHOIBx3jJB2EBE5iMRBXbGEERBxjDPeYwgC6cfFgooow1PKMQ/5cY/zLlU3DKUfNtB+doCP9wio2IqyFc/lqQFriQLOoVi2iJtxTFXaj8JAAl9Iffdcn2H0O4lCZnCVSwiuawcie5hZV0dz6XlcY9dmrkagoUo/NvUJTcijyW0Se1XQziOiOGW/RiuCDxOp/RZRZDER9hN4OzkZOc7hDefjn+B3I4+2PNd7wDWvk5jBRsprIAAAAASUVORK5CYII=';
 
@@ -62,6 +68,7 @@ class SessionPanel implements IBarPanel {
     /**
      * @param array|object $data
      * @return string
+     * @noinspection DuplicatedCode
      */
     private function cell(array|object $data): string {
 
@@ -78,7 +85,7 @@ class SessionPanel implements IBarPanel {
         foreach ($data as $key => $value) {
 
             if(is_string($value) && in_array($key, $hidden, true)) {
-                $value = "<span $this->value_mod_attributes>" . substr($value, 0, 3) . '...' . substr($value, -3) . "</span>";
+                $value = "<span $this->value_mod_attributes>" . substr($value, 0, 3) . '...' . substr($value, -3) . '</span>';
             } elseif($value === true) {
                 $value = "<span $this->value_mod_attributes>true</span>";
             } elseif($value === false) {
@@ -95,11 +102,11 @@ class SessionPanel implements IBarPanel {
                 $return .= $value;
             }
 
-            $return .= "</td><tr>";
+            $return .= '</td><tr>';
 
         }
 
-        $return .= "</tr></table>";
+        $return .= '</tr></table>';
 
         return $return;
 

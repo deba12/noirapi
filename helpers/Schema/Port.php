@@ -9,15 +9,14 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+/** @psalm-api  */
 class Port implements Schema {
 
-    /** @var bool */
-    private $required = false;
-    /** @var bool */
-    private $nullable = false;
+    private bool $required = false;
+    private bool $nullable = false;
 
     /** @var array{?int, ?int} */
-    private $range = [null, null];
+    private array $range = [null, null];
 
     public function required(bool $state = true): self {
         $this->required = $state;
@@ -49,6 +48,7 @@ class Port implements Schema {
 
     /**
      * @inheritDoc
+     * @psalm-suppress MissingParamType
      */
     public function normalize($value, Context $context) {
 
@@ -87,6 +87,7 @@ class Port implements Schema {
 
     /**
      * @inheritDoc
+     * @psalm-suppress MissingParamType
      */
     public function merge($value, $base) {
         return $value;
@@ -94,6 +95,7 @@ class Port implements Schema {
 
     /**
      * @inheritDoc
+     * @psalm-suppress MissingParamType
      */
     public function complete($value, Context $context) {
         return $value;
@@ -101,6 +103,7 @@ class Port implements Schema {
 
     /**
      * @inheritDoc
+     *
      */
     public function completeDefault(Context $context) {
         if ($this->required) {
@@ -110,8 +113,14 @@ class Port implements Schema {
         return null;
     }
 
-    private function isInRange($value, array $range): bool
+    /**
+     * @param int|string $value
+     * @param array{?int, ?int} $range
+     * @return bool
+     */
+    private function isInRange(int|string $value, array $range): bool
     {
+        $value = (int) $value;
         return ($range[0] === null || $value >= $range[0])
             && ($range[1] === null || $value <= $range[1]);
     }

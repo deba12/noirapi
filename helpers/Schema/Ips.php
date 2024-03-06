@@ -14,6 +14,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+/** @psalm-api  */
 class Ips implements Schema {
 
     private bool $required = false;
@@ -31,7 +32,7 @@ class Ips implements Schema {
 
     public function normalize($value, Context $context) {
 
-        if($this->required && empty($value)) {
+        if($this->required && empty($value) && !$this->nullable) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is empty.', Message::MISSING_ITEM);
             return null;
@@ -44,6 +45,7 @@ class Ips implements Schema {
                 continue;
             }
             if(!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                /** @noinspection UnusedFunctionResultInspection */
                 $context->addError("Value: ($ip) is not valid ipv4 address", Message::TYPE_MISMATCH);
                 return null;
             }

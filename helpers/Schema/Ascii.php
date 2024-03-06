@@ -7,6 +7,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+/** @psalm-api  */
 class Ascii implements Schema {
 
     /** @var bool */

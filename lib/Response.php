@@ -9,21 +9,32 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use Exception;
 use JsonException;
 use LaLit\Array2XML;
 use noirapi\helpers\RestMessage;
 use RuntimeException;
+use SimpleXMLElement;
+use stdClass;
+use function gettype;
 use function is_array;
+use function is_callable;
+use function is_float;
+use function is_int;
+use function is_object;
+use function is_resource;
+use function is_string;
 
 class Response {
 
-    private string|array|RestMessage $body = '';
     private int $status = 200;
+    private int $csv_maxmem = 1024 * 1024; //1 MB
+    private string|array|object $body = '';
     private string $contentType = self::TYPE_HTML;
+    private string $xml_root = '<root/>';
     private array $headers = [];
     private array $cookies = [];
-
-    private array $headersCallback = [];
+    private array $headerCallback = [];
 
     public const TYPE_JSON  = 'application/json';
     public const TYPE_XML   = 'text/xml';
@@ -36,20 +47,54 @@ class Response {
     public const TYPE_RAW   = 'application/octet-stream';
     public const TYPE_ZIP   = 'application/zip';
 
+    public ?string $initiator_class = null;
+    public ?string $initiator_method = null;
+    public ?int $initiator_line = null;
+
     /**
-     * @param $body
+     * @param mixed $body
      * @return $this
      */
-    public function setBody($body): Response {
+    public function setBody(mixed $body): Response {
+        if($body === null) {
+            $body = '';
+        } elseif(is_float($body) || is_int($body)) {
+            $body = (string)$body;
+        } elseif($body === true) {
+            $body = 'true';
+        } elseif($body === false) {
+            $body = 'false';
+        } elseif(is_resource($body)) {
+            throw new RuntimeException('Invalid body type: resource');
+        } elseif(is_callable($body)) {
+            throw new RuntimeException('Invalid body type: callable');
+        }
+
         $this->body = $body;
         return $this;
     }
 
+
     /**
-     * @param $body
+     * @param mixed $body
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function appendBody($body): Response {
+    public function appendBody(mixed $body): Response {
+        if(gettype($body) !== gettype($this->body)) {
+            throw new RuntimeException('Invalid body type: ' . gettype($body) . ' for response->body type: ' . gettype($this->body));
+        }
+
+        if (is_array($this->body)) {
+            $this->body += $body;
+            return $this;
+        }
+
+        if(is_object($this->body)) {
+            $this->body = $this->objectMerge($this->body, $body);
+            return $this;
+        }
+
         $this->body .= $body;
         return $this;
     }
@@ -58,95 +103,71 @@ class Response {
      * @return string
      * @throws JsonException
      * @throws RuntimeException
+     * @throws Exception
      * @noinspection PhpUndefinedClassInspection
      */
     public function getBody(): string {
-
-        if($this->contentType === self::TYPE_HTML) {
-
-            if($this->body instanceof RestMessage) {
-                $this->body = $this->body->toArray();
-            }
-
-            if(is_array($this->body)) {
-                return implode(PHP_EOL, $this->body);
-            }
-
+        if(is_string($this->body)) {
             return $this->body;
-
         }
 
-        if($this->contentType === self::TYPE_JSON) {
+        if(is_object($this->body)) {
+            if (method_exists($this->body, '__toString')) {
+                return $this->body->__toString();
+            }
 
-            if($this->body instanceof RestMessage) {
+            if(method_exists($this->body, 'toJson')) {
                 return $this->body->toJson();
             }
 
-            if(is_array($this->body)){
-                return json_encode($this->body, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
+            if (method_exists($this->body, 'toArray')) {
+                $this->body = $this->body->toArray();
+            } else {
+                $this->body = $this->object2array($this->body);
             }
+        }
 
-            return $this->body;
+        if($this->contentType === self::TYPE_HTML && is_array($this->body)) {
+            return implode(PHP_EOL, $this->body);
+        }
 
+        if($this->contentType === self::TYPE_JSON) {
+            return json_encode($this->body, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
         }
 
         if($this->contentType === self::TYPE_XML) {
-
-            if(is_string($this->body)) {
-                return $this->body;
+            if(class_exists(Array2XML::class)) {
+                return Array2XML::createXML($this->xml_root, $this->body)->saveXML();
             }
 
-            if(!class_exists(Array2XML::class)) {
-                throw new RuntimeException('Array2XML class not found');
-            }
-
-            if($this->body instanceof RestMessage) {
-                $this->body = $this->body->toArray();
-            }
-
-            return Array2XML::createXML('root', $this->body)->saveXML();
-
+            return $this->array2xml($this->body)->saveXML();
         }
 
-        if(($this->contentType === self::TYPE_CSV)) {
-
-            if($this->body instanceof RestMessage) {
-                $this->body = $this->body->toArray();
-            }
-
-            if(is_array($this->body)){
-                $this->body = $this->toCsv($this->body);
-            }
-
-            return $this->body;
-
-        }
-
-        if($this->body instanceof RestMessage) {
-
-            return $this->body->toJson();
-
+        if($this->contentType === self::TYPE_CSV) {
+            return $this->toCsv($this->body);
         }
 
         throw new RuntimeException('Invalid body type: ' . gettype($this->body) . ' for content type: ' . $this->contentType);
-
     }
 
     /**
-     * @return string|array|RestMessage
+     * @return string|array|object
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getRawBody(): string|array|RestMessage {
+    public function getRawBody(): string|array|object {
         return $this->body;
     }
 
+    /**
+     * @return RestMessage
+     * @psalm-suppress PossiblyUnusedMethod
+     */
     public function getRestMessage(): RestMessage {
-
         if($this->body instanceof RestMessage) {
             return $this->body;
         }
 
         throw new RuntimeException('Response body is not a RestMessage');
-
     }
 
     /**
@@ -155,6 +176,7 @@ class Response {
      */
     public function withStatus(int $status): Response {
         $this->status = $status;
+
         return $this;
     }
 
@@ -177,6 +199,7 @@ class Response {
 
     /**
      * @return string
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getContentType(): string {
         return $this->contentType;
@@ -193,6 +216,7 @@ class Response {
 
     /**
      * @return string
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getLocation(): string {
         if(empty($this->location)) {
@@ -206,6 +230,7 @@ class Response {
      * @param string $key
      * @param string $value
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function addHeader(string $key, string $value): Response {
         $this->headers[$key] = $value;
@@ -215,6 +240,7 @@ class Response {
     /**
      * @param string $key
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function removeHeader(string $key): Response {
         unset($this->headers[$key]);
@@ -225,10 +251,9 @@ class Response {
      * @return array
      */
     public function getHeaders(): array {
-
         $headers = array_merge([], $this->headers);
 
-        foreach($this->headersCallback as $callback) {
+        foreach($this->headerCallback as $callback) {
             $res = $callback($this);
             if(is_array($res)) {
                 /** @noinspection SlowArrayOperationsInLoopInspection */
@@ -237,25 +262,28 @@ class Response {
         }
 
         return $headers;
-
     }
 
     /**
      * @param string $filename
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function downloadFile(string $filename): Response {
         $this->addHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
+
         return $this;
     }
 
     /**
      * @param string $filename
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function inlineFile(string $filename): Response {
         $this->addHeader('Content-Disposition', 'inline; filename="' . $filename . '"');
         $this->addHeader('Content-Transfer-Encoding', 'binary');
+
         return $this;
     }
 
@@ -276,12 +304,14 @@ class Response {
             'httponly'  => true,
             'samesite'  => 'strict'
         ];
+
         return $this;
     }
 
     /**
      * @param string $key
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function clearCookie(string $key): Response {
         $this->addCookie($key, '', 0);
@@ -295,36 +325,124 @@ class Response {
         return $this->cookies;
     }
 
-    public function addHeadersCallback(callable $callback): Response {
-        $this->headersCallback[] = $callback;
+    /**
+     * @param callable $callback
+     * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function addHeaderCallback(callable $callback): Response {
+        $this->headerCallback[] = $callback;
         return $this;
     }
 
     /**
-     * @param array $data
+     * @param string $root
+     * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function setXmlRoot(string $root): Response {
+        $this->xml_root = $root;
+        return $this;
+    }
+
+    /**
+     * @param object $class1
+     * @param object $class2
+     * @return stdClass
+     */
+    private function objectMerge(object $class1, object $class2): stdClass {
+        $object = new stdClass();
+
+        foreach($class1 as $key => $value) {
+            if(is_object($value)) {
+                $object->$key = $this->objectMerge($object->$key, $value);
+            } else {
+                $object->$key = $value;
+            }
+        }
+
+        foreach($class2 as $key => $value) {
+            if(is_object($value)) {
+                $object->$key = $this->objectMerge($object->$key, $value);
+            } else {
+                $object->$key = $value;
+            }
+        }
+
+        return $object;
+    }
+
+    /**
+     * @param array|object $data
      * @return string
      */
-    private function toCsv(array $data): string {
+    private function toCsv(array|object $data): string {
+        $csv = '';
+        $written = 0;
 
         $fh = fopen('php://temp', 'rwb');
-        fputcsv($fh, array_keys(current($data)));
+        fputcsv($fh, array_keys(current((array)$data)));
 
-        foreach ($data as $row) {
-            fputcsv($fh, $row);
+        foreach($data as $key => $row) {
+            $w = fputcsv($fh, (array)$row);
+            if($w === false) {
+                $error = error_get_last();
+                throw new RuntimeException('fputcsv failed on key: ' . $key . ' with error: ' . ($error === null ? 'unknown' : $error['message']));
+            }
+            $written += $w;
+            if($written > $this->csv_maxmem) {
+                rewind($fh);
+                $csv .= stream_get_contents($fh);
+                $written = 0;
+                ftruncate($fh, 0);
+                // Important to avoid memory leaks
+                rewind($fh);
+            }
         }
 
         rewind($fh);
 
-        $csv = stream_get_contents($fh);
+        $csv .= stream_get_contents($fh);
 
-        if($csv === false) {
-            throw new RuntimeException('stream_get_contents failed');
+        if(empty($csv)) {
+            throw new RuntimeException('no csv data found');
         }
 
         fclose($fh);
 
         return $csv;
+    }
 
+    /**
+     * @param array $array
+     * @param SimpleXMLElement|null $xml
+     * @return SimpleXMLElement
+     * @throws Exception
+     */
+    private function array2xml(array $array, ?SimpleXMLElement $xml = null): SimpleXMLElement {
+        $xml ?? ($xml = new SimpleXMLElement($this->xml_root));
+
+        foreach ($array as $k => $v) {
+            is_array($v)
+                ? $this->array2xml($v, $xml->addChild($k))
+                : $xml->addChild($k, $v);
+        }
+
+        return $xml;
+    }
+
+    /**
+     * @param object|array $object
+     * @return array
+     */
+    private function object2array(object|array $object): array {
+        $result = [];
+
+        foreach ($object as $key => $value) {
+            $result[$key] = (is_array($value) || is_object($value)) ? $this->object2array($value) : $value;
+        }
+
+        return $result;
     }
 
 }

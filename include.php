@@ -1,6 +1,9 @@
-<?php /** @noinspection PhpUnused */
-/** @noinspection PhpUndefinedNamespaceInspection */
-/** @noinspection PhpUndefinedClassInspection */
+<?php
+/**
+ * @noinspection PhpUnused
+ * @noinspection PhpUndefinedNamespaceInspection
+ * @noinspection PhpUndefinedClassInspection
+ */
 
 declare(strict_types = 1);
 
@@ -33,7 +36,10 @@ if(empty($config)) {
 }
 
 if(empty($config)) {
-    throw new RuntimeException('CONFIG environment must be set');
+    if(!Config::defaultConfigAvailable()) {
+        throw new RuntimeException('CONFIG environment must be set');
+    }
+    $config = 'default';
 }
 
 /** @noinspection PhpUnhandledExceptionInspection */
@@ -52,11 +58,11 @@ $dev = Config::get('dev');
 $dev_ips = Config::get('dev_ips');
 
 if($dev === true || (!empty($dev_ips) && isset($_SERVER['REMOTE_ADDR']) && in_array($_SERVER['REMOTE_ADDR'], $dev_ips, true))) {
-    //we are missing dome debug events in Tracy that's why we start session so early
+    //we are missing some debug events in Tracy that's why we start session so early
     if(session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
-    Debugger::enable(Debugger::DEVELOPMENT, PATH_LOGS);
+    Debugger::enable(Debugger::Development, PATH_LOGS);
 } else {
-    Debugger::enable(Debugger::PRODUCTION, PATH_LOGS, Config::get('dev_email'));
+    Debugger::enable(Debugger::Production, PATH_LOGS, Config::get('dev_email'));
 }

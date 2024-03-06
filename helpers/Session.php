@@ -7,6 +7,7 @@ namespace noirapi\helpers;
 use function is_array;
 use function is_object;
 
+/** @psalm-api  */
 class Session {
 
     /**
@@ -18,7 +19,6 @@ class Session {
      * Get $_SESSION['namespace']->key
      */
     public static function get(string $namespace, ?string $key = null): mixed {
-
         if($key === null) {
             return $_SESSION[$namespace] ?? null;
         }
@@ -37,7 +37,6 @@ class Session {
         }
 
         return null;
-
     }
 
     /**
@@ -64,7 +63,6 @@ class Session {
      * @return bool
      */
     public static function has(string $namespace, ?string $key = null): bool {
-
         if($key === null) {
             return isset($_SESSION[$namespace]);
         }
@@ -83,7 +81,6 @@ class Session {
         }
 
         return false;
-
     }
 
     /**
@@ -92,7 +89,6 @@ class Session {
      * @return void
      */
     public static function remove(string $namespace, ?string $key = null): void {
-
         if($key === null) {
             unset($_SESSION[$namespace]);
         } elseif (isset($_SESSION[$namespace]) && is_array($_SESSION[$namespace])) {
@@ -101,7 +97,6 @@ class Session {
             /** @noinspection PhpExpressionAlwaysNullInspection */
             unset($_SESSION[$namespace]->$key);
         }
-
     }
 
     /**

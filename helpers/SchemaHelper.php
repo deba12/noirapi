@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace noirapi\helpers;
 use Nette\Schema\ValidationException;
 
+/** @psalm-api  */
 class SchemaHelper {
 
     public static array $messages;
@@ -32,7 +33,6 @@ class SchemaHelper {
      * @return string
      */
     public static function message(ValidationException $exceptions): string {
-
         foreach($exceptions->getMessageObjects() as $exception) {
             $path = array_shift($exception->path);
             if(isset(self::$messages[$path])) {
@@ -45,7 +45,6 @@ class SchemaHelper {
         }
 
         return self::$messages['_default'] ?? $exceptions->getMessage();
-
     }
 
 }

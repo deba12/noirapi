@@ -1,5 +1,8 @@
-<?php /** @noinspection ContractViolationInspection */
-/** @noinspection PhpUnused */
+<?php
+/**
+ * @noinspection ContractViolationInspection
+ * @noinspection PhpUnused
+ */
 declare(strict_types=1);
 
 namespace noirapi\helpers\Schema;
@@ -9,6 +12,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+/** @psalm-api  */
 class Recaptcha implements Schema {
 
     private bool $required = false;
@@ -61,6 +65,7 @@ class Recaptcha implements Schema {
      * @param $value
      * @param Context $context
      * @return bool|null
+     * @psalm-suppress MissingParamType
      */
     public function normalize($value, Context $context): ?bool {
 
@@ -70,19 +75,17 @@ class Recaptcha implements Schema {
 
         if(!$this->nullable && empty($value)) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid recaptcha response", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid recaptcha response', Message::PATTERN_MISMATCH);
             return false;
         }
 
         if(empty($this->secret)) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid recaptcha secret", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid recaptcha secret', Message::PATTERN_MISMATCH);
             return false;
         }
 
-        $res = $this->verify($value, $this->secret);
-
-        if($res === false) {
+        if(!$this->verify($value, $this->secret)) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('Captcha verification failed', Message::PATTERN_MISMATCH);
             return false;
@@ -96,6 +99,7 @@ class Recaptcha implements Schema {
      * @param $value
      * @param $base
      * @return mixed
+     * @psalm-suppress MissingParamType
      */
     public function merge($value, $base): mixed {
 
@@ -107,6 +111,7 @@ class Recaptcha implements Schema {
      * @param $value
      * @param Context $context
      * @return mixed
+     * @psalm-suppress MissingParamType
      */
     public function complete($value, Context $context): mixed {
 
@@ -114,8 +119,11 @@ class Recaptcha implements Schema {
 
     }
 
-    /** @noinspection ReturnTypeCanBeDeclaredInspection */
-    public function completeDefault(Context $context) {
+    /**
+     * @param Context $context
+     * @return null
+     */
+    public function completeDefault(Context $context): null {
 
         if ($this->required) {
             /** @noinspection UnusedFunctionResultInspection */

@@ -14,6 +14,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+/** @psalm-api  */
 class Url implements Schema {
 
     private bool $required = false;
@@ -51,6 +52,7 @@ class Url implements Schema {
      * @param Context $context
      * @return false|mixed|null
      * @noinspection HttpUrlsUsage
+     * @psalm-suppress MissingParamType
      */
     public function normalize($value, Context $context)
     {
@@ -97,6 +99,7 @@ class Url implements Schema {
      * @param $value
      * @param $base
      * @return mixed
+     * @psalm-suppress MissingParamType
      */
     public function merge($value, $base)
     {
@@ -107,6 +110,7 @@ class Url implements Schema {
      * @param $value
      * @param Context $context
      * @return mixed
+     * @psalm-suppress MissingParamType
      */
     public function complete($value, Context $context)
     {

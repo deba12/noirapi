@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace noirapi\helpers\Schema;
 
-use DateTimeImmutable;
 use DateTimeZone;
 use Exception;
 use Nette\Schema\Context;
@@ -18,34 +17,71 @@ use Nette\Schema\Schema;
 use function gettype;
 use function is_string;
 
+/** @psalm-api  */
 class DateTime implements Schema {
 
-    private bool $required = false;
-    protected bool $nullable = true;
-    protected mixed $format;
+    protected bool $required = false;
+    protected string $name;
+    protected bool $nullable = false;
+    protected string $format;
     protected ?DateTimeZone $timeZone;
+    /** @psalm-suppress PropertyNotSetInConstructor  */
     protected string $output_format;
+
+    protected \DateTime|null $date = null;
+    protected \DateTime|null $time = null;
 
     /**
      * @param string $format
      * @param DateTimeZone|null $timeZone
+     * @param string $name
      * @throws Exception
      */
-    public function __construct(string $format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null) {
+    public function __construct(string $format = 'Y-m-d H:i:s', ?DateTimeZone $timeZone = null, string $name = 'DateTime') {
         $this->format = $format;
         $this->timeZone = $timeZone ?? new DateTimeZone(date_default_timezone_get());
+        $this->name = $name;
     }
 
+    public function setTime(string $time, string $format): self {
+        $this->time = \DateTime::createFromFormat($format, $time, $this->timeZone);
+
+        return $this;
+    }
+
+    /**
+     * @param string $date
+     * @param string $format
+     * @return $this
+     */
+    public function setDate(string $date, string $format): self {
+        $this->date = \DateTime::createFromFormat($format, $date, $this->timeZone);
+
+        return $this;
+    }
+
+    /**
+     * @param bool $state
+     * @return $this
+     */
     public function required(bool $state = true): self {
         $this->required = $state;
         return $this;
     }
 
+    /**
+     * @param bool $state
+     * @return $this
+     */
     public function nullable(bool $state = true): self {
         $this->nullable = $state;
         return $this;
     }
 
+    /**
+     * @param string $format
+     * @return $this
+     */
     public function format(string $format): self {
         $this->output_format = $format;
         return $this;
@@ -54,34 +90,52 @@ class DateTime implements Schema {
     /**
      * @param $value
      * @param Context $context
-     * @return string|DateTimeImmutable|null
+     * @return string|\DateTime|null
+     * @psalm-suppress MissingParamType
      */
-    public function normalize($value, Context $context): string|null|DateTimeImmutable {
+    public function normalize($value, Context $context): string|null|\DateTime {
 
         if($this->nullable && empty($value)) {
             return null;
         }
 
-        // Must be string or empty (null / 0 / false /
-        if (!is_string($value) && !empty($value)) {
+        if (!is_string($value) && empty($value)) {
             $type = gettype($value);
-            $context->addError("The option %path% expects Date, $type given.", Message::PATTERN_MISMATCH);
+            $context->addError("The option %path% expects $this->name($this->format), $type($value) given.", Message::PATTERN_MISMATCH);
             return null;
         }
 
         if (!$this->nullable && empty($value)) {
-            $context->addError('The option %path% expects not-nullable Date, nothing given.', Message::PATTERN_MISMATCH);
+            $context->addError("The option %path% expects not-nullable $this->name, nothing given.", Message::PATTERN_MISMATCH);
             return null;
         }
 
-        $normalized = DateTimeImmutable::createFromFormat($this->format, $value, $this->timeZone);
-        if (!$normalized instanceof DateTimeImmutable) {
-            $context->addError("The option %path% expects Date to match pattern '$this->format', '$value' given.", Message::PATTERN_MISMATCH);
-            return null;
+        $normalized = null;
+
+        if(!empty($value)) {
+            $normalized = \DateTime::createFromFormat($this->format, $value, $this->timeZone);
         }
 
-        if($normalized->format($this->format) !== $value) {
-            $context->addError("The option %path% expects Date to be valid Date format. Input Date is not the same as formatted date. Format:'$this->format' Input: '$value', Formatted: '{$normalized->format($this->format)}'.", Message::PATTERN_MISMATCH);
+        if(!empty($this->date)) {
+
+            if(!empty($normalized)) {
+                $normalized->setDate((int)$this->date->format('Y'), (int)$this->date->format('m'), (int)$this->date->format('d'));
+            } else {
+                $normalized = $this->date;
+            }
+
+        }
+
+        if(isset($this->time)) {
+            if(!empty($normalized)) {
+                $normalized->setTime((int)$this->time->format('H'), (int)$this->time->format('i'), (int)$this->time->format('s'));
+            } else {
+                $normalized = $this->date;
+            }
+        }
+
+        if(empty($normalized)) {
+            $context->addError("The option %path% expects $this->name to match pattern '$this->format', '$value' given.", Message::PATTERN_MISMATCH);
             return null;
         }
 
@@ -92,11 +146,23 @@ class DateTime implements Schema {
         return $normalized;
     }
 
-    public function merge($value, $base) {
+    /**
+     * @param $value
+     * @param $base
+     * @return mixed
+     * @psalm-suppress MissingParamType
+     */
+    public function merge($value, $base): mixed {
         return $value;
     }
 
-    public function complete($value, Context $context) {
+    /**
+     * @param $value
+     * @param Context $context
+     * @return mixed
+     * @psalm-suppress MissingParamType
+     */
+    public function complete($value, Context $context): mixed {
         return $value;
     }
 

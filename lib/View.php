@@ -4,10 +4,10 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use Latte\Bridges\Tracy\BlueScreenPanel;
 use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
+use Nette\Neon\Exception;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\helpers\DummyTranslator;
@@ -17,10 +17,8 @@ use noirapi\helpers\Macros;
 use noirapi\helpers\Session;
 use noirapi\interfaces\Translator;
 use noirapi\lib\View\Layout;
-use noirapi\Tracy\SystemBarPanel;
 use RuntimeException;
 use stdClass;
-use Tracy\Debugger;
 use function count;
 
 class View {
@@ -30,6 +28,7 @@ class View {
 
     private stdClass $params;
     private ?string $template = null;
+    private bool $dev;
 
     public Engine $latte;
     private ?string $layout_file = null;
@@ -46,12 +45,13 @@ class View {
      * @param Response $response
      * @param bool $dev
      * @throws FileNotFoundException
+     * @throws Exception
      */
     public function __construct(Request $request, Response $response, bool $dev = false) {
-
         $this->request = $request;
         $this->response = $response;
         $this->params = new stdClass();
+        $this->dev = $dev;
 
         $this->latte = new Engine;
         /** @psalm-suppress UndefinedConstant */
@@ -102,20 +102,13 @@ class View {
         }
 
         if($dev) {
-
-            BlueScreenPanel::initialize();
-
-            $panel = new SystemBarPanel($this);
-            Debugger::getBar()->addPanel($panel);
             $this->latte->addExtension(new TracyExtension());
-
         }
 
         $this->latte->setStrictParsing();
         $this->latte->setStrictTypes();
 
         self::$uri = $request->uri;
-
     }
 
     /**
@@ -124,6 +117,17 @@ class View {
      * @throws FileNotFoundException
      */
     public function display(array $params = []): Response {
+
+        if($this->dev) {
+
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+
+            $this->response->initiator_class = $caller['class'];
+            $this->response->initiator_method = $caller['function'];
+            $this->response->initiator_line = $caller['line'];
+
+        }
 
         if($this->template === null) {
             $this->setTemplate($this->request->function);
@@ -153,7 +157,6 @@ class View {
         $this->mergeParams($this->layout, 'layout');
 
         return $this->response->setBody($this->latte->renderToString($layout, $this->params));
-
     }
 
     /**
@@ -162,8 +165,20 @@ class View {
      * @param array $params
      * @return string
      * @throws FileNotFoundException
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function print(?string $layout, string $view, array $params = []): string {
+
+        if($this->dev) {
+
+            $bt = debug_backtrace();
+            $caller = array_shift($bt);
+
+            $this->response->initiator_class = $caller['class'];
+            $this->response->initiator_method = $caller['function'];
+            $this->response->initiator_line = $caller['line'];
+
+        }
 
         $this->setTemplate($view);
         $params['template'] = $this->template;
@@ -185,18 +200,17 @@ class View {
         }
 
         return $this->latte->renderToString($this->template, $this->params);
-
     }
 
     /**
      * @param string $template
      * @param string|null $controller
-     * @return View
+     * @return self
      * @noinspection PhpUnused
      * @throws FileNotFoundException
+     * @psalm-suppress PossiblyUnusedReturnValue
      */
-    public function setTemplate(string $template, string $controller = null): View {
-
+    public function setTemplate(string $template, string $controller = null): self {
         if($controller === null) {
             $controller = $this->request->controller;
         }
@@ -209,22 +223,21 @@ class View {
         }
 
         throw new FileNotFoundException('Unable to find template: ' . $file);
-
     }
 
     /**
      * @return string|null
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getTemplate(): ?string {
-
         return $this->template;
-
     }
 
 
     /**
      * @return $this
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function noLayout(): View {
         $this->layout_file = null;
@@ -233,11 +246,13 @@ class View {
 
     /**
      * @param string|null $layout_file
-     * @return View
+     * @return self
      * @throws FileNotFoundException
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress PossiblyUnusedReturnValue
      */
-    public function setLayout(?string $layout_file = null): View {
+    public function setLayout(?string $layout_file = null): self {
         if($layout_file === null) {
             $this->layout_file = null;
             return $this;
@@ -253,18 +268,16 @@ class View {
         }
 
         throw new FileNotFoundException('Unable to find layout_file: ' . $file);
-
     }
 
 
     /**
      * @return string|null
      * @noinspection GetSetMethodCorrectnessInspection
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getLayout(): ?string {
-
         return $this->layout_file;
-
     }
 
     /**
@@ -272,6 +285,7 @@ class View {
      * @param string|null $controller
      * @return bool
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function templateExists(string $template, string $controller = null): bool {
         if($controller === null) {
@@ -287,6 +301,7 @@ class View {
      * @param string $layout
      * @return bool
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function layoutExists(string $layout): bool {
         /** @psalm-suppress UndefinedConstant */
@@ -296,12 +311,12 @@ class View {
     }
 
     /**
-     * @param string $param
-     * @param int|string $page
+     * @param string $key
+     * @param int|float|string|null $value
      * @return string
+     * @psalm-suppress PossiblyUnusedMethod
      */
-    public static function add_url_var(string $param, int|string $page): string {
-
+    public static function add_url_var(string $key, int|float|string|null $value): string {
         $params = parse_url(self::$uri, PHP_URL_QUERY);
 
         if(!empty($params)) {
@@ -309,24 +324,24 @@ class View {
             parse_str($params, $array);
 
             if(count($array) > 0) {
-                $array[$param] = $page;
+                $array[$key] = (string)$value;
                 return '?' . http_build_query($array);
             }
-            return '?' . $param . '=' . $page;
+            return '?' . $key . '=' . $value;
         }
-        return '?' . $param . '=' . $page;
+
+        return '?' . $key . '=' . $value;
     }
 
     /**
      * @return array
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      *
      * this is used by system panel
      */
     public function getParams(): array {
-
         return get_object_vars($this);
-
     }
 
     /**
@@ -335,23 +350,21 @@ class View {
      * @return void
      */
     public function mergeParams(array|object $params, ?string $namespace = null): void {
-
         if($namespace === null) {
 
             foreach($params as $key => $value) {
-                if(!isset($this->params->$key)) {
-                    $this->params->$key = $value;
-                } else {
+                if(isset($this->params->$key)) {
                     throw new RuntimeException("Duplicate key in view params: $key");
                 }
+
+                $this->params->$key = $value;
             }
 
-        } else if(!isset($this->params->$namespace)) {
-            $this->params->$namespace = $params;
-        } else {
+        } else if(isset($this->params->$namespace)) {
             throw new RuntimeException("Duplicate key ain view params: $namespace");
+        } else {
+            $this->params->$namespace = $params;
         }
-
     }
 
     /**
@@ -362,6 +375,14 @@ class View {
      */
     public function addParam(string $key, mixed $value): void {
         $this->params->$key = $value;
+    }
+
+    /**
+     * @return Response
+     * @note this is used by the system panel
+     */
+    public function getResponse(): Response {
+        return $this->response;
     }
 
 }
