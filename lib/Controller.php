@@ -18,6 +18,7 @@ use noirapi\helpers\Message;
 use noirapi\helpers\RestMessage;
 use noirapi\helpers\Session;
 use noirapi\helpers\Utils;
+use noirapi\Tracy\GenericPanel;
 use noirapi\Tracy\PDOBarPanel;
 use Throwable;
 use Tracy\Debugger;
@@ -88,6 +89,35 @@ class Controller {
         // We need this when we are moving across domains
         if(isset($this->request->get['message'], $this->request->get['type'])) {
             $this->message($this->request->get['message'], $this->request->get['type']);
+        }
+
+    }
+
+    public function __destruct() {
+
+        if($this->dev) {
+
+            /** @noinspection HttpUrlsUsage */
+            $host = ($this->request->https ? 'https://' : 'http://') . Config::$config;
+
+            $urls = [];
+            $urls['uri'] = $host . $this->request->uri;
+
+            $ref = $this->referer(false);
+            if(!str_starts_with('http', $ref)) {
+                $urls['ref'] = $host . $ref;
+            } else {
+                $urls['ref'] = $ref;
+            }
+
+            $location = $this->response->getLocation();
+            if($location !== null) {
+                $urls['fwd'] = $host . $location;
+            }
+
+            $panel = new GenericPanel('url', $urls);
+            Debugger::getBar()->addPanel($panel);
+
         }
 
     }

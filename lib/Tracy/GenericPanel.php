@@ -72,6 +72,7 @@ class GenericPanel implements IBarPanel{
 
         foreach($this->data as $key => $value) {
             $html .= '<tr>';
+            $html .= "<td class='noir-copy' data-clipboard-text='$value' data-bs-toggle='tooltip' data-bs-title='Copy to clipboard' data-bs-container='.tracy-InfoPanel'><i class='bi bi-clipboard'></i></td>";
             $html .= "<td><span $this->key_attributes>$key</span></td>";
             $html .= "<td $this->value_attributes>$value</td>";
             $html .= '</tr>';
@@ -79,6 +80,7 @@ class GenericPanel implements IBarPanel{
 
         $html .= '</table>';
         $html .= '</div>';
+        $html .= "<script>if( typeof clipboard === 'function'){ clipboard();}</script>";
 
         return $html;
 

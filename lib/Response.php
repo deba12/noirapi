@@ -215,15 +215,11 @@ class Response {
     }
 
     /**
-     * @return string
+     * @return string|null
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getLocation(): string {
-        if(empty($this->location)) {
-            throw new RuntimeException('$response->setLocation is mandatory');
-        }
-
-        return $this->location;
+    public function getLocation(): ?string {
+        return $this->headers['Location'] ?? null;
     }
 
     /**
