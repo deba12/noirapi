@@ -112,7 +112,11 @@ class Controller {
 
             $location = $this->response->getLocation();
             if($location !== null) {
-                $urls['fwd'] = $host . $location;
+                if(!str_starts_with('http', $location)) {
+                    $urls['fwd'] = $host . $location;
+                } else {
+                    $urls['fwd'] = $location;
+                }
             }
 
             $panel = new GenericPanel('url', $urls);
