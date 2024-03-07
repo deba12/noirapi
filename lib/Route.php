@@ -10,7 +10,7 @@ namespace noirapi\lib;
 
 use FastRoute\Dispatcher;
 use JsonException;
-use Nette\StaticClass;
+use Nette\Neon\Exception;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
 use noirapi\Exceptions\InternalServerError;
@@ -81,6 +81,7 @@ class Route {
 
     /**
      * @return array|string
+     * @throws Exception
      * @throws FileNotFoundException
      * @throws JsonException
      */
@@ -279,8 +280,9 @@ class Route {
      * @param int $error
      * @param string $defaultText
      * @return Response
-     * @noinspection PhpFullyQualifiedNameUsageInspection
      * @throws FileNotFoundException
+     * @throws Exception
+     * @noinspection PhpFullyQualifiedNameUsageInspection
      */
     private function handleErrors(int $error, string $defaultText): Response {
 
