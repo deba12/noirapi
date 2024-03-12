@@ -35,20 +35,22 @@ $server->on('start', function () use($listen_ip, $listen_port) {
 });
 
 $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) use($server) {
+
     $request->server['headers'] = $request->header;
     $route = Route::fromSwoole($request->server, $request->get ?? [], $request->post ?? [], $request->files ?? [], $request->cookie ?? []);
     $route->setSwoole($server);
 
-    /** @noinspection PhpUnhandledExceptionInspection */
-    $res = $route->serve();
+    //TODO set http hostname, https and cooke_domain like kernel.php
 
-    $response->setStatusCode($res['status']);
+    $app = $route->serve();
 
-    foreach ($res['headers'] as $key => $value) {
+    $response->setStatusCode($app->getStatus());
+
+    foreach ($app->getHeaders() as $key => $value) {
         $response->header($key, $value);
     }
 
-    foreach ($res['cookies'] as $cookie) {
+    foreach ($app->getCookies() as $cookie) {
 
         $response->setCookie(
             name: $cookie['key'],
@@ -63,7 +65,7 @@ $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Respo
 
     }
 
-    $response->end($res['body']);
+    $response->end($app->getBody());
 
 });
 

@@ -18,7 +18,6 @@ use noirapi\helpers\Message;
 use noirapi\helpers\RestMessage;
 use noirapi\helpers\Session;
 use noirapi\helpers\Utils;
-use noirapi\Tracy\GenericPanel;
 use noirapi\Tracy\PDOBarPanel;
 use Throwable;
 use Tracy\Debugger;
@@ -28,10 +27,10 @@ use function in_array;
 class Controller {
 
     public Request $request;
+    public Response $response;
     public array $server;
     /** @var Model|null */
     public $model;
-    public Response $response;
     public ?View $view = null;
     public bool $dev;
     /** @var mixed|non-empty-array<array-key, true>|null */
@@ -40,11 +39,13 @@ class Controller {
     /**
      * Controller constructor.
      * @param Request $request
+     * @param Response $response
      * @param array $server
      */
-    public function __construct(Request $request, array $server) {
+    public function __construct(Request $request, Response $response, array $server) {
 
         $this->request = $request;
+        $this->response = $response;
         $this->server = $server;
 
         $db = Config::get('db');
@@ -84,8 +85,6 @@ class Controller {
 
         }
 
-        $this->response = new Response();
-
         // We need this when we are moving across domains
         if(isset($this->request->get['message'], $this->request->get['type'])) {
             $this->message($this->request->get['message'], $this->request->get['type']);
@@ -96,32 +95,7 @@ class Controller {
     public function __destruct() {
 
         if($this->dev) {
-
-            /** @noinspection HttpUrlsUsage */
-            $host = ($this->request->https ? 'https://' : 'http://') . Config::$config;
-
-            $urls = [];
-            $urls['uri'] = $host . $this->request->uri;
-
-            $ref = $this->referer(false);
-            if(!str_starts_with('http', $ref)) {
-                $urls['ref'] = $host . $ref;
-            } else {
-                $urls['ref'] = $ref;
-            }
-
-            $location = $this->response->getLocation();
-            if($location !== null) {
-                if(!str_starts_with('http', $location)) {
-                    $urls['fwd'] = $host . $location;
-                } else {
-                    $urls['fwd'] = $location;
-                }
-            }
-
-            $panel = new GenericPanel('url', $urls);
-            Debugger::getBar()->addPanel($panel);
-
+            Route::handleRouteUrlDebugBar($this->request, $this->response, $this->server);
         }
 
     }

@@ -9,7 +9,6 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use FastRoute\Dispatcher;
-use JsonException;
 use Nette\Neon\Exception;
 use noirapi\Config;
 use noirapi\Exceptions\FileNotFoundException;
@@ -19,18 +18,16 @@ use noirapi\Exceptions\MessageException;
 use noirapi\Exceptions\NotFoundException;
 use noirapi\Exceptions\RestException;
 use noirapi\helpers\Utils;
+use noirapi\Tracy\GenericPanel;
 use Swoole\Http\Server;
+use Tracy\Debugger;
 use function call_user_func_array;
-use function http_response_code;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 class Route {
 
-    public const type_swoole = 'swoole';
-    public const type_globals = 'globals';
-
-    private string $type;
     private Request $request;
+    private Response $response;
     private array $server;
 
     /**
@@ -46,7 +43,6 @@ class Route {
 
         $self->request = Request::fromGlobals($server, $get, $post, $files, $cookies);
         $self->server = $server;
-        $self->type = self::type_globals;
 
         return $self;
     }
@@ -64,7 +60,6 @@ class Route {
         $self = new self();
         $self->request = Request::fromSwoole($server, $get, $post, $files, $cookies);
         $self->server = Request::swooleUpperCase($server);
-        $self->type = self::type_swoole;
 
         return $self;
     }
@@ -80,14 +75,17 @@ class Route {
     }
 
     /**
-     * @return array|string
+     * @return Response
      * @throws Exception
      * @throws FileNotFoundException
-     * @throws JsonException
      */
-    public function serve(): array|string {
+    public function serve(): Response {
 
-        $route = new \app\Route(Config::get('dev') ?? false);
+        $dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
+
+        $this->response = new Response();
+
+        $route = new \app\Route($dev);
 
         $pos = strpos($this->request->uri, '?');
 
@@ -120,31 +118,11 @@ class Route {
         }
 
         if(empty($this->request->language) && !empty($languages)) {
-
-            $response = $this->redirect('/' . (Config::get('default_language') ?? 'en') . $uri, 307);
-
-            if($this->type === self::type_globals) {
-                http_response_code($response->getStatus());
-
-                foreach($response->getHeaders() as $key => $value) {
-                    header(ucfirst($key) . ': ' . $value);
-                }
-
-                return $response->getBody();
-
+            $this->redirect('/' . (Config::get('default_language') ?? 'en') . $uri, 307);
+            if($dev) {
+                self::handleRouteUrlDebugBar($this->request,$this->response, $this->server);
             }
-
-            if($this->type === self::type_swoole) {
-
-                $res = [
-                    'status'    => $response->getStatus(),
-                    'body'      => $response->getBody(),
-                    'cookies'   => $response->getCookies(),
-                    'headers'   => $response->getHeaders(),
-                ];
-
-            }
-
+            return $this->response;
         }
 
         $this->request->url_no_lang = $uri;
@@ -153,16 +131,6 @@ class Route {
 
         switch ($this->request->route[0]) {
 
-            case Dispatcher::NOT_FOUND:
-
-                $response = $this->handleErrors(404, '404 Not found');
-                break;
-
-            case Dispatcher::METHOD_NOT_ALLOWED:
-
-                $response = $this->handleErrors(405, '405 Method not allowed');
-                break;
-
             case Dispatcher::FOUND:
 
                 $this->request->controller = Utils::getCLassName($this->request->route[1][0]);
@@ -170,121 +138,74 @@ class Route {
 
                 try{
 
-                    /** @var Response|null $response */
-                    $response = call_user_func_array(
+                    call_user_func_array(
                         [
-                            new $this->request->route[1][0]($this->request, $this->server),
+                            new $this->request->route[1][0]($this->request, $this->response, $this->server),
                             $this->request->route[1][1]
                         ],
                         $this->request->route[2]
                     );
 
-                    if($response === null) {
-                        $response = new Response();
-                        $response->withStatus(500)
-                            ->setBody('Internal server error');
-                    }
-
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (LoginException $exception) {
 
-                    $response = new Response();
-
                     if($exception->getCode() === 403) {
-                        $response->withStatus(403)
+                        $this->response->withStatus(403)
                             ->setContentType(Response::TYPE_JSON)
                             ->setBody(['forward' => $exception->getMessage()]);
                     } else {
-                        $response->withStatus($exception->getCode())
+                        $this->response->withStatus($exception->getCode())
                             ->withLocation($exception->getMessage());
                     }
 
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (RestException $exception) {
-                    $response = new Response();
-                    $response->withStatus($exception->getCode())
+                    $this->response->withStatus($exception->getCode())
                         ->setContentType(Response::TYPE_JSON)
                         ->setBody($exception->getMessage());
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (MessageException $exception) {
-                    $response = new Response();
-                    $response->withStatus($exception->getCode())
+                    $this->response->withStatus($exception->getCode())
                         ->setBody($exception->getMessage());
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (InternalServerError $exception) {
-                    $response = $this->handleErrors(500, $exception->getMessage() ?? 'Internal server error');
+                    $this->handleErrors(500, $exception->getMessage() ?? 'Internal server error');
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (NotFoundException $exception) {
-                    $response = $this->handleErrors(404, $exception->getMessage() ?? '404 Not found');
+                    $this->handleErrors(404, $exception->getMessage() ?? '404 Not found');
                 }
 
                 break;
 
+            case Dispatcher::NOT_FOUND:
+
+                $this->handleErrors(404, '404 Not found');
+                break;
+
+            case Dispatcher::METHOD_NOT_ALLOWED:
+
+                $this->handleErrors(405, '405 Method not allowed');
+                break;
+
             default:
 
-                $response = $this->handleErrors(500, 'Internal server error');
+                $this->handleErrors(500, 'Internal server error');
 
         }
 
-        if($this->type === self::type_globals) {
-
-            http_response_code($response->getStatus());
-            foreach($response->getHeaders() as $key => $value) {
-                header(ucfirst($key) . ': ' . $value);
-            }
-
-            $domain = Config::get('cookie_domain');
-
-            foreach($response->getCookies() as $cookie) {
-
-                setcookie(
-                    $cookie['key'],
-                    $cookie['value'],
-                    [
-                        'expires'   => $cookie['expire'],
-                        'path'      => '/',
-                        'domain'    => $domain ?? $this->server['HTTP_HOST'] ?? $this->server['SERVER_NAME'],
-                        'secure'    => !$this->request->https ? false : $cookie['secure'],
-                        'httponly'  => $cookie['httponly'],
-                        'samesite'  => $cookie['samesite'],
-                    ]);
-
-            }
-
-            $res = $response->getBody();
-
-        } elseif($this->type === self::type_swoole) {
-
-            $res = [
-                'status'    => $response->getStatus(),
-                'body'      => $response->getBody(),
-                'cookies'   => $response->getCookies(),
-                'headers'   => $response->getHeaders(),
-            ];
-
-        }
-
-        //force calling destructor
-        $response = null;
-        unset($response);
-
-        /**
-         * @noinspection PhpUndefinedVariableInspection
-         * @psalm-suppress PossiblyUndefinedVariable
-         */
-        return $res;
+        return $this->response;
 
     }
 
     /**
      * @param int $error
      * @param string $defaultText
-     * @return Response
-     * @throws FileNotFoundException
+     * @return void
      * @throws Exception
+     * @throws FileNotFoundException
      * @noinspection PhpFullyQualifiedNameUsageInspection
      */
-    private function handleErrors(int $error, string $defaultText): Response {
+    private function handleErrors(int $error, string $defaultText): void {
 
         $function = 'e' . $error;
 
@@ -292,29 +213,62 @@ class Route {
         if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
             $this->request->controller = 'errors';
             $this->request->function = $function;
-            $response = (new \app\controllers\errors($this->request, $this->server))->$function();
+            $this->response = (new \app\controllers\errors($this->request, $this->response, $this->server))->$function();
         } else {
-            $response = new Response();
-            $response->setBody($defaultText);
+            $this->response->setBody($defaultText);
         }
-
-        return $response->withStatus($error);
 
     }
 
     /**
      * @param string $location
      * @param int $status
-     * @return Response
+     * @return void
      */
-    private function redirect(string $location, int $status = 302): Response {
+    private function redirect(string $location, int $status = 302): void {
 
         // Attach get to current future location
         if(!empty($this->request->get)) {
             $location .= '?' . http_build_query($this->request->get);
         }
 
-        return (new Response())->withLocation($location)->withStatus($status);
+        $this->response->withLocation($location)->withStatus($status);
+
+    }
+
+    /**
+     * @param Request $request
+     * @param Response $response
+     * @param array $server
+     * @return void
+     */
+    public static function handleRouteUrlDebugBar(Request $request, Response $response, array $server): void {
+
+        /** @noinspection HttpUrlsUsage */
+        $host = ($request->https ? 'https://' : 'http://') . Config::$config;
+
+        $urls = [];
+        $urls['uri'] = $host . $request->uri;
+
+        $ref = $server[ 'HTTP_REFERER' ] ?? '';
+        if(!str_starts_with($ref, 'http')) {
+            $urls['ref'] = $host . $ref;
+        } elseif($ref !== '') {
+            $urls['ref'] = $ref;
+        }
+
+        $location = $response->getLocation();
+        if($location !== null) {
+
+            if(!str_starts_with($location, 'http')) {
+                $urls['fwd'] = $host . $location;
+            } else {
+                $urls['fwd'] = $location;
+            }
+        }
+
+        $panel = new GenericPanel('url', $urls);
+        Debugger::getBar()->addPanel($panel);
 
     }
 
