@@ -166,9 +166,9 @@ class Macros extends Extension {
             fn (PrintContext $context) => $context->format('
                 foreach($layout->get(\'top-js\') as $js) {
                     if(\str_starts_with($js, \'/\')) {
-                        echo "<script type=\"text/javascript\" src=\"$js\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . "></script>" . PHP_EOL;
+                        echo "<script " . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . "></script>" . PHP_EOL;
                     } else {
-                        echo "<script type=\"text/javascript\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">$js</script>" . PHP_EOL;
+                        echo "<script " . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">$js</script>" . PHP_EOL;
                     }
                }
             ')
@@ -188,9 +188,9 @@ class Macros extends Extension {
             fn (PrintContext $context) => $context->format('
                 foreach($layout->get(\'bottom-js\') as $js) {
                     if(\str_starts_with($js, \'/\')) {
-                        echo "<script type=\"text/javascript\" src=\"$js\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . "></script>" . PHP_EOL;
+                        echo "<script " . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . "></script>" . PHP_EOL;
                     } else {
-                        echo "<script type=\"text/javascript\"" . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">$js</script>" . PHP_EOL;
+                        echo "<script " . (!empty($nonce) ? " nonce=\"$nonce\"" : "") . ">$js</script>" . PHP_EOL;
                     }
                 }
             ')
