@@ -36,6 +36,8 @@ class Controller {
     /** @var mixed|non-empty-array<array-key, true>|null */
     public static $panels;
 
+    public static string $model_path = 'app\\models\\';
+
     /**
      * Controller constructor.
      * @param Request $request
@@ -55,7 +57,7 @@ class Controller {
 
             if(empty($this->model)) {
 
-                $model = 'app\\models\\' . Utils::getClassName(get_class($this));
+                $model = self::$model_path . Utils::getClassName(get_class($this));
                 if(class_exists($model) && is_subclass_of($model, Model::class)) {
                     $this->model = new $model();
                 } else {
