@@ -24,20 +24,21 @@ use function count;
 class View {
 
     public Request $request;
-    private Response $response;
+    public Layout $layout;
+    public Translator $translator;
+    public Response $response;
+    public Engine $latte;
+
+    public static string $template_dir_prefix = '/';
 
     private stdClass $params;
     private ?string $template = null;
     private bool $dev;
-
-    public Engine $latte;
     private ?string $layout_file = null;
     private const latte_ext = '.latte';
 
     private static string $uri;
 
-    public Layout $layout;
-    public Translator $translator;
 
     /**
      * View constructor.
@@ -215,7 +216,7 @@ class View {
             $controller = $this->request->controller;
         }
         /** @psalm-suppress UndefinedConstant */
-        $file = PATH_VIEWS . $controller . DIRECTORY_SEPARATOR . $template . self::latte_ext;
+        $file = PATH_VIEWS . $controller . self::$template_dir_prefix . $template . self::latte_ext;
 
         if(is_readable($file)) {
             $this->template = $file;
