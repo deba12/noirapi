@@ -56,7 +56,7 @@ class Json implements Schema {
 
         if(!$this->nullable && empty($value)) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid json", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid json', Message::PATTERN_MISMATCH);
             return false;
         }
 
@@ -64,7 +64,7 @@ class Json implements Schema {
             $ret = json_decode($value, false, 512, JSON_THROW_ON_ERROR);
         } catch (JsonException $e) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid json. " . $e->getMessage(), Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid json. ' . $e->getMessage(), Message::PATTERN_MISMATCH);
             return false;
         }
 

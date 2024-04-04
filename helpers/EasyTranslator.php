@@ -6,6 +6,12 @@ namespace noirapi\helpers;
 use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use noirapi\interfaces\Translator;
+use function array_map;
+use function is_string;
+use function sprintf;
+use function str_contains;
+use function str_starts_with;
+use function strtolower;
 
 /** @psalm-api  */
 class EasyTranslator implements Translator

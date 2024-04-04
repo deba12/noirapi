@@ -109,7 +109,7 @@ class Request {
                 return true;
             }
 
-            if ($server['HTTPS'] === "1") {
+            if ($server['HTTPS'] === '1') {
                 return true;
             }
         } elseif (isset($server['SERVER_PORT']) && ($server['SERVER_PORT'] === 443)) {

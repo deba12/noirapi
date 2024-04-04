@@ -25,6 +25,8 @@ use noirapi\helpers\Schema\Recaptcha;
 use noirapi\helpers\Schema\Time;
 use noirapi\helpers\Schema\Url;
 use RuntimeException;
+use function is_callable;
+use function is_string;
 
 /** @psalm-api  */
 final class Expect2 {

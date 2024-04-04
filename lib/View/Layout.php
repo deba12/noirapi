@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace noirapi\lib\View;
 
 use noirapi\interfaces\Translator;
+use function is_string;
 
 class Layout {
 

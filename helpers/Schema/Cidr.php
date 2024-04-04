@@ -1,4 +1,5 @@
 <?php
+/** @noinspection ContractViolationInspection */
 declare(strict_types=1);
 
 namespace noirapi\helpers\Schema;

@@ -63,7 +63,7 @@ class Url implements Schema {
 
         if(!$this->nullable && empty($value)) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid url address", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid url address', Message::PATTERN_MISMATCH);
             return false;
         }
 
@@ -71,13 +71,13 @@ class Url implements Schema {
 
             if(!str_starts_with($value, 'https://')) {
                 /** @noinspection UnusedFunctionResultInspection */
-                $context->addError("The option %path% requires valid https:// url scheme", Message::TYPE_MISMATCH);
+                $context->addError('The option %path% requires valid https:// url scheme', Message::TYPE_MISMATCH);
                 return false;
             }
 
         } else if(!str_starts_with($value, 'http://') && !str_starts_with($value, 'https://')) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid http(s):// url scheme", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid http(s):// url scheme', Message::PATTERN_MISMATCH);
             return false;
         }
 
@@ -87,7 +87,7 @@ class Url implements Schema {
 
         if($ret === false) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid url address", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid url address', Message::PATTERN_MISMATCH);
             return false;
         }
 

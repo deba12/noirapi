@@ -1,4 +1,5 @@
 <?php
+/** @noinspection DevelopmentDependenciesUsageInspection */
 declare(strict_types=1);
 
 namespace noirapi\Tracy;
@@ -6,6 +7,7 @@ namespace noirapi\Tracy;
 use noirapi\PDO\PDO;
 use SqlFormatter;
 use Tracy\IBarPanel;
+use function count;
 
 /**
  * @codeCoverageIgnore

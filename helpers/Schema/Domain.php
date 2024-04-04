@@ -52,7 +52,7 @@ class Domain implements Schema {
 
             if($res === false) {
                 /** @noinspection UnusedFunctionResultInspection */
-                $context->addError("The option %path% requires valid wildcard hostname", Message::PATTERN_MISMATCH);
+                $context->addError('The option %path% requires valid wildcard hostname', Message::PATTERN_MISMATCH);
                 return null;
             }
 
@@ -64,7 +64,7 @@ class Domain implements Schema {
 
         if($res === false) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% requires valid hostname", Message::PATTERN_MISMATCH);
+            $context->addError('The option %path% requires valid hostname', Message::PATTERN_MISMATCH);
             return null;
         }
 

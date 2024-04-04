@@ -23,6 +23,7 @@ use Throwable;
 use Tracy\Debugger;
 use function get_class;
 use function in_array;
+use function strlen;
 
 class Controller {
 

@@ -67,7 +67,7 @@ class Filters {
      */
     public static function inverse(int|bool|string $bool):int {
         /** @noinspection InArrayCanBeUsedInspection */
-        if($bool === 1 || $bool === true || $bool === "1") {
+        if($bool === 1 || $bool === true || $bool === '1') {
             return 0;
         }
         return 1;

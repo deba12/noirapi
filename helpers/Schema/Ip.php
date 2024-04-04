@@ -144,7 +144,7 @@ class Ip implements Schema {
 
                 if(str_contains($from, ':')) {
                     /** @noinspection UnusedFunctionResultInspection */
-                    $context->addError("The option %path% unable to convert ipv6 address to long", Message::TYPE_MISMATCH);
+                    $context->addError('The option %path% unable to convert ipv6 address to long', Message::TYPE_MISMATCH);
                     return null;
                 }
                 $to = ip2long($from);
@@ -159,7 +159,7 @@ class Ip implements Schema {
         /** @noinspection PhpUndefinedVariableInspection */
         if(empty($to) && $to !== 0) {
             /** @noinspection UnusedFunctionResultInspection */
-            $context->addError("The option %path% unable to produce valid ip address", Message::TYPE_MISMATCH);
+            $context->addError('The option %path% unable to produce valid ip address', Message::TYPE_MISMATCH);
             return null;
         }
 

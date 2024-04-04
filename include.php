@@ -45,7 +45,7 @@ if(empty($config)) {
 /** @noinspection PhpUnhandledExceptionInspection */
 Config::init($config);
 
-define("SESSION_ROOT", Config::get('SESSION_ROOT') ?? (ROOT . '/sessions'));
+define('SESSION_ROOT', Config::get('SESSION_ROOT') ?? (ROOT . '/sessions'));
 
 Debugger::$strictMode = E_ALL;
 

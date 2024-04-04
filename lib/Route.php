@@ -22,6 +22,8 @@ use noirapi\Tracy\GenericPanel;
 use Swoole\Http\Server;
 use Tracy\Debugger;
 use function call_user_func_array;
+use function in_array;
+use function strlen;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
 class Route {
@@ -260,10 +262,10 @@ class Route {
         $location = $response->getLocation();
         if($location !== null) {
 
-            if(!str_starts_with($location, 'http')) {
-                $urls['fwd'] = $host . $location;
-            } else {
+            if(str_starts_with($location, 'http')) {
                 $urls['fwd'] = $location;
+            } else {
+                $urls['fwd'] = $host . $location;
             }
         }
 

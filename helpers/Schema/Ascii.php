@@ -6,6 +6,7 @@ namespace noirapi\helpers\Schema;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
+use function is_string;
 
 /** @psalm-api  */
 class Ascii implements Schema {
