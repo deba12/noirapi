@@ -200,16 +200,16 @@ class Route {
     }
 
     /**
-     * @param int $error
+     * @param int $status_code
      * @param string $defaultText
      * @return void
      * @throws Exception
      * @throws FileNotFoundException
      * @noinspection PhpFullyQualifiedNameUsageInspection
      */
-    private function handleErrors(int $error, string $defaultText): void {
+    private function handleErrors(int $status_code, string $defaultText): void {
 
-        $function = 'e' . $error;
+        $function = 'e' . $status_code;
 
         /** @psalm-suppress UndefinedClass */
         if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
@@ -217,7 +217,7 @@ class Route {
             $this->request->function = $function;
             $this->response = (new \app\controllers\errors($this->request, $this->response, $this->server))->$function();
         } else {
-            $this->response->setBody($defaultText);
+            $this->response->setBody($defaultText)->withStatus($status_code);
         }
 
     }
