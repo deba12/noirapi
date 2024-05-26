@@ -9,9 +9,7 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use FastRoute\Dispatcher;
-use Nette\Neon\Exception;
 use noirapi\Config;
-use noirapi\Exceptions\FileNotFoundException;
 use noirapi\Exceptions\InternalServerError;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
@@ -78,8 +76,6 @@ class Route {
 
     /**
      * @return Response
-     * @throws Exception
-     * @throws FileNotFoundException
      */
     public function serve(): Response {
 
@@ -171,27 +167,27 @@ class Route {
                         ->setBody($exception->getMessage());
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (InternalServerError $exception) {
-                    $this->handleErrors(500, $exception->getMessage() ?? 'Internal server error');
+                    self::handleErrors(500, $exception->getMessage() ?? 'Internal server error', $this);
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (NotFoundException $exception) {
-                    $this->handleErrors(404, $exception->getMessage() ?? '404 Not found');
+                    self::handleErrors(404, $exception->getMessage() ?? '404 Not found', $this);
                 }
 
                 break;
 
             case Dispatcher::NOT_FOUND:
 
-                $this->handleErrors(404, '404 Not found');
+                self::handleErrors(404, '404 Not found', $this);
                 break;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
 
-                $this->handleErrors(405, '405 Method not allowed');
+                self::handleErrors(405, '405 Method not allowed', $this);
                 break;
 
             default:
 
-                $this->handleErrors(500, 'Internal server error');
+                self::handleErrors(500, 'Internal server error', $this);
 
         }
 
@@ -202,24 +198,60 @@ class Route {
     /**
      * @param int $status_code
      * @param string $defaultText
+     * @param Route $instance
      * @return void
-     * @throws Exception
-     * @throws FileNotFoundException
      * @noinspection PhpFullyQualifiedNameUsageInspection
      */
-    private function handleErrors(int $status_code, string $defaultText): void {
+    private static function handleErrors(int $status_code, string $defaultText, Route $instance): void {
 
-        $function = 'e' . $status_code;
+        $res = false;
 
         /** @psalm-suppress UndefinedClass */
-        if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
-            $this->request->controller = 'errors';
-            $this->request->function = $function;
-            $this->response = (new \app\controllers\errors($this->request, $this->response, $this->server))->$function();
-        } else {
-            $this->response->setBody($defaultText)->withStatus($status_code);
+        if(class_exists(\app\lib\errorHandler::class)) {
+
+            $res = \app\lib\errorHandler::handle($status_code, $defaultText, $instance);
+
         }
 
+        if(!$res) {
+
+            $function = 'e' . $status_code;
+
+            /** @psalm-suppress UndefinedClass */
+            if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
+                $instance->request->controller = 'errors';
+                $instance->request->function = $function;
+                $instance->response = (new \app\controllers\errors($instance->request, $instance->response, $instance->server))->$function();
+            } else {
+                $instance->response->setBody($defaultText)->withStatus($status_code);
+            }
+
+        }
+
+    }
+
+    /**
+     * @return Response
+     * @noinspection PhpUnused
+     */
+    public function getResponse(): Response {
+        return $this->response;
+    }
+
+    /**
+     * @return Request
+     * @noinspection PhpUnused
+     */
+    public function getRequest(): Request {
+        return $this->request;
+    }
+
+    /**
+     * @return array
+     * @noinspection PhpUnused
+     */
+    public function getServer(): array {
+        return $this->server;
     }
 
     /**
