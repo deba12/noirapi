@@ -35,6 +35,7 @@ class Response {
     private array $headers = [];
     private array $cookies = [];
     private array $headerCallback = [];
+    private bool $csv_header = true;
 
     public const TYPE_JSON  = 'application/json';
     public const TYPE_XML   = 'text/xml';
@@ -342,6 +343,14 @@ class Response {
     }
 
     /**
+     * @return $this
+     */
+    public function disableCsvHeader(): Response {
+        $this->csv_header = false;
+        return $this;
+    }
+
+    /**
      * @param object $class1
      * @param object $class2
      * @return stdClass
@@ -377,7 +386,9 @@ class Response {
         $written = 0;
 
         $fh = fopen('php://temp', 'rwb');
-        fputcsv($fh, array_keys(current((array)$data)));
+        if($this->csv_header) {
+            fputcsv($fh, array_keys(current((array)$data)));
+        }
 
         foreach($data as $key => $row) {
             $w = fputcsv($fh, (array)$row);
