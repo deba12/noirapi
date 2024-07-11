@@ -8,8 +8,12 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use function call_user_func_array;
 use FastRoute\Dispatcher;
+use function in_array;
+use Nette\Neon\Exception;
 use noirapi\Config;
+use noirapi\Exceptions\FileNotFoundException;
 use noirapi\Exceptions\InternalServerError;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
@@ -17,14 +21,13 @@ use noirapi\Exceptions\NotFoundException;
 use noirapi\Exceptions\RestException;
 use noirapi\helpers\Utils;
 use noirapi\Tracy\GenericPanel;
+use function strlen;
 use Swoole\Http\Server;
 use Tracy\Debugger;
-use function call_user_func_array;
-use function in_array;
-use function strlen;
 
 /** @psalm-suppress PropertyNotSetInConstructor */
-class Route {
+class Route
+{
 
     private Request $request;
     private Response $response;
@@ -38,7 +41,8 @@ class Route {
      * @param array $cookies
      * @return self
      */
-    public static function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): self {
+    public static function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): self
+    {
         $self = new self();
 
         $self->request = Request::fromGlobals($server, $get, $post, $files, $cookies);
@@ -55,8 +59,10 @@ class Route {
      * @param array $cookies
      * @return self
      * @psalm-suppress PossiblyUnusedMethod
+     * @noinspection SpellCheckingInspection
      */
-    public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): self {
+    public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): self
+    {
         $self = new self();
         $self->request = Request::fromSwoole($server, $get, $post, $files, $cookies);
         $self->server = Request::swooleUpperCase($server);
@@ -69,15 +75,19 @@ class Route {
      * @return void
      * @noinspection PhpUndefinedClassInspection
      * @psalm-suppress PossiblyUnusedMethod
+     * @psalm-suppress UndefinedClass
+     * @noinspection SpellCheckingInspection
      */
-    public function setSwoole(Server $server): void {
+    public function setSwoole(Server $server): void
+    {
         $this->request->swoole = $server;
     }
 
     /**
      * @return Response
      */
-    public function serve(): Response {
+    public function serve(): Response
+    {
 
         $dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
 
@@ -103,6 +113,7 @@ class Route {
             if($uri === '/' . $code) {
                 $this->request->language = $code;
                 $uri = '/';
+
                 break;
             }
 
@@ -110,16 +121,19 @@ class Route {
             if (str_starts_with($uri, '/' . $code . '/')) {
                 $this->request->language = $code;
                 $uri = substr($uri, strlen($code) + 1);
+
                 break;
             }
 
         }
 
-        if(empty($this->request->language) && !empty($languages)) {
+        /** @psalm-suppress RedundantCondition */
+        if(empty($this->request->language) && ! empty($languages)) {
             $this->redirect('/' . (Config::get('default_language') ?? 'en') . $uri, 307);
             if($dev) {
-                self::handleRouteUrlDebugBar($this->request,$this->response, $this->server);
+                self::handleRouteUrlDebugBar($this->request, $this->response, $this->server);
             }
+
             return $this->response;
         }
 
@@ -134,12 +148,12 @@ class Route {
                 $this->request->controller = Utils::getCLassName($this->request->route[1][0]);
                 $this->request->function = $this->request->route[1][1];
 
-                try{
+                try {
 
                     call_user_func_array(
                         [
                             new $this->request->route[1][0]($this->request, $this->response, $this->server),
-                            $this->request->route[1][1]
+                            $this->request->route[1][1],
                         ],
                         $this->request->route[2]
                     );
@@ -178,11 +192,13 @@ class Route {
             case Dispatcher::NOT_FOUND:
 
                 self::handleErrors(404, '404 Not found', $this);
+
                 break;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
 
                 self::handleErrors(405, '405 Method not allowed', $this);
+
                 break;
 
             default:
@@ -202,7 +218,8 @@ class Route {
      * @return void
      * @noinspection PhpFullyQualifiedNameUsageInspection
      */
-    private static function handleErrors(int $status_code, string $defaultText, Route $instance): void {
+    private static function handleErrors(int $status_code, string $defaultText, Route $instance): void
+    {
 
         $res = false;
 
@@ -213,7 +230,7 @@ class Route {
 
         }
 
-        if(!$res) {
+        if(! $res) {
 
             $function = 'e' . $status_code;
 
@@ -221,7 +238,12 @@ class Route {
             if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
                 $instance->request->controller = 'errors';
                 $instance->request->function = $function;
-                $instance->response = (new \app\controllers\errors($instance->request, $instance->response, $instance->server))->$function();
+                try {
+                    $instance->response = (new \app\controllers\errors($instance->request, $instance->response, $instance->server))->$function();
+                } catch (Exception | FileNotFoundException $e) {
+                    Debugger::log($e);
+                    die();
+                }
             } else {
                 $instance->response->setBody($defaultText)->withStatus($status_code);
             }
@@ -234,7 +256,8 @@ class Route {
      * @return Response
      * @noinspection PhpUnused
      */
-    public function getResponse(): Response {
+    public function getResponse(): Response
+    {
         return $this->response;
     }
 
@@ -242,7 +265,8 @@ class Route {
      * @return Request
      * @noinspection PhpUnused
      */
-    public function getRequest(): Request {
+    public function getRequest(): Request
+    {
         return $this->request;
     }
 
@@ -250,7 +274,8 @@ class Route {
      * @return array
      * @noinspection PhpUnused
      */
-    public function getServer(): array {
+    public function getServer(): array
+    {
         return $this->server;
     }
 
@@ -259,10 +284,11 @@ class Route {
      * @param int $status
      * @return void
      */
-    private function redirect(string $location, int $status = 302): void {
+    private function redirect(string $location, int $status = 302): void
+    {
 
         // Attach get to current future location
-        if(!empty($this->request->get)) {
+        if(! empty($this->request->get)) {
             $location .= '?' . http_build_query($this->request->get);
         }
 
@@ -276,7 +302,8 @@ class Route {
      * @param array $server
      * @return void
      */
-    public static function handleRouteUrlDebugBar(Request $request, Response $response, array $server): void {
+    public static function handleRouteUrlDebugBar(Request $request, Response $response, array $server): void
+    {
 
         /** @noinspection HttpUrlsUsage */
         $host = ($request->https ? 'https://' : 'http://') . Config::$config;
@@ -285,7 +312,7 @@ class Route {
         $urls['uri'] = $host . $request->uri;
 
         $ref = $server[ 'HTTP_REFERER' ] ?? '';
-        if(!str_starts_with($ref, 'http')) {
+        if(! str_starts_with($ref, 'http')) {
             $urls['ref'] = $host . $ref;
         } elseif($ref !== '') {
             $urls['ref'] = $ref;

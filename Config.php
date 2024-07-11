@@ -3,11 +3,12 @@ declare(strict_types=1);
 
 namespace noirapi;
 
+use function is_array;
 use Nette\Neon\Neon;
 use noirapi\Exceptions\ConfigException;
-use function is_array;
 
-class Config {
+class Config
+{
 
     private static array $options;
     public static string $config;
@@ -15,7 +16,9 @@ class Config {
     /**
      * @return bool
      */
-    public static function defaultConfigAvailable(): bool {
+    public static function defaultConfigAvailable(): bool
+    {
+        /** @psalm-suppress UndefinedConstant */
         return is_file(ROOT . '/app/config/default.neon');
     }
 
@@ -24,7 +27,8 @@ class Config {
      * @return void
      * @throws ConfigException
      */
-    public static function init(string $config): void {
+    public static function init(string $config): void
+    {
         /** @psalm-suppress UndefinedConstant */
         $file = ROOT . '/app/config/' . $config . '.neon';
 
@@ -63,7 +67,8 @@ class Config {
      * @param mixed $default
      * @return mixed
      */
-    public static function get(string $option, mixed $default = null): mixed {
+    public static function get(string $option, mixed $default = null): mixed
+    {
         if(str_contains($option, '.')) {
 
             $parts = explode('.', $option);
@@ -81,7 +86,7 @@ class Config {
                     if(isset(self::$options[$part])) {
                         $path = self::$options[$part];
                     }
-                } else if(isset($path[$part])) {
+                } elseif(isset($path[$part])) {
                     $path = $path[$part];
                 } else {
                     return $default ?? null;
@@ -101,7 +106,8 @@ class Config {
      * @param mixed $data
      * @return void
      */
-    public static function set(string $option, mixed $data): void {
+    public static function set(string $option, mixed $data): void
+    {
         self::$options[$option] = $data;
     }
 
@@ -109,7 +115,8 @@ class Config {
      * @return array
      * @noinspection PhpUnused
      */
-    public static function getAll(): array {
+    public static function getAll(): array
+    {
         return self::$options;
     }
 

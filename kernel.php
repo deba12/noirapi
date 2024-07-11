@@ -51,6 +51,6 @@ if(isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
     echo $response->getBody();
 
     //Force calling destructors
-    $response = null;
+    unset($response);
 
 }

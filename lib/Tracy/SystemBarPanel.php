@@ -6,7 +6,8 @@ namespace noirapi\Tracy;
 use noirapi\lib\View;
 use Tracy\IBarPanel;
 
-class SystemBarPanel implements IBarPanel {
+class SystemBarPanel implements IBarPanel
+{
 
     /**
      * Base64 icon for the Tracy panel.
@@ -21,7 +22,8 @@ class SystemBarPanel implements IBarPanel {
 
     private View $view;
 
-    public function __construct(View $view) {
+    public function __construct(View $view)
+    {
 
         $this->view = $view;
 
@@ -30,11 +32,12 @@ class SystemBarPanel implements IBarPanel {
     /**
      * @return string
      */
-    public function getTab(): string {
+    public function getTab(): string
+    {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
         $template = $this->view->getTemplate() === null ? 'None' : substr($this->view->getTemplate(), strpos($this->view->getTemplate(), '/app'));
-        $called =  $this->view->request->controller . '::' . $this->view->request->function;
+        $called = $this->view->request->controller . '::' . $this->view->request->function;
         if(isset($this->view->getResponse()->initiator_line)) {
             $called .= '::<strong>' . $this->view->getResponse()->initiator_line . '</strong>';
         }
@@ -44,7 +47,8 @@ class SystemBarPanel implements IBarPanel {
 
     }
 
-    public function getPanel():? string {
+    public function getPanel(): null
+    {
 
         return null;
 

@@ -6,10 +6,13 @@ use noirapi\Config;
 use noirapi\lib\Route;
 use Swoole\Http\Server;
 
-if(!extension_loaded('swoole')) {
+/** @noinspection SpellCheckingInspection */
+if(! extension_loaded('swoole')) {
+    /** @noinspection SpellCheckingInspection */
     throw new RuntimeException('Swoole extension is mandatory');
 }
 
+/** @psalm-suppress MissingFile */
 include(__DIR__ . '/include.php');
 
 $listen_ip = Config::get('swoole.listen_ip') ?? '127.0.0.1';
@@ -18,23 +21,27 @@ $listen_port = Config::get('swoole.listen_port') ?? 9400;
 $server = new Swoole\Http\Server($listen_ip, $listen_port);
 $static_files = Config::get('swoole.static_files');
 $server->set([
-    'worker_num'        => Config::get('swoole.workers') ?? 1,
-    'task_worker_num'   => Config::get('swoole.task_workers') ?? 1,
+    'worker_num'      => Config::get('swoole.workers') ?? 1,
+    'task_worker_num' => Config::get('swoole.task_workers') ?? 1,
 ]);
 
-if(!empty($static_files)) {
+if(! empty($static_files)) {
+    /** @psalm-suppress UndefinedConstant */
     $server->set([
         'document_root'         => ROOT . '/htdocs',
         'enable_static_handler' => true,
     ]);
 }
 
-$server->on('start', function () use($listen_ip, $listen_port) {
-    /** @noinspection HttpUrlsUsage */
+$server->on('start', function () use ($listen_ip, $listen_port) {
+    /**
+     * @noinspection HttpUrlsUsage
+     * @noinspection SpellCheckingInspection
+     */
     echo "Swoole http server is started at http://$listen_ip:$listen_port\n";
 });
 
-$server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) use($server) {
+$server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Response $response) use ($server) {
 
     $request->server['headers'] = $request->header;
     $route = Route::fromSwoole($request->server, $request->get ?? [], $request->post ?? [], $request->files ?? [], $request->cookie ?? []);
@@ -69,7 +76,7 @@ $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Respo
 
 });
 
-$server->on('Task', static function(Server $server, $task_id, $reactorId, $data) {
+$server->on('Task', static function (Server $server, $task_id, $reactorId, $data) {
 
     if(isset($data[ 'class' ], $data[ 'params' ])) {
         echo "Begin task: \t" . $task_id . "\t" . $data['class'] . "\n";
