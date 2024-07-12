@@ -3,18 +3,19 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
-use noirapi\helpers\Curl;
-use Tracy\Debugger;
-use Tracy\IBarPanel;
 use function count;
 use function gettype;
 use function is_array;
 use function is_object;
+use noirapi\helpers\Curl;
+use Tracy\Debugger;
+use Tracy\IBarPanel;
 
 /**
  * @codeCoverageIgnore
  */
-class CurlBarPanel implements IBarPanel {
+class CurlBarPanel implements IBarPanel
+{
     /**
      * Base64 icon for the Tracy panel.
      * @var string
@@ -28,30 +29,28 @@ class CurlBarPanel implements IBarPanel {
     public string $title = 'Curl logger';
     public string $title_attributes = 'style="font-size:1.6em"';
     public string $time_attributes = 'style="font-weight:bold;color:#333;font-family:Courier New;font-size:1.1em"';
-    private string|Curl $curl;
-
-    public function __construct() {
-        $this->curl = Curl::class;
-    }
 
     /**
      * Get total queries execution time
      * @return string
      */
-    protected function getTotalTime(): string {
-        return (string) round(array_sum(array_column($this->curl::getLog(), 'time')), 4);
+    protected function getTotalTime(): string
+    {
+        return (string) round(array_sum(array_column(Curl::getLog(), 'time')), 4);
     }
 
     /**
      * @return string
      */
-    public function getTab(): string {
+    public function getTab(): string
+    {
 
         $html = '<img src="'.$this->icon.'" alt="Curl Request logger" /> ';
-        $queries = count($this->curl::getLog());
+        $queries = count(Curl::getLog());
 
         if ($queries === 0) {
             $html .= 'no requests!';
+
             return $html;
         }
 
@@ -71,25 +70,26 @@ class CurlBarPanel implements IBarPanel {
      * Renders HTML code for custom panel.
      * @return string
      */
-    public function getPanel(): string {
+    public function getPanel(): string
+    {
 
         $html = '<h1 '.$this->title_attributes.'>'.$this->title.'</h1>';
 
         $html .= '<div class="tracy-inner tracy-InfoPanel">';
-        if (count($this->curl::getLog()) > 0) {
+        if (count(Curl::getLog()) > 0) {
             $html .= '<table class="tracy-sortable">';
             $html .= '<tr>';
             $html .= '<th>Time(ms)</td>';
             $html .= '<th>Statement</td>';
             $html .= '</tr>';
-            foreach ($this->curl::getLog() as $request) {
+            foreach (Curl::getLog() as $request) {
 
                 $html .= '<tr>';
                 $html .= '<td><span '.$this->time_attributes.'>'.round($request['time'], 4).'</span></td>';
                 $html .= '<td><i class="fa fa-chevron-right"></i> '. $request['url'] . ' <i class="fa fa-chevron-left"></i> ' . $request['info'] . '</td>';
                 $html .= '</tr>';
 
-                if(!empty($request['request'])) {
+                if(! empty($request['request'])) {
                     $html .= '<tr>';
                     $html .= '<td>';
                     $html .= gettype($request['request']);
@@ -130,14 +130,14 @@ class CurlBarPanel implements IBarPanel {
         }
         $html .= '</div>';
 
-		// Works only with a custom Tracy version
+        // Works only with a custom Tracy version
         /** @noinspection PhpUndefinedFieldInspection */
         if(isset(Debugger::$nonce)) {
             /** @noinspection PhpUndefinedFieldInspection */
             $nonce = 'nonce-' . Debugger::$nonce;
-		} else {
-			$nonce = '';
-		}
+        } else {
+            $nonce = '';
+        }
 
         $html .= <<<EOT
 <script $nonce>
