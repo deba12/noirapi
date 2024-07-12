@@ -36,10 +36,11 @@ class SystemBarPanel implements IBarPanel
     {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
-        $template = $this->view->getTemplate() === null ? 'None' : substr($this->view->getTemplate(), strpos($this->view->getTemplate(), '/app'));
+        /** @psalm-suppress  PossiblyNullArgument */
+        $template = is_string($this->view->getTemplate()) ? substr($this->view->getTemplate(), (int)strpos($this->view->getTemplate(), '/app')) : 'None';
         $called = $this->view->request->controller . '::' . $this->view->request->function;
         if(isset($this->view->getResponse()->initiator_line)) {
-            $called .= '::<strong>' . $this->view->getResponse()->initiator_line . '</strong>';
+            $called .= '::<strong>' . (is_int($this->view->getResponse()->initiator_line) ? (string)$this->view->getResponse()->initiator_line : '(none)') . '</strong>';
         }
         $html .= $this->view->request->method . '[' . $called . '][' . basename($this->view->getLayout() ?? 'None') . '][' . $template . ']';
 
