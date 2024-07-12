@@ -9,7 +9,8 @@ use Nette\SmartObject;
  * @psalm-suppress MissingConstructor
  * @psalm-api
  */
-class Request {
+class Request
+{
 
     use SmartObject;
 
@@ -17,10 +18,10 @@ class Request {
     public string $method;
     public string $uri;
     public string $url_no_lang;
-    public ?array $get;
-    public ?array $post;
-    public ?array $files;
-    public ?array $cookies;
+    public array $get;
+    public array $post;
+    public array $files;
+    public array $cookies;
     public string $controller;
     public string $function;
     public array $route;
@@ -43,7 +44,8 @@ class Request {
      * @param array $cookies
      * @return self
      */
-    public static function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): self {
+    public static function fromGlobals(array $server, array $get, array $post, array $files, array $cookies): self
+    {
         $self = self::transform($server, $get, $post, $files, $cookies);
         $self->headers = self::globalsRequestHeaders($server);
 
@@ -57,8 +59,10 @@ class Request {
      * @param array $files
      * @param array $cookies
      * @return self
+     * @noinspection SpellCheckingInspection
      */
-    public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): self {
+    public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): self
+    {
         $self = self::transform($server, $get, $post, $files, $cookies);
         $self->headers = self::swooleUpperCase($server['headers']);
 
@@ -69,7 +73,8 @@ class Request {
      * @param array $server
      * @return array
      */
-    private static function globalsRequestHeaders(array $server): array {
+    private static function globalsRequestHeaders(array $server): array
+    {
         $headers = [];
 
         foreach($server as $name => $value) {
@@ -88,10 +93,12 @@ class Request {
     /**
      * @param array $headers
      * @return array
+     * @noinspection SpellCheckingInspection
      */
-    public static function swooleUpperCase(array $headers): array {
+    public static function swooleUpperCase(array $headers): array
+    {
         $res = [];
-        array_walk($headers, static function(string $value, string $key) use(&$res) {
+        array_walk($headers, static function (string $value, string $key) use (&$res) {
             $key = str_replace('-', '_', strtoupper($key));
             $res[$key] = $value;
         });
@@ -103,9 +110,10 @@ class Request {
      * @param array $server
      * @return bool
      */
-    private static function is_https(array $server): bool {
+    private static function is_https(array $server): bool
+    {
         if (isset($_SERVER['HTTPS'])) {
-            if (strtolower($server['HTTPS'])  === 'on') {
+            if (strtolower($server['HTTPS']) === 'on') {
                 return true;
             }
 
@@ -119,7 +127,8 @@ class Request {
         return false;
     }
 
-    private static function is_ajax(array $server): bool {
+    private static function is_ajax(array $server): bool
+    {
         if(isset($server['HTTP_X_REQUESTED_WITH']) && strtolower($server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
             return true;
         }
@@ -137,7 +146,8 @@ class Request {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setHttps(bool $https): static {
+    public function setHttps(bool $https): static
+    {
         $this->https = $https;
 
         return $this;
@@ -149,7 +159,8 @@ class Request {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setAjax(bool $ajax): static {
+    public function setAjax(bool $ajax): static
+    {
         $this->ajax = $ajax;
 
         return $this;
@@ -163,16 +174,17 @@ class Request {
      * @param array $cookies
      * @return self
      */
-    private static function transform(array $server, array $get, array $post, array $files, array $cookies): self {
+    private static function transform(array $server, array $get, array $post, array $files, array $cookies): self
+    {
         $self = new self();
 
-        $self->hostname   = $server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? '';
-        $self->method     = $server['REQUEST_METHOD'];
-        $self->uri        = $server['REQUEST_URI'];
-        $self->get        = $get;
-        $self->post       = $post;
-        $self->files      = $files;
-        $self->cookies    = $cookies;
+        $self->hostname = $server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? '';
+        $self->method = $server['REQUEST_METHOD'];
+        $self->uri = $server['REQUEST_URI'];
+        $self->get = $get;
+        $self->post = $post;
+        $self->files = $files;
+        $self->cookies = $cookies;
 
         $self->https = self::is_https($server);
         $self->ajax = self::is_ajax($server);

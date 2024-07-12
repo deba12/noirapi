@@ -25,12 +25,14 @@ use function strlen;
 use Swoole\Http\Server;
 use Tracy\Debugger;
 
-/** @psalm-suppress PropertyNotSetInConstructor */
 class Route
 {
 
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private Request $request;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private Response $response;
+    /** @psalm-suppress PropertyNotSetInConstructor */
     private array $server;
 
     /**
@@ -128,7 +130,7 @@ class Route
         }
 
         /** @psalm-suppress RedundantCondition */
-        if(empty($this->request->language) && ! empty($languages)) {
+        if($this->request->language === null && ! empty($languages)) {
             $this->redirect('/' . (Config::get('default_language') ?? 'en') . $uri, 307);
             if($dev) {
                 self::handleRouteUrlDebugBar($this->request, $this->response, $this->server);
@@ -222,12 +224,9 @@ class Route
     {
 
         $res = false;
-
         /** @psalm-suppress UndefinedClass */
         if(class_exists(\app\lib\errorHandler::class)) {
-
-            $res = \app\lib\errorHandler::handle($status_code, $defaultText, $instance);
-
+            $res = (bool)\app\lib\errorHandler::handle($status_code, $defaultText, $instance);
         }
 
         if(! $res) {
@@ -244,8 +243,6 @@ class Route
                     Debugger::log($e);
                     die();
                 }
-            } else {
-                $instance->response->setBody($defaultText)->withStatus($status_code);
             }
 
         }
@@ -312,6 +309,8 @@ class Route
         $urls['uri'] = $host . $request->uri;
 
         $ref = $server[ 'HTTP_REFERER' ] ?? '';
+
+        /** @psalm-suppress RedundantConditionGivenDocblockType */
         if(! str_starts_with($ref, 'http')) {
             $urls['ref'] = $host . $ref;
         } elseif($ref !== '') {
