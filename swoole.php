@@ -76,7 +76,7 @@ $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Respo
 
 });
 
-$server->on('Task', static function (Server $server, $task_id, $reactorId, $data) {
+$server->on('Task', static function (Server $server, int $task_id, int $reactorId, mixed $data) {
 
     if(isset($data[ 'class' ], $data[ 'params' ])) {
         echo "Begin task: \t" . $task_id . "\t" . $data['class'] . "\n";
