@@ -4,6 +4,7 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use function count;
 use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
@@ -19,9 +20,9 @@ use noirapi\interfaces\Translator;
 use noirapi\lib\View\Layout;
 use RuntimeException;
 use stdClass;
-use function count;
 
-class View {
+class View
+{
 
     public Request $request;
     public Layout $layout;
@@ -48,7 +49,8 @@ class View {
      * @throws FileNotFoundException
      * @throws Exception
      */
-    public function __construct(Request $request, Response $response, bool $dev = false) {
+    public function __construct(Request $request, Response $response, bool $dev = false)
+    {
         $this->request = $request;
         $this->response = $response;
         $this->params = new stdClass();
@@ -77,7 +79,7 @@ class View {
         }
 
         $languages = Config::get('languages') ?? [];
-        if(!empty($languages)) {
+        if(! empty($languages)) {
             if($this->request->language === null) {
                 $this->request->language = Config::get('default_language') ?? 'en';
             }
@@ -117,16 +119,17 @@ class View {
      * @return Response
      * @throws FileNotFoundException
      */
-    public function display(array $params = []): Response {
+    public function display(array $params = []): Response
+    {
 
         if($this->dev) {
 
             $bt = debug_backtrace();
             $caller = array_shift($bt);
 
-            $this->response->initiator_class = $caller['class'];
-            $this->response->initiator_method = $caller['function'];
-            $this->response->initiator_line = $caller['line'];
+            $this->response->initiator_class = $caller['class'] ?? null;
+            $this->response->initiator_method = $caller['function'] ?? null;
+            $this->response->initiator_line = $caller['line'] ?? null;
 
         }
 
@@ -146,13 +149,13 @@ class View {
 
         $message = Session::get('message');
 
-        if(!empty($message)) {
+        if(! empty($message)) {
             $this->mergeParams(['message' => $message]);
             Session::remove('message');
         }
 
         $this->mergeParams([
-            'template'  => $this->template
+            'template' => $this->template,
         ]);
 
         $this->mergeParams($this->layout, 'layout');
@@ -168,16 +171,17 @@ class View {
      * @throws FileNotFoundException
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function print(?string $layout, string $view, array $params = []): string {
+    public function print(?string $layout, string $view, array $params = []): string
+    {
 
         if($this->dev) {
 
             $bt = debug_backtrace();
             $caller = array_shift($bt);
 
-            $this->response->initiator_class = $caller['class'];
-            $this->response->initiator_method = $caller['function'];
-            $this->response->initiator_line = $caller['line'];
+            $this->response->initiator_class = $caller['class'] ?? null;
+            $this->response->initiator_method = $caller['function'] ?? null;
+            $this->response->initiator_line = $caller['line'] ?? null;
 
         }
 
@@ -211,7 +215,8 @@ class View {
      * @throws FileNotFoundException
      * @psalm-suppress PossiblyUnusedReturnValue
      */
-    public function setTemplate(string $template, string $controller = null): self {
+    public function setTemplate(string $template, string $controller = null): self
+    {
         if($controller === null) {
             $controller = $this->request->controller;
         }
@@ -220,6 +225,7 @@ class View {
 
         if(is_readable($file)) {
             $this->template = $file;
+
             return $this;
         }
 
@@ -230,7 +236,8 @@ class View {
      * @return string|null
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getTemplate(): ?string {
+    public function getTemplate(): ?string
+    {
         return $this->template;
     }
 
@@ -240,8 +247,10 @@ class View {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function noLayout(): View {
+    public function noLayout(): View
+    {
         $this->layout_file = null;
+
         return $this;
     }
 
@@ -253,9 +262,11 @@ class View {
      * @psalm-suppress PossiblyUnusedMethod
      * @psalm-suppress PossiblyUnusedReturnValue
      */
-    public function setLayout(?string $layout_file = null): self {
+    public function setLayout(?string $layout_file = null): self
+    {
         if($layout_file === null) {
             $this->layout_file = null;
+
             return $this;
         }
 
@@ -265,6 +276,7 @@ class View {
         if(is_readable($file)) {
             $this->layout_file = $file;
             $this->layout->setName($layout_file);
+
             return $this;
         }
 
@@ -277,7 +289,8 @@ class View {
      * @noinspection GetSetMethodCorrectnessInspection
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getLayout(): ?string {
+    public function getLayout(): ?string
+    {
         return $this->layout_file;
     }
 
@@ -288,7 +301,8 @@ class View {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function templateExists(string $template, string $controller = null): bool {
+    public function templateExists(string $template, string $controller = null): bool
+    {
         if($controller === null) {
             $controller = $this->request->controller;
         }
@@ -304,7 +318,8 @@ class View {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function layoutExists(string $layout): bool {
+    public function layoutExists(string $layout): bool
+    {
         /** @psalm-suppress UndefinedConstant */
         $file = PATH_LAYOUTS . $layout . self::latte_ext;
 
@@ -317,17 +332,22 @@ class View {
      * @return string
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public static function add_url_var(string $key, int|float|string|null $value): string {
+    public static function add_url_var(string $key, int|float|string|null $value): string
+    {
         $params = parse_url(self::$uri, PHP_URL_QUERY);
 
-        if(!empty($params)) {
+        $value = (string)$value;
+
+        if(is_string($params)) {
 
             parse_str($params, $array);
 
             if(count($array) > 0) {
-                $array[$key] = (string)$value;
+                $array[$key] = $value;
+
                 return '?' . http_build_query($array);
             }
+
             return '?' . $key . '=' . $value;
         }
 
@@ -341,7 +361,8 @@ class View {
      *
      * this is used by system panel
      */
-    public function getParams(): array {
+    public function getParams(): array
+    {
         return get_object_vars($this);
     }
 
@@ -350,7 +371,8 @@ class View {
      * @param string|null $namespace
      * @return void
      */
-    public function mergeParams(array|object $params, ?string $namespace = null): void {
+    public function mergeParams(array|object $params, ?string $namespace = null): void
+    {
         if($namespace === null) {
 
             foreach($params as $key => $value) {
@@ -361,7 +383,7 @@ class View {
                 $this->params->$key = $value;
             }
 
-        } else if(isset($this->params->$namespace)) {
+        } elseif(isset($this->params->$namespace)) {
             throw new RuntimeException("Duplicate key ain view params: $namespace");
         } else {
             $this->params->$namespace = $params;
@@ -374,7 +396,8 @@ class View {
      * @return void
      * @noinspection PhpUnused
      */
-    public function addParam(string $key, mixed $value): void {
+    public function addParam(string $key, mixed $value): void
+    {
         $this->params->$key = $value;
     }
 
@@ -382,7 +405,8 @@ class View {
      * @return Response
      * @note this is used by the system panel
      */
-    public function getResponse(): Response {
+    public function getResponse(): Response
+    {
         return $this->response;
     }
 

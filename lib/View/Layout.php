@@ -3,19 +3,20 @@ declare(strict_types=1);
 
 namespace noirapi\lib\View;
 
-use noirapi\interfaces\Translator;
 use function is_string;
+use noirapi\interfaces\Translator;
 
-class Layout {
+class Layout
+{
 
-    public string $name         = '';
-    public string $title        = '';
-    public array $breadcrumbs   = [];
-    public array $params        = [
-        'top-css'   => [],
-        'top-js'    => [],
-        'bottom-css'=> [],
-        'bottom-js' => [],
+    public string $name = '';
+    public string $title = '';
+    public array $breadcrumbs = [];
+    public array $params = [
+        'top-css'    => [],
+        'top-js'     => [],
+        'bottom-css' => [],
+        'bottom-js'  => [],
     ];
     private Translator $translator;
 
@@ -34,7 +35,8 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setName(string $name): void {
+    public function setName(string $name): void
+    {
         $this->name = $name;
     }
 
@@ -42,7 +44,8 @@ class Layout {
      * @return string
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getName(): string {
+    public function getName(): string
+    {
         return $this->name;
     }
 
@@ -52,8 +55,9 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setTitle(?string $title): static {
-        if(empty($title)) {
+    public function setTitle(?string $title): static
+    {
+        if($title === null) {
             $title = '';
         }
         $this->title = $this->translator->translate($title);
@@ -67,7 +71,8 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function appendTitle(string $title): static {
+    public function appendTitle(string $title): static
+    {
         $this->title .= $this->translator->translate($title);
 
         return $this;
@@ -81,14 +86,15 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addBreadCrumb(int|string $name, ?string $url = null, ?bool $active = null): void {
+    public function addBreadCrumb(int|string $name, ?string $url = null, ?bool $active = null): void
+    {
 
-        $key = md5(!is_string($name) ? (string)$name : $name);
+        $key = md5(! is_string($name) ? (string)$name : $name);
 
         $this->breadcrumbs[$key] = [
-            'name'      => is_string($name) ? $this->translator->translate($name) : (string)$name,
-            'url'       => $url !== null ? $this->translator->translate($url) : null,
-            'active'    => $active
+            'name'   => is_string($name) ? $this->translator->translate($name) : (string)$name,
+            'url'    => $url !== null ? $this->translator->translate($url) : null,
+            'active' => $active,
         ];
 
     }
@@ -99,7 +105,8 @@ class Layout {
      * @return void
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function add(string $key, mixed $value): void {
+    public function add(string $key, mixed $value): void
+    {
         $this->params[$key][] = is_string($value) ? $this->translator->translate($value) : $value;
     }
 
@@ -109,7 +116,8 @@ class Layout {
      * @return void
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function set(string $key, mixed $value): void {
+    public function set(string $key, mixed $value): void
+    {
         $this->params[$key] = is_string($value) ? $this->translator->translate($value) : $value;
     }
 
@@ -120,7 +128,8 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function get(string $key, mixed $default = null): mixed {
+    public function get(string $key, mixed $default = null): mixed
+    {
         return $this->params[$key] ?? $default ?? null;
     }
 
@@ -130,7 +139,8 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function exists(string $key): bool {
+    public function exists(string $key): bool
+    {
         return isset($this->params[$key]);
     }
 
@@ -140,7 +150,8 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addTopJS(string $js): void {
+    public function addTopJS(string $js): void
+    {
         $this->params['top-js'][] = $js;
     }
 
@@ -150,7 +161,8 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addBottomJS(string $js): void {
+    public function addBottomJS(string $js): void
+    {
         $this->params['bottom-js'][] = $js;
     }
 
@@ -160,7 +172,8 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addTopCss(string $css): void {
+    public function addTopCss(string $css): void
+    {
         $this->params['top-css'][] = $css;
     }
 
@@ -170,7 +183,8 @@ class Layout {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addBottomCss(string $css): void {
+    public function addBottomCss(string $css): void
+    {
         $this->params['bottom-css'][] = $css;
     }
 
@@ -180,7 +194,8 @@ class Layout {
      * @noinspection MagicMethodsValidityInspection
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function __get(string $name) {
+    public function __get(string $name)
+    {
         return $this->params[$name] ?? null;
     }
 
