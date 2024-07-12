@@ -9,6 +9,7 @@ declare(strict_types = 1);
 use noirapi\Config;
 use noirapi\lib\Route;
 
+/** @psalm-suppress MissingFile */
 include(__DIR__ . '/include.php');
 
 // If the request is for the index.php, use the router
@@ -16,7 +17,7 @@ if(isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
     $https = isset($_SERVER['HTTPS']);
     Config::set('https', $https);
     /** @noinspection HostnameSubstitutionInspection */
-    $domain = $_SERVER['SERVER_NAME'];
+    $domain = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'default';
     Config::set('domain',  $domain);
     /**
      * @noinspection PhpUnhandledExceptionInspection
