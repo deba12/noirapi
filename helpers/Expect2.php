@@ -94,14 +94,6 @@ final class Expect2
     }
 
     /**
-     * @return Ascii
-     */
-    public function Ascii(): Ascii
-    {
-        return new Ascii();
-    }
-
-    /**
      * @return Url
      */
     public static function Url(): Url
