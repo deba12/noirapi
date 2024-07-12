@@ -2,10 +2,12 @@
 declare(strict_types=1);
 
 namespace noirapi\helpers;
+
 use Nette\Schema\ValidationException;
 
 /** @psalm-api  */
-class Message {
+class Message
+{
 
     public string $message;
     public string $type = 'info';
@@ -17,7 +19,8 @@ class Message {
      * @param string|null $type
      * @return Message
      */
-    public static function new(string $message, ?string $type = null): Message {
+    public static function new(string $message, ?string $type = null): Message
+    {
 
         $static = new self();
 
@@ -30,7 +33,8 @@ class Message {
 
     }
 
-    public static function fromSchema(ValidationException $e, ?string $type = null): Message {
+    public static function fromSchema(ValidationException $e, ?string $type = null): Message
+    {
 
         return self::new(SchemaHelper::message($e), $type);
 
@@ -42,32 +46,40 @@ class Message {
      * @return $this
      * @noinspection PhpUnused
      */
-    public function timeout(int $timeout_ms): Message {
+    public function timeout(int $timeout_ms): Message
+    {
         $this->timeout_ms = $timeout_ms;
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function html(): Message {
+    public function html(): Message
+    {
         $this->html = true;
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function primary(): Message {
+    public function primary(): Message
+    {
         $this->type = 'primary';
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function secondary(): Message {
+    public function secondary(): Message
+    {
         $this->type = 'secondary';
+
         return $this;
     }
 
@@ -75,8 +87,10 @@ class Message {
      * @return $this
      * @noinspection PhpUnused
      */
-    public function light(): Message {
+    public function light(): Message
+    {
         $this->type = 'light';
+
         return $this;
     }
 
@@ -84,40 +98,50 @@ class Message {
      * @return $this
      * @noinspection PhpUnused
      */
-    public function dark(): Message {
+    public function dark(): Message
+    {
         $this->type = 'dark';
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function danger(): Message {
+    public function danger(): Message
+    {
         $this->type = 'danger';
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function success(): Message {
+    public function success(): Message
+    {
         $this->type = 'success';
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function warning(): Message {
+    public function warning(): Message
+    {
         $this->type = 'warning';
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function info(): Message {
+    public function info(): Message
+    {
         $this->type = 'info';
+
         return $this;
     }
 

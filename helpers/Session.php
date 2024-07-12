@@ -8,7 +8,8 @@ use function is_array;
 use function is_object;
 
 /** @psalm-api  */
-class Session {
+class Session
+{
 
     /**
      * @param string $namespace
@@ -18,12 +19,13 @@ class Session {
      * Get $_SESSION['namespace']['key']
      * Get $_SESSION['namespace']->key
      */
-    public static function get(string $namespace, ?string $key = null): mixed {
+    public static function get(string $namespace, ?string $key = null): mixed
+    {
         if($key === null) {
             return $_SESSION[$namespace] ?? null;
         }
 
-        if(!isset($_SESSION[$namespace])) {
+        if(! isset($_SESSION[$namespace])) {
             return null;
         }
 
@@ -47,10 +49,11 @@ class Session {
      * Set $_SESSION['namespace'] = $value
      * Set $_SESSION['namespace']['key'] = $value
      */
-    public static function set(string $namespace, ?string $key, mixed $value): void {
+    public static function set(string $namespace, ?string $key, mixed $value): void
+    {
         if($key === null) {
             $_SESSION[$namespace] = $value;
-        } else if(isset($_SESSION[$namespace]) && is_object($_SESSION[$namespace])) {
+        } elseif(isset($_SESSION[$namespace]) && is_object($_SESSION[$namespace])) {
             $_SESSION[$namespace]->$key = $value;
         } else {
             $_SESSION[$namespace][$key] = $value;
@@ -62,12 +65,13 @@ class Session {
      * @param string|null $key
      * @return bool
      */
-    public static function has(string $namespace, ?string $key = null): bool {
+    public static function has(string $namespace, ?string $key = null): bool
+    {
         if($key === null) {
             return isset($_SESSION[$namespace]);
         }
 
-        if(!isset($_SESSION[$namespace])) {
+        if(! isset($_SESSION[$namespace])) {
             return false;
         }
 
@@ -88,12 +92,13 @@ class Session {
      * @param string|null $key
      * @return void
      */
-    public static function remove(string $namespace, ?string $key = null): void {
+    public static function remove(string $namespace, ?string $key = null): void
+    {
         if($key === null) {
             unset($_SESSION[$namespace]);
         } elseif (isset($_SESSION[$namespace]) && is_array($_SESSION[$namespace])) {
             unset($_SESSION[$namespace][$key]);
-        }elseif (isset($_SESSION[$namespace]) &&  is_object($_SESSION[$namespace])) {
+        } elseif (isset($_SESSION[$namespace]) && is_object($_SESSION[$namespace])) {
             /** @noinspection PhpExpressionAlwaysNullInspection */
             unset($_SESSION[$namespace]->$key);
         }
@@ -103,7 +108,8 @@ class Session {
      * @return array<non-empty-string, mixed>
      * @psalm-suppress InvalidReturnType
      */
-    public static function all(): array {
+    public static function all(): array
+    {
         /** @psalm-suppress InvalidReturnStatement */
         return $_SESSION;
     }
@@ -111,7 +117,8 @@ class Session {
     /**
      * @return void
      */
-    public static function clear(): void {
+    public static function clear(): void
+    {
         $_SESSION = [];
     }
 

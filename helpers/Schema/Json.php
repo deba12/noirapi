@@ -16,7 +16,8 @@ use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
 /** @psalm-api  */
-class Json implements Schema {
+class Json implements Schema
+{
 
     private bool $required = false;
     private bool $nullable = false;
@@ -28,6 +29,7 @@ class Json implements Schema {
     public function required(bool $state = true): self
     {
         $this->required = $state;
+
         return $this;
     }
 
@@ -38,6 +40,7 @@ class Json implements Schema {
     public function nullable(bool $state = true): self
     {
         $this->nullable = $state;
+
         return $this;
     }
 
@@ -54,9 +57,10 @@ class Json implements Schema {
             return null;
         }
 
-        if(!$this->nullable && empty($value)) {
+        if(! $this->nullable && empty($value)) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The option %path% requires valid json', Message::PATTERN_MISMATCH);
+
             return false;
         }
 
@@ -65,6 +69,7 @@ class Json implements Schema {
         } catch (JsonException $e) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The option %path% requires valid json. ' . $e->getMessage(), Message::PATTERN_MISMATCH);
+
             return false;
         }
 
@@ -105,6 +110,7 @@ class Json implements Schema {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is missing.', Message::MISSING_ITEM);
         }
+
         return null;
     }
 

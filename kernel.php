@@ -35,13 +35,14 @@ if(isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
             $cookie['key'],
             $cookie['value'],
             [
-                'expires'   => $cookie['expire'],
-                'path'      => '/',
-                'domain'    => $cookie_domain ?? $domain,
-                'secure'    => $https ? $cookie['secure'] : false,
-                'httponly'  => $cookie['httponly'],
-                'samesite'  => $cookie['samesite'],
-            ]);
+                'expires'  => $cookie['expire'],
+                'path'     => '/',
+                'domain'   => $cookie_domain ?? $domain,
+                'secure'   => $https ? $cookie['secure'] : false,
+                'httponly' => $cookie['httponly'],
+                'samesite' => $cookie['samesite'],
+            ]
+        );
 
     }
 

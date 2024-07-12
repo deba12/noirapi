@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace noirapi\helpers\Schema;
 
-
+use function is_string;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
-use function is_string;
 
 /** @psalm-api  */
-class Port implements Schema {
+class Port implements Schema
+{
 
     private bool $required = false;
     private bool $nullable = false;
@@ -19,13 +19,17 @@ class Port implements Schema {
     /** @var array{?int, ?int} */
     private array $range = [null, null];
 
-    public function required(bool $state = true): self {
+    public function required(bool $state = true): self
+    {
         $this->required = $state;
+
         return $this;
     }
 
-    public function nullable(bool $state = true): self {
+    public function nullable(bool $state = true): self
+    {
         $this->nullable = $state;
+
         return $this;
     }
 
@@ -33,8 +37,10 @@ class Port implements Schema {
      * @param int $min
      * @return $this
      */
-    public function min(int $min): Port {
+    public function min(int $min): Port
+    {
         $this->range[0] = $min;
+
         return $this;
     }
 
@@ -42,8 +48,10 @@ class Port implements Schema {
      * @param int $max
      * @return $this
      */
-    public function max(int $max): Port {
+    public function max(int $max): Port
+    {
         $this->range[1] = $max;
+
         return $this;
     }
 
@@ -51,7 +59,8 @@ class Port implements Schema {
      * @inheritDoc
      * @psalm-suppress MissingParamType
      */
-    public function normalize($value, Context $context) {
+    public function normalize($value, Context $context)
+    {
 
         /** @noinspection TypeUnsafeComparisonInspection */
         if($this->nullable && (empty($value) && $value != '0')) {
@@ -62,23 +71,26 @@ class Port implements Schema {
         if($this->required && (empty($value) && $value != '0')) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is empty.', Message::MISSING_ITEM);
+
             return null;
         }
 
-        if(is_string($value) && !preg_match('/\d+/', $value)) {
+        if(is_string($value) && ! preg_match('/\d+/', $value)) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is string but not number.', Message::PATTERN_MISMATCH);
+
             return null;
         }
         $value = (int) $value;
 
-        if(!$this->isInRange($value, $this->range)) {
+        if(! $this->isInRange($value, $this->range)) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError(
                 'The %label% %path% expects to be in range %expected%, %value% given.',
                 Message::VALUE_OUT_OF_RANGE,
                 ['value' => $value, 'expected' => implode('..', $this->range)]
             );
+
             return false;
         }
 
@@ -90,7 +102,8 @@ class Port implements Schema {
      * @inheritDoc
      * @psalm-suppress MissingParamType
      */
-    public function merge($value, $base) {
+    public function merge($value, $base)
+    {
         return $value;
     }
 
@@ -98,7 +111,8 @@ class Port implements Schema {
      * @inheritDoc
      * @psalm-suppress MissingParamType
      */
-    public function complete($value, Context $context) {
+    public function complete($value, Context $context)
+    {
         return $value;
     }
 
@@ -106,11 +120,13 @@ class Port implements Schema {
      * @inheritDoc
      *
      */
-    public function completeDefault(Context $context) {
+    public function completeDefault(Context $context)
+    {
         if ($this->required) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is missing.', Message::MISSING_ITEM);
         }
+
         return null;
     }
 
@@ -122,6 +138,7 @@ class Port implements Schema {
     private function isInRange(int|string $value, array $range): bool
     {
         $value = (int) $value;
+
         return ($range[0] === null || $value >= $range[0])
             && ($range[1] === null || $value <= $range[1]);
     }

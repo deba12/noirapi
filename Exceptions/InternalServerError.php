@@ -5,4 +5,6 @@ namespace noirapi\Exceptions;
 
 use Exception;
 
-class InternalServerError extends Exception {}
+class InternalServerError extends Exception
+{
+}

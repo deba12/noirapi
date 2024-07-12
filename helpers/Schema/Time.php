@@ -11,7 +11,8 @@ use Exception;
  * @psalm-api
  * @psalm-suppress PropertyNotSetInConstructor
  */
-class Time extends DateTime {
+class Time extends DateTime
+{
 
     /**
      * @param string $format
@@ -19,7 +20,8 @@ class Time extends DateTime {
      * @throws Exception
      *
      */
-    public function __construct(string $format = 'H:i:s', ?DateTimeZone $timeZone = null) {
+    public function __construct(string $format = 'H:i:s', ?DateTimeZone $timeZone = null)
+    {
         parent::__construct($format, $timeZone, 'time');
     }
 

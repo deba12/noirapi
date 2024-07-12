@@ -15,7 +15,8 @@ use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
 /** @psalm-api  */
-class Url implements Schema {
+class Url implements Schema
+{
 
     private bool $required = false;
     private bool $nullable = false;
@@ -28,6 +29,7 @@ class Url implements Schema {
     public function required(bool $state = true): self
     {
         $this->required = $state;
+
         return $this;
     }
 
@@ -38,12 +40,14 @@ class Url implements Schema {
     public function nullable(bool $state = true): self
     {
         $this->nullable = $state;
+
         return $this;
     }
 
     public function require_https(bool $state = true): self
     {
         $this->https = $state;
+
         return $this;
     }
 
@@ -61,23 +65,26 @@ class Url implements Schema {
             return null;
         }
 
-        if(!$this->nullable && empty($value)) {
+        if(! $this->nullable && empty($value)) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The option %path% requires valid url address', Message::PATTERN_MISMATCH);
+
             return false;
         }
 
         if($this->https) {
 
-            if(!str_starts_with($value, 'https://')) {
+            if(! str_starts_with($value, 'https://')) {
                 /** @noinspection UnusedFunctionResultInspection */
                 $context->addError('The option %path% requires valid https:// url scheme', Message::TYPE_MISMATCH);
+
                 return false;
             }
 
-        } else if(!str_starts_with($value, 'http://') && !str_starts_with($value, 'https://')) {
+        } elseif(! str_starts_with($value, 'http://') && ! str_starts_with($value, 'https://')) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The option %path% requires valid http(s):// url scheme', Message::PATTERN_MISMATCH);
+
             return false;
         }
 
@@ -88,6 +95,7 @@ class Url implements Schema {
         if($ret === false) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The option %path% requires valid url address', Message::PATTERN_MISMATCH);
+
             return false;
         }
 
@@ -124,6 +132,7 @@ class Url implements Schema {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is missing.', Message::MISSING_ITEM);
         }
+
         return null;
     }
 

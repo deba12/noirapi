@@ -3,18 +3,21 @@
 declare(strict_types=1);
 
 namespace noirapi\helpers;
+
 use JsonException;
 use noirapi\Exceptions\FilterNotFoundException;
 
 /** @psalm-api  */
-class Filters {
+class Filters
+{
 
     /**
      * @param string $filter
      * @return array
      * @throws FilterNotFoundException
      */
-    public static function init(string $filter): array {
+    public static function init(string $filter): array
+    {
 
         if(class_exists(\app\lib\Filters::class) && method_exists(\app\lib\Filters::class, $filter)) {
             return [\app\lib\Filters::class, $filter];
@@ -32,7 +35,8 @@ class Filters {
      * @param string $string
      * @return string
      */
-    public static function urlencode(string $string): string {
+    public static function urlencode(string $string): string
+    {
         return urlencode($string);
     }
 
@@ -40,7 +44,8 @@ class Filters {
      * @param string $string
      * @return string
      */
-    public static function urldecode(string $string): string {
+    public static function urldecode(string $string): string
+    {
         return urldecode($string);
     }
 
@@ -48,7 +53,8 @@ class Filters {
      * @param string $string
      * @return string
      */
-    public static function html_entity_decode(string $string): string {
+    public static function html_entity_decode(string $string): string
+    {
         return html_entity_decode($string);
     }
 
@@ -57,7 +63,8 @@ class Filters {
      * @param string $format
      * @return string
      */
-    public static function date_format(string $date, string $format): string {
+    public static function date_format(string $date, string $format): string
+    {
         return date($format, strtotime($date));
     }
 
@@ -65,11 +72,13 @@ class Filters {
      * @param int|bool|string $bool
      * @return int
      */
-    public static function inverse(int|bool|string $bool):int {
+    public static function inverse(int|bool|string $bool):int
+    {
         /** @noinspection InArrayCanBeUsedInspection */
         if($bool === 1 || $bool === true || $bool === '1') {
             return 0;
         }
+
         return 1;
     }
 
@@ -77,7 +86,8 @@ class Filters {
      * @param string $data
      * @return string
      */
-    public static function base64_encode(string $data): string {
+    public static function base64_encode(string $data): string
+    {
         return base64_encode($data);
     }
 
@@ -86,7 +96,8 @@ class Filters {
      * @return string
      * @throws JsonException
      */
-    public static function json_prettify(object|array $data): string {
+    public static function json_prettify(object|array $data): string
+    {
         return json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
     }
 

@@ -5,4 +5,6 @@ namespace noirapi\Exceptions;
 
 use Exception;
 
-class UsersException extends Exception {}
+class UsersException extends Exception
+{
+}

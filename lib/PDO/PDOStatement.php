@@ -3,12 +3,13 @@ declare(strict_types=1);
 
 namespace noirapi\PDO;
 
-use PDOStatement as NativePdoStatement;
 use function is_array;
 use function is_string;
+use PDOStatement as NativePdoStatement;
 
 /** @psalm-suppress MissingTemplateParam */
-class PDOStatement extends NativePdoStatement {
+class PDOStatement extends NativePdoStatement
+{
     /**
      * PDO instance.
      */
@@ -38,6 +39,7 @@ class PDOStatement extends NativePdoStatement {
     public function bindParam(int|string $param, mixed &$var, int $type = \PDO::PARAM_STR, int $maxLength = null, mixed $driverOptions = null): bool
     {
         $this->bindings[$param] = $var;
+
         return parent::bindParam($param, $var, $type, $maxLength, $driverOptions);
 
     }
@@ -51,6 +53,7 @@ class PDOStatement extends NativePdoStatement {
     public function bindValue(int|string $param, mixed $value, int $type = \PDO::PARAM_STR): bool
     {
         $this->bindings[$param] = $value;
+
         return parent::bindValue($param, $value, $type);
 
     }
@@ -66,7 +69,7 @@ class PDOStatement extends NativePdoStatement {
             $this->bindings = $params;
         }
 
-        $start  = microtime(true);
+        $start = microtime(true);
         $result = parent::execute($params);
 
         $this->pdo->addLog(

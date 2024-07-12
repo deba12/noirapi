@@ -9,7 +9,8 @@ use RateLimit\Rate;
 use RateLimit\Status;
 use Tracy\IBarPanel;
 
-class RateLimitBarPanel implements IBarPanel {
+class RateLimitBarPanel implements IBarPanel
+{
 
     /**
      * Base64 icon for Tracy panel.
@@ -46,7 +47,8 @@ class RateLimitBarPanel implements IBarPanel {
 
     private Status $limiter;
 
-    public function __construct(string $title, string $keyPrefix, string $identifier) {
+    public function __construct(string $title, string $keyPrefix, string $identifier)
+    {
 
         $this->title = $title;
 
@@ -54,7 +56,8 @@ class RateLimitBarPanel implements IBarPanel {
 
     }
 
-    public function getTab(): string {
+    public function getTab(): string
+    {
 
         $html = '<img src="'.$this->icon.'" alt="' . $this->title . '" /> ';
         $html .= $this->limiter->getIdentifier() . ' => ' . $this->limiter->getRemainingAttempts() . '/' . $this->limiter->getLimit();
@@ -63,7 +66,8 @@ class RateLimitBarPanel implements IBarPanel {
 
     }
 
-    public function getPanel(): string {
+    public function getPanel(): string
+    {
 
         $html = '<h1 ' . $this->title_attributes . '>' . $this->title . '</h1>';
         $html .= '<div class="tracy-inner tracy-InfoPanel">';

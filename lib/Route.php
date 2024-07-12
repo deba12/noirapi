@@ -237,6 +237,7 @@ class Route
             if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
                 $instance->request->controller = 'errors';
                 $instance->request->function = $function;
+
                 try {
                     $instance->response = (new \app\controllers\errors($instance->request, $instance->response, $instance->server))->$function();
                 } catch (Exception | FileNotFoundException $e) {
