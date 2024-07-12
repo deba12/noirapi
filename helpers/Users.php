@@ -326,4 +326,9 @@ class Users
 
     }
 
+    public function checkHash(string $password, string $hash): bool
+    {
+        return password_verify($password, $hash);
+    }
+
 }
