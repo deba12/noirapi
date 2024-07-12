@@ -6,6 +6,12 @@ namespace noirapi\interfaces;
 interface Translator
 {
 
-    public function translate(string $message, ?string $key = null, ...$args): string;
+    /**
+     * @param string $message
+     * @param string|null $key
+     * @param mixed ...$args
+     * @return string
+     */
+    public function translate(string $message, ?string $key = null, mixed ...$args): string;
 
 }

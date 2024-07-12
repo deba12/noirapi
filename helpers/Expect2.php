@@ -13,7 +13,6 @@ use function is_callable;
 use function is_string;
 use Nette;
 use Nette\Schema\Schema;
-use noirapi\helpers\Schema\Ascii;
 use noirapi\helpers\Schema\Cidr;
 use noirapi\helpers\Schema\Date;
 use noirapi\helpers\Schema\DateTime;
@@ -127,11 +126,11 @@ final class Expect2
     }
 
     /**
-     * @param $callable
+     * @param callable|string|Schema $callable
      * @param mixed ...$params
      * @return Schema|null
      */
-    public static function custom($callable, ...$params): ?Schema
+    public static function custom(callable|string|Schema $callable, ...$params): ?Schema
     {
 
         if(is_callable($callable)) {

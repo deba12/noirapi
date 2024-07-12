@@ -18,7 +18,10 @@ use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 
-/** @psalm-api  */
+/**
+ * @psalm-api
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class Mail
 {
 
@@ -244,6 +247,11 @@ class Mail
             $this->error = $e->getMessage();
             $this->debug_data = $e->getDebug();
 
+            return false;
+        }
+
+        if($res === null) {
+            $this->error = 'No response from server';
             return false;
         }
 

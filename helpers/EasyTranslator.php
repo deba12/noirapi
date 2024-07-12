@@ -42,7 +42,7 @@ class EasyTranslator implements Translator
      * @param mixed ...$args
      * @return string
      */
-    public function translate(string $message, ?string $key = null, ...$args): string
+    public function translate(string $message, ?string $key = null, mixed ...$args): string
     {
         // Condition is like /en,
         if($message === '/') {

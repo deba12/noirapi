@@ -82,6 +82,7 @@ class Config
                     return $default ?? null;
                 }
 
+                /** @psalm-suppress RiskyTruthyFalsyComparison */
                 if(empty($path)) {
                     if(isset(self::$options[$part])) {
                         $path = self::$options[$part];
@@ -94,6 +95,7 @@ class Config
 
             }
 
+            /** @psalm-suppress RiskyTruthyFalsyComparison */
             return empty($path) ? $default ?? null : $path;
 
         }
