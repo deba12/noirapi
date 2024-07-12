@@ -5,7 +5,10 @@ namespace noirapi\helpers;
 
 use Nette\Schema\ValidationException;
 
-/** @psalm-api  */
+/**
+ * @psalm-api
+ * @psalm-suppress MissingConstructor
+ */
 class Message
 {
 

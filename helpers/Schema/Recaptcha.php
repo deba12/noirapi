@@ -12,7 +12,10 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
-/** @psalm-api  */
+/**
+ * @psalm-api
+ * @psalm-suppress MissingConstructor
+ */
 class Recaptcha implements Schema
 {
 
