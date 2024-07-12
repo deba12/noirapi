@@ -9,6 +9,8 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use function get_class;
+use function in_array;
 use Laminas\Permissions\Acl\Acl;
 use noirapi\Config;
 use noirapi\Exceptions\LoginException;
@@ -19,13 +21,12 @@ use noirapi\helpers\RestMessage;
 use noirapi\helpers\Session;
 use noirapi\helpers\Utils;
 use noirapi\Tracy\PDOBarPanel;
+use function strlen;
 use Throwable;
 use Tracy\Debugger;
-use function get_class;
-use function in_array;
-use function strlen;
 
-class Controller {
+class Controller
+{
 
     public Request $request;
     public Response $response;
@@ -45,7 +46,8 @@ class Controller {
      * @param Response $response
      * @param array $server
      */
-    public function __construct(Request $request, Response $response, array $server) {
+    public function __construct(Request $request, Response $response, array $server)
+    {
 
         $this->request = $request;
         $this->response = $response;
@@ -74,7 +76,7 @@ class Controller {
 
                 foreach($this->model::tracyGetPdo() as $driver => $pdo) {
 
-                    if(!isset(self::$panels[$driver])) {
+                    if(! isset(self::$panels[$driver])) {
                         self::$panels[$driver] = true;
 
                         $panel = new PDOBarPanel($pdo);
@@ -95,7 +97,8 @@ class Controller {
 
     }
 
-    public function __destruct() {
+    public function __destruct()
+    {
 
         if($this->dev) {
             Route::handleRouteUrlDebugBar($this->request, $this->response, $this->server);
@@ -110,23 +113,25 @@ class Controller {
      * @return Response
      * @throws UnableToForwardException
      */
-    public function forward(?string $location = null, int $status = 302, bool $skip_lang = false): Response {
+    public function forward(?string $location = null, int $status = 302, bool $skip_lang = false): Response
+    {
 
         if($status !== 302 && $status !== 301) {
             throw new UnableToForwardException('Unable to forward with status code: ' . $status);
         }
 
-        if(empty($location)) {
+        if($location === null) {
             $location = $this->referer();
         }
 
-        if(!$skip_lang && !empty($this->request->language) && str_starts_with($location, '/')) {
+        if(! $skip_lang && $this->request->language !== null && str_starts_with($location, '/')) {
             if($location === '/') {
                 $location = '/' . $this->request->language;
             }
             if($location !== '/' . $this->request->language) {
                 $location = '/' . $this->request->language . $location;
             }
+
             return $this->response->withStatus($status)->withLocation($location);
         }
 
@@ -138,7 +143,8 @@ class Controller {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function ok(): Response {
+    public function ok(): Response
+    {
         return $this->response->withStatus(200);
     }
 
@@ -147,7 +153,8 @@ class Controller {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function notFound(): Response {
+    public function notFound(): Response
+    {
         return $this->response->withStatus(404);
     }
 
@@ -156,7 +163,8 @@ class Controller {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function internalServerError(): Response {
+    public function internalServerError(): Response
+    {
         return $this->response->withStatus(500);
     }
 
@@ -210,7 +218,8 @@ class Controller {
      * @return string
      * @noinspection PhpUnused
      */
-    public function referer(bool $same_domain = true): string {
+    public function referer(bool $same_domain = true): string
+    {
 
         if(isset($this->server['HTTP_REFERER'])) {
 
@@ -220,23 +229,23 @@ class Controller {
             }
 
             $orig_url = filter_var($url, FILTER_SANITIZE_URL);
-            if(empty($orig_url)) {
+            if($orig_url === false) {
                 return '/';
             }
 
             /** @psalm-suppress PossiblyInvalidCast */
             $url = parse_url((string)preg_replace('/\s+/', '', $orig_url));
-            if(empty($url)) {
+            if($url === false) {
                 return '/';
             }
 
-            if(!isset($url['host'])) {
+            if(! isset($url['host'])) {
                 return $orig_url;
             }
 
             if($url['host'] === $this->server['HTTP_HOST']) {
 
-                $url['path'] = empty($url['path']) ? '/' : $url['path'];
+                $url['path'] = $url['path'] ?? '/';
 
                 foreach(Config::get('languages') ?? [] as $code => $_) {
 
@@ -247,12 +256,13 @@ class Controller {
                     // Condition like /en
                     if(str_starts_with($url['path'], '/' . $code . '/')) {
                         $path = substr($url['path'], strlen($code) + 1);
-                        return $path . (empty($url['query']) ?  '' : '?' . ($url['query']));
+
+                        return $path . (! isset($url['query']) ?  '' : '?' . ($url['query']));
                     }
 
                 }
 
-                return (empty($this->request->language)  ? '' : '/' . $this->request->language) . $url['path'] . (empty($url['query']) ?  '' : '?' . ($url['query']));
+                return ($this->request->language === null  ? '' : '/' . $this->request->language) . $url['path'] . (! isset($url['query']) ?  '' : '?' . ($url['query']));
 
             }
 
@@ -262,16 +272,16 @@ class Controller {
 
             if(isset($url['scheme']) && ($url['scheme'] === 'http' || $url['scheme'] === 'https')) {
 
-                $url['path'] = empty($url['path']) ? '/' : $url['path'];
+                $url['path'] = $url['path'] ?? '/';
 
                 /** @noinspection BypassedUrlValidationInspection */
                 if(filter_var($url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . ($url['query'] ?? ''), FILTER_VALIDATE_URL)) {
 
-                    if(empty($url['query'])) {
-                        return $url['scheme'] . '://' . $url['host'] . $url['path'];
+                    if(isset($url['query'])) {
+                        return $url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . $url['query'];
                     }
 
-                    return $url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . $url['query'];
+                    return $url['scheme'] . '://' . $url['host'] . $url['path'];
 
                 }
 
@@ -293,9 +303,11 @@ class Controller {
      * @return Response
      * @noinspection PhpUnused
      */
-    public function restMessage(bool $status, object|array|string $message, ?string $next = null, ?string $message_tag = null): Response {
+    public function restMessage(bool $status, object|array|string $message, ?string $next = null, ?string $message_tag = null): Response
+    {
 
-        return $this->response->setBody(RestMessage::new(
+        return $this->response->setBody(
+            RestMessage::new(
                 ok: $status,
                 message: $message instanceof Message ? $message->message : $message,
                 next: $next,
@@ -311,15 +323,17 @@ class Controller {
      * @throws LoginException
      * @throws MessageException
      */
-    public function hasResource(Acl $acl): void {
+    public function hasResource(Acl $acl): void
+    {
 
-        if(!$acl->hasResource($this->request->controller)){
+        if(! $acl->hasResource($this->request->controller)) {
 
             if($this->request->ajax) {
                 throw new MessageException('Page not Found', 403);
             }
 
             $this->message('Page not found', 'danger');
+
             throw new LoginException('/');
 
         }
@@ -332,9 +346,10 @@ class Controller {
      * @throws LoginException
      * @throws MessageException
      */
-    public function isAllowed(Acl $acl): void {
+    public function isAllowed(Acl $acl): void
+    {
 
-        if(!$acl->isAllowed($this->request->role, $this->request->controller)) {
+        if(! $acl->isAllowed($this->request->role, $this->request->controller)) {
 
             if($this->request->ajax) {
                 throw new MessageException('Please Login', 403);
@@ -349,6 +364,7 @@ class Controller {
             Session::set('login', null, $login);
 
             $this->message('Please login', 'success');
+
             throw new LoginException('/');
 
         }
