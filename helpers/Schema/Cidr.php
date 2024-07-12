@@ -35,7 +35,12 @@ class Cidr implements Schema
         return $this;
     }
 
-    public function normalize($value, Context $context)
+    /**
+     * @param mixed $value
+     * @param Context $context
+     * @return mixed
+     */
+    public function normalize(mixed $value, Context $context): mixed
     {
 
         if($this->required && empty($value)) {
@@ -85,7 +90,7 @@ class Cidr implements Schema
      * @param $base
      * @return mixed
      */
-    public function merge($value, $base): mixed
+    public function merge(mixed $value, mixed $base): mixed
     {
         return $value;
     }
@@ -95,7 +100,7 @@ class Cidr implements Schema
      * @param Context $context
      * @return mixed
      */
-    public function complete($value, Context $context): mixed
+    public function complete(mixed $value, Context $context): mixed
     {
         return $value;
     }
@@ -106,7 +111,7 @@ class Cidr implements Schema
      * @return null
      * @noinspection ReturnTypeCanBeDeclaredInspection
      */
-    public function completeDefault(Context $context)
+    public function completeDefault(Context $context): null
     {
         if ($this->required) {
             /** @noinspection UnusedFunctionResultInspection */

@@ -6,7 +6,10 @@ namespace noirapi\helpers;
 use Latte;
 use noirapi\Exceptions\FileNotFoundException;
 
-/** @psalm-api  */
+/**
+ * @psalm-api
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
 class Template
 {
 
@@ -21,6 +24,7 @@ class Template
         $this->latte->setAutoRefresh();
         /** @psalm-suppress UndefinedConstant */
         $this->latte->setTempDirectory(ROOT . '/temp');
+        /** @psalm-suppress UndefinedClass */
         $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
     }

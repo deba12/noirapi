@@ -117,7 +117,7 @@ class Users
     public function newUserWithPassword(string $username, string $password, ?string $email = null, ?string $ip = null):? int
     {
 
-        if($this->emailExists($email) || $this->userExists($username)) {
+        if(($email !== null && $this->emailExists($email)) || $this->userExists($username)) {
             return null;
         }
 

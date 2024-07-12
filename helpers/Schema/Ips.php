@@ -35,7 +35,12 @@ class Ips implements Schema
         return $this;
     }
 
-    public function normalize($value, Context $context)
+    /**
+     * @param mixed $value
+     * @param Context $context
+     * @return array|null
+     */
+    public function normalize(mixed $value, Context $context): ?array
     {
 
         if($this->required && empty($value) && ! $this->nullable) {
@@ -64,12 +69,22 @@ class Ips implements Schema
 
     }
 
-    public function merge($value, $base)
+    /**
+     * @param mixed $value
+     * @param mixed $base
+     * @return mixed
+     */
+    public function merge(mixed $value, mixed $base): mixed
     {
         return $value;
     }
 
-    public function complete($value, Context $context)
+    /**
+     * @param mixed $value
+     * @param Context $context
+     * @return mixed
+     */
+    public function complete(mixed $value, Context $context): mixed
     {
         return $value;
     }

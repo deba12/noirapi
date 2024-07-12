@@ -82,7 +82,12 @@ class Ip implements Schema
         return $this;
     }
 
-    public function normalize($value, Context $context)
+    /**
+     * @param mixed $value
+     * @param Context $context
+     * @return int|string|null
+     */
+    public function normalize(mixed $value, Context $context)
     {
 
         // '0' is a valid long ip address
@@ -184,16 +189,16 @@ class Ip implements Schema
             return null;
         }
 
-        return $to;
+        return is_string($to) || is_int($to) ? $to : null;
 
     }
 
-    public function merge($value, $base)
+    public function merge(mixed $value, mixed $base): mixed
     {
         return $value;
     }
 
-    public function complete($value, Context $context)
+    public function complete(mixed $value, Context $context): mixed
     {
         return $value;
     }

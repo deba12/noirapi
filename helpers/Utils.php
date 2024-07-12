@@ -215,6 +215,7 @@ class Utils
 
         }
 
+        /** @psalm-suppress InvalidStringClass */
         $class = new $className();
 
         try {

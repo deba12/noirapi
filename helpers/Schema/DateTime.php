@@ -98,12 +98,12 @@ class DateTime implements Schema
     }
 
     /**
-     * @param $value
+     * @param mixed $value
      * @param Context $context
      * @return string|\DateTime|null
      * @psalm-suppress MissingParamType
      */
-    public function normalize($value, Context $context): string|null|\DateTime
+    public function normalize(mixed $value, Context $context): string|null|\DateTime
     {
 
         if($this->nullable && empty($value)) {
@@ -117,7 +117,7 @@ class DateTime implements Schema
             return null;
         }
 
-        if (! $this->nullable && empty($value)) {
+        if (! $this->nullable && $value !== '') {
             $context->addError("The option %path% expects not-nullable $this->name, nothing given.", Message::PATTERN_MISMATCH);
 
             return null;
@@ -125,7 +125,7 @@ class DateTime implements Schema
 
         $normalized = null;
 
-        if(! empty($value)) {
+        if($value !== '') {
             $normalized = \DateTime::createFromFormat($this->format, $value, $this->timeZone);
         }
 

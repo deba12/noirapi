@@ -57,7 +57,7 @@ class Numeric implements Schema
     /**
      * @inheritDoc
      */
-    public function normalize($value, Context $context)
+    public function normalize(mixed $value, Context $context): int|null|false
     {
 
         /** @noinspection TypeUnsafeComparisonInspection */
@@ -99,7 +99,7 @@ class Numeric implements Schema
     /**
      * @inheritDoc
      */
-    public function merge($value, $base)
+    public function merge(mixed $value, mixed $base): mixed
     {
         return $value;
     }
@@ -107,7 +107,7 @@ class Numeric implements Schema
     /**
      * @inheritDoc
      */
-    public function complete($value, Context $context)
+    public function complete(mixed $value, Context $context)
     {
         return $value;
     }
