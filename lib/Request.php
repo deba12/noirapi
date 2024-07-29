@@ -180,7 +180,7 @@ class Request
 
         $self->hostname = $server['HTTP_HOST'] ?? $server['SERVER_NAME'] ?? '';
         $self->method = $server['REQUEST_METHOD'];
-        $self->uri = $server['REQUEST_URI'];
+        $self->uri = filter_var(urldecode($server['REQUEST_URI']), FILTER_SANITIZE_URL);
         $self->get = $get;
         $self->post = $post;
         $self->files = $files;
