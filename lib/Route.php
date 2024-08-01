@@ -109,7 +109,7 @@ class Route
 
         $languages = Config::get('languages') ?? [];
 
-        // Check for language, if found strip it from the uri
+        // Check for language, if found, strip it from the uri
         foreach ($languages as $code => $_) {
             // Condition like /en,
             if($uri === '/' . $code) {
