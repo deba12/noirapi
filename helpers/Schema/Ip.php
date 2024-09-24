@@ -15,7 +15,8 @@ use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
 /** @psalm-api  */
-class Ip implements Schema {
+class Ip implements Schema
+{
 
     private bool $required = false;
     private bool $nullable = false;
@@ -25,6 +26,7 @@ class Ip implements Schema {
     public function fromBin(): self
     {
         $this->from = 'bin';
+
         return $this;
     }
 
@@ -34,46 +36,58 @@ class Ip implements Schema {
     public function fromString() :self
     {
         $this->from = 'string';
+
         return $this;
     }
 
     public function fromLong(): self
     {
         $this->from = 'long';
+
         return $this;
     }
 
     public function toBin(): self
     {
         $this->to = 'bin';
+
         return $this;
     }
 
     public function toString(): self
     {
         $this->to = 'string';
+
         return $this;
     }
 
     public function toLong(): self
     {
         $this->to = 'long';
+
         return $this;
     }
 
     public function required(bool $state = true): self
     {
         $this->required = $state;
+
         return $this;
     }
 
     public function nullable(bool $state = true): self
     {
         $this->nullable = $state;
+
         return $this;
     }
 
-    public function normalize($value, Context $context)
+    /**
+     * @param mixed $value
+     * @param Context $context
+     * @return int|string|null
+     */
+    public function normalize(mixed $value, Context $context)
     {
 
         // '0' is a valid long ip address
@@ -86,19 +100,21 @@ class Ip implements Schema {
         if($this->required && (empty($value) && $value != '0')) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is empty.', Message::MISSING_ITEM);
+
             return null;
         }
 
-        switch($this->from)
-        {
+        switch($this->from) {
             case 'string':
                 $from = $value;
+
                 break;
 
             case 'long':
-                if(!ctype_digit($value)) {
+                if(! ctype_digit($value)) {
                     /** @noinspection UnusedFunctionResultInspection */
                     $context->addError('The option %path% is not valid integer.', Message::TYPE_MISMATCH);
+
                     return null;
                 }
 
@@ -107,8 +123,10 @@ class Ip implements Schema {
                 if($value !== ip2long($from)) {
                     /** @noinspection UnusedFunctionResultInspection */
                     $context->addError('The option %path% is not valid (long) ipv4 address.', Message::TYPE_MISMATCH);
+
                     return null;
                 }
+
                 break;
 
             case 'bin':
@@ -116,8 +134,10 @@ class Ip implements Schema {
                 if($value !== inet_pton($from)) {
                     /** @noinspection UnusedFunctionResultInspection */
                     $context->addError('The option %path% is not valid (binary) ip address.', Message::TYPE_MISMATCH);
+
                     return null;
                 }
+
                 break;
         }
 
@@ -125,19 +145,21 @@ class Ip implements Schema {
             /** @noinspection UnusedFunctionResultInspection */
             /** @noinspection PhpUndefinedVariableInspection */
             $context->addError("The option %path% expects valid ip address. ('$from') given", Message::TYPE_MISMATCH);
+
             return null;
         }
 
-        if(!filter_var($from, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4|FILTER_FLAG_IPV6)) {
+        if(! filter_var($from, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_IPV6)) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError("The option %path% expects valid ip (ipv4|ipv6) address. ('$from') given", Message::TYPE_MISMATCH);
+
             return null;
         }
 
-        switch($this->to)
-        {
+        switch($this->to) {
             case 'string':
                 $to = $from;
+
                 break;
 
             case 'long':
@@ -145,13 +167,16 @@ class Ip implements Schema {
                 if(str_contains($from, ':')) {
                     /** @noinspection UnusedFunctionResultInspection */
                     $context->addError('The option %path% unable to convert ipv6 address to long', Message::TYPE_MISMATCH);
+
                     return null;
                 }
                 $to = ip2long($from);
+
                 break;
 
             case 'bin':
                 $to = inet_pton($from);
+
                 break;
 
         }
@@ -160,19 +185,20 @@ class Ip implements Schema {
         if(empty($to) && $to !== 0) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The option %path% unable to produce valid ip address', Message::TYPE_MISMATCH);
+
             return null;
         }
 
-        return $to;
+        return is_string($to) || is_int($to) ? $to : null;
 
     }
 
-    public function merge($value, $base)
+    public function merge(mixed $value, mixed $base): mixed
     {
         return $value;
     }
 
-    public function complete($value, Context $context)
+    public function complete(mixed $value, Context $context): mixed
     {
         return $value;
     }
@@ -184,6 +210,7 @@ class Ip implements Schema {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is missing.', Message::MISSING_ITEM);
         }
+
         return null;
     }
 

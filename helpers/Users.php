@@ -6,20 +6,22 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-use noirapi\lib\Model;
 use function call_user_func;
 use function is_string;
+use noirapi\lib\Model;
 
 /** @psalm-api  */
-class Users {
+class Users
+{
 
     private Model $model;
-    /** @var callable  */
+    /** @var callable */
     private $hash;
     private string $secret;
     private string $table = 'users';
 
-    public function __construct(Model $model, string $secret = null) {
+    public function __construct(Model $model, string $secret = null)
+    {
 
         $this->model = $model;
         $this->hash = [$this, 'PasswordHash'];
@@ -37,8 +39,10 @@ class Users {
      * @return $this
      * @noinspection PhpUnused
      */
-    public function setTable(string $table): Users {
+    public function setTable(string $table): Users
+    {
         $this->table = $table;
+
         return $this;
     }
 
@@ -47,8 +51,10 @@ class Users {
      * @return $this
      * @noinspection PhpUnused
      */
-    public function setHash(callable $hash): Users {
+    public function setHash(callable $hash): Users
+    {
         $this->hash = $hash;
+
         return $this;
     }
 
@@ -58,7 +64,8 @@ class Users {
      * @param string $password
      * @return mixed
      */
-    private function login(string $field, string $login, string $password): mixed {
+    private function login(string $field, string $login, string $password): mixed
+    {
 
         $user = $this->model->db->from($this->table)
             ->where($field)->is($login)
@@ -83,7 +90,8 @@ class Users {
      * @return bool
      * @noinspection PhpUnused
      */
-    public function loginWithUsername(string $username, string $password): mixed {
+    public function loginWithUsername(string $username, string $password): mixed
+    {
         return $this->login('username', $username, $password);
     }
 
@@ -93,7 +101,8 @@ class Users {
      * @return $this
      * @noinspection PhpUnused
      */
-    public function loginWithEmail(string $email, string $password): mixed {
+    public function loginWithEmail(string $email, string $password): mixed
+    {
         return $this->login('email', $email, $password);
     }
 
@@ -105,9 +114,10 @@ class Users {
      * @return int|null
      * @noinspection PhpUnused
      */
-    public function newUserWithPassword(string $username, string $password, ?string $email = null, ?string $ip = null):? int {
+    public function newUserWithPassword(string $username, string $password, ?string $email = null, ?string $ip = null):? int
+    {
 
-        if($this->emailExists($email) || $this->userExists($username)) {
+        if(($email !== null && $this->emailExists($email)) || $this->userExists($username)) {
             return null;
         }
 
@@ -118,8 +128,8 @@ class Users {
             $this->model->db->insert([
                 'username' => $username,
                 'password' => call_user_func($this->hash, $password),
-                'email' => $email,
-                'ip' => $ip
+                'email'    => $email,
+                'ip'       => $ip,
             ])->into($this->table);
 
             return (int)$this->model->lastId();
@@ -137,7 +147,8 @@ class Users {
      * @return int|null
      * @noinspection PhpUnused
      */
-    public function newUserWithEmail(string $email, string $password, ?string $ip = null):? int {
+    public function newUserWithEmail(string $email, string $password, ?string $ip = null):? int
+    {
 
         if($this->emailExists($email)) {
             return null;
@@ -148,10 +159,10 @@ class Users {
         if(is_string($hash)) {
 
             $this->model->db->insert([
-                'username'  => $email,
-                'email'     => $email,
-                'password'  => $hash,
-                'ip'        => $ip
+                'username' => $email,
+                'email'    => $email,
+                'password' => $hash,
+                'ip'       => $ip,
             ])->into('users');
 
             return (int)$this->model->lastId();
@@ -168,7 +179,8 @@ class Users {
      * @return bool
      * @noinspection PhpUnused
      */
-    public function checkPassword(int $user_id, string $password): bool {
+    public function checkPassword(int $user_id, string $password): bool
+    {
 
         $res = $this->model->db->from($this->table)
             ->where('id')->is($user_id)
@@ -189,7 +201,8 @@ class Users {
      * @param string $email
      * @return bool
      */
-    public function emailExists(string $email): bool {
+    public function emailExists(string $email): bool
+    {
 
         return $this->model->db->from($this->table)
             ->where('email')->is($email)
@@ -201,7 +214,8 @@ class Users {
      * @param string $username
      * @return bool
      */
-    public function userExists(string $username): bool {
+    public function userExists(string $username): bool
+    {
 
         return $this->model->db->from($this->table)
             ->where('username')->is($username)
@@ -215,7 +229,8 @@ class Users {
      * @return bool
      * @noinspection PhpUnused
      */
-    public function changePassword(int|string $id, string $password): bool {
+    public function changePassword(int|string $id, string $password): bool
+    {
 
         $hash = call_user_func($this->hash, $password);
 
@@ -224,7 +239,7 @@ class Users {
             $this->model->db->update($this->table)
                 ->where('id')->is($id)
                 ->set([
-                    'password'  => $hash
+                    'password' => $hash,
                 ]);
 
             return true;
@@ -242,13 +257,14 @@ class Users {
      * @param bool $ok
      * @return void
      */
-    public function log(string $action, string $identifier, string $ip, bool $ok): void {
+    public function log(string $action, string $identifier, string $ip, bool $ok): void
+    {
 
         $this->model->db->insert([
-            'action'        => $action,
-            'identifier'    => $identifier,
-            'ip'            => $ip,
-            'status'        => $ok
+            'action'     => $action,
+            'identifier' => $identifier,
+            'ip'         => $ip,
+            'status'     => $ok,
         ])->into('users_log');
 
     }
@@ -257,7 +273,8 @@ class Users {
      * @return void
      * @noinspection PhpUnused
      */
-    public function logout(): void {
+    public function logout(): void
+    {
         session_destroy();
     }
 
@@ -266,7 +283,8 @@ class Users {
      * @return string
      * @noinspection PhpUnused
      */
-    public function getHashedPassword(string $password): string {
+    public function getHashedPassword(string $password): string
+    {
         return call_user_func($this->hash, $password);
     }
 
@@ -280,7 +298,8 @@ class Users {
      * @psalm-suppress PossiblyUnusedMethod
      * @psalm-suppress UnusedMethod
      */
-    private function PasswordSha1(string $password, ?string $hash = null): string|bool {
+    private function PasswordSha1(string $password, ?string $hash = null): string|bool
+    {
         if($hash === null) {
             return sha1($this->secret . $password);
         }
@@ -296,7 +315,8 @@ class Users {
      * @noinspection PhpSameParameterValueInspection
      * @noinspection PhpUnused
      */
-    public function PasswordHash(string $password, ?string $hash = null): bool|string {
+    public function PasswordHash(string $password, ?string $hash = null): bool|string
+    {
 
         if($hash === null) {
             return password_hash($password,  PASSWORD_BCRYPT);
@@ -304,6 +324,11 @@ class Users {
 
         return password_verify($password, $hash);
 
+    }
+
+    public function checkHash(string $password, string $hash): bool
+    {
+        return password_verify($password, $hash);
     }
 
 }

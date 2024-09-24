@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-use InvalidArgumentException;
-use JsonException;
 use function in_array;
+use InvalidArgumentException;
 use function is_string;
+use JsonException;
 
 /**
  * @property bool $ok
@@ -15,11 +15,13 @@ use function is_string;
  * @property string|null $message_tag
  * @psalm-api
  */
-class RestMessage {
+class RestMessage
+{
 
     private array $params = [];
 
-    public static function new(bool $ok, string|object|array $message, string|null $next, string|null $message_tag): RestMessage {
+    public static function new(bool $ok, string|object|array $message, string|null $next, string|null $message_tag): RestMessage
+    {
         $static = new self();
         $static->params['ok'] = $ok;
         $static->params['next'] = $next;
@@ -51,14 +53,16 @@ class RestMessage {
      * @throws JsonException
      * @noinspection PhpUnused
      */
-    public function toJson(): string {
-        return json_encode($this->params, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
+    public function toJson(): string
+    {
+        return json_encode($this->params, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
     }
 
     /**
      * @return array
      */
-    public function toArray(): array {
+    public function toArray(): array
+    {
         return $this->params;
     }
 
@@ -66,7 +70,8 @@ class RestMessage {
      * @param string $name
      * @return mixed|null
      */
-    public function __get(string $name) {
+    public function __get(string $name)
+    {
         return $this->params[$name] ?? null;
     }
 
@@ -75,7 +80,8 @@ class RestMessage {
      * @param mixed $value
      * @return void
      */
-    public function __set(string $name, mixed $value) {
+    public function __set(string $name, mixed $value)
+    {
         $this->params[$name] = $value;
     }
 
@@ -83,8 +89,9 @@ class RestMessage {
      * @param string $name
      * @return bool
      */
-    public function __isset(string $name): bool {
-        return !empty($this->params[$name]);
+    public function __isset(string $name): bool
+    {
+        return ! empty($this->params[$name]);
     }
 
 }

@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
-use Tracy\IBarPanel;
 use function count;
 use function in_array;
 use function is_array;
 use function is_object;
 use function is_string;
+use Tracy\IBarPanel;
 
-class SessionPanel implements IBarPanel {
+class SessionPanel implements IBarPanel
+{
 
 
     /**
@@ -33,7 +34,8 @@ class SessionPanel implements IBarPanel {
     public array $SESSION;
     public int $status;
 
-    public function __construct(array $SESSION, int $status) {
+    public function __construct(array $SESSION, int $status)
+    {
         $this->SESSION = $SESSION;
         $this->status = $status;
     }
@@ -41,7 +43,8 @@ class SessionPanel implements IBarPanel {
     /**
      * @return string
      */
-    public function getTab(): string {
+    public function getTab(): string
+    {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
         if($this->status !== PHP_SESSION_ACTIVE) {
@@ -54,7 +57,8 @@ class SessionPanel implements IBarPanel {
 
     }
 
-    public function getPanel(): string {
+    public function getPanel(): string
+    {
 
         $html = '<h1 ' . $this->title_attributes . '>' . $this->title . '</h1>';
         $html .= '<div class="tracy-inner tracy-InfoPanel" style="width: 500px;">';
@@ -70,14 +74,15 @@ class SessionPanel implements IBarPanel {
      * @return string
      * @noinspection DuplicatedCode
      */
-    private function cell(array|object $data): string {
+    private function cell(array|object $data): string
+    {
 
         $hidden = [
             'password',
             'key',
             'token',
             'salt',
-            'pass'
+            'pass',
         ];
 
         $return = '<table class="tracy-sortable">';

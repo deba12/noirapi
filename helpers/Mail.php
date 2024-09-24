@@ -9,17 +9,21 @@ declare(strict_types = 1);
 
 namespace noirapi\helpers;
 
+use function is_string;
 use Latte\Engine;
 use RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-use Symfony\Component\Mailer\Transport;
 
+use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
-use function is_string;
 
-/** @psalm-api  */
-class Mail {
+/**
+ * @psalm-api
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
+class Mail
+{
 
     public string $message_id;
 
@@ -30,7 +34,8 @@ class Mail {
     private string $debug_data;
     private Transport\TransportInterface $transport;
 
-    public function __construct(string $dsn, bool $debug = false) {
+    public function __construct(string $dsn, bool $debug = false)
+    {
 
         $this->transport = Transport::fromDsn($dsn);
         $this->debug = $debug;
@@ -44,7 +49,8 @@ class Mail {
      * @param string $subject
      * @return Mail
      */
-    public function new(string|array $from, array|string $to, string $subject): Mail {
+    public function new(string|array $from, array|string $to, string $subject): Mail
+    {
 
         if(is_string($to)) {
 
@@ -75,7 +81,8 @@ class Mail {
      * @param array $cc
      * @return $this
      */
-    public function setCC(array $cc): Mail {
+    public function setCC(array $cc): Mail
+    {
 
         foreach($cc as $address) {
             $this->message->addCc($address);
@@ -89,7 +96,8 @@ class Mail {
      * @param array $bcc
      * @return $this
      */
-    public function setBCC(array $bcc): Mail {
+    public function setBCC(array $bcc): Mail
+    {
 
         foreach($bcc as $address) {
             $this->message->addBcc($address);
@@ -104,11 +112,12 @@ class Mail {
      * @param array $params
      * @return Mail
      */
-    public function setTemplate(string $template, array $params): Mail {
+    public function setTemplate(string $template, array $params): Mail
+    {
 
         /** @psalm-suppress UndefinedConstant */
         $file = ROOT  . "/app/templates/$template.latte";
-        if(!is_readable($file)){
+        if(! is_readable($file)) {
             throw new RuntimeException('Unable to load template: ' . $file);
         }
 
@@ -121,8 +130,10 @@ class Mail {
 
     }
 
-    public function setReplyTo(string $email): Mail {
+    public function setReplyTo(string $email): Mail
+    {
         $this->message->replyTo($email);
+
         return $this;
     }
 
@@ -130,7 +141,8 @@ class Mail {
      * @param string $body
      * @return $this
      */
-    public function setBody(string $body): Mail {
+    public function setBody(string $body): Mail
+    {
 
         $this->body = $body;
 
@@ -143,7 +155,8 @@ class Mail {
      * @param string $value
      * @return Mail
      */
-    public function addHeader(string $key, string $value): Mail {
+    public function addHeader(string $key, string $value): Mail
+    {
 
         $this->message->getHeaders()->addTextHeader($key, $value);
 
@@ -157,7 +170,8 @@ class Mail {
      * @param string|null $mime_type
      * @return Mail
      */
-    public function attach(string $data, string $filename, ?string $mime_type = null): Mail {
+    public function attach(string $data, string $filename, ?string $mime_type = null): Mail
+    {
 
         $this->message->attach($data, $filename, $mime_type);
 
@@ -171,9 +185,10 @@ class Mail {
      * @param string|null $mime_type
      * @return Mail
      */
-    public function attachFile(string $file, string $name, ?string $mime_type = null): Mail {
+    public function attachFile(string $file, string $name, ?string $mime_type = null): Mail
+    {
 
-        if(!is_readable($file)) {
+        if(! is_readable($file)) {
             throw new RuntimeException("Unable to open $file");
         }
 
@@ -189,7 +204,8 @@ class Mail {
      * @param string|null $mime_type
      * @return Mail
      */
-    public function embed(string $data, string $filename, ?string $mime_type = null): Mail {
+    public function embed(string $data, string $filename, ?string $mime_type = null): Mail
+    {
 
         $this->message->embed($data, $filename, $mime_type);
 
@@ -203,9 +219,10 @@ class Mail {
      * @param string|null $mime_type
      * @return Mail
      */
-    public function embedFile(string $file, string $name, ?string $mime_type = null): Mail {
+    public function embedFile(string $file, string $name, ?string $mime_type = null): Mail
+    {
 
-        if(!is_readable($file)) {
+        if(! is_readable($file)) {
             throw new RuntimeException("Unable to open $file");
         }
 
@@ -218,7 +235,8 @@ class Mail {
     /**
      * @return bool
      */
-    public function send(): bool {
+    public function send(): bool
+    {
 
         $this->message->html($this->body);
         $this->message->text(strip_tags($this->body));
@@ -228,6 +246,12 @@ class Mail {
         } catch (TransportExceptionInterface $e) {
             $this->error = $e->getMessage();
             $this->debug_data = $e->getDebug();
+
+            return false;
+        }
+
+        if($res === null) {
+            $this->error = 'No response from server';
             return false;
         }
 
@@ -242,7 +266,8 @@ class Mail {
     /**
      * @return $this
      */
-    public function noResponders(): Mail {
+    public function noResponders(): Mail
+    {
 
         $this->addHeader('X-Auto-Response-Suppress', 'OOF, DR, RN, NRN, AutoReply');
 
@@ -253,14 +278,16 @@ class Mail {
     /**
      * @return string
      */
-    public function getBody(): string {
+    public function getBody(): string
+    {
         return $this->body;
     }
 
     /**
      * @return string
      */
-    public function getError(): string {
+    public function getError(): string
+    {
         return $this->error;
     }
 
@@ -268,7 +295,8 @@ class Mail {
      * @return string
      * @noinspection GetSetMethodCorrectnessInspection
      */
-    public function getDebug(): string {
+    public function getDebug(): string
+    {
         return $this->debug_data;
     }
 

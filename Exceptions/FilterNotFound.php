@@ -5,4 +5,6 @@ namespace noirapi\Exceptions;
 
 use Exception;
 
-class FilterNotFound extends Exception {}
+class FilterNotFound extends Exception
+{
+}

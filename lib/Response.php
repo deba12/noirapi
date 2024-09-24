@@ -10,12 +10,6 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use Exception;
-use JsonException;
-use LaLit\Array2XML;
-use noirapi\helpers\RestMessage;
-use RuntimeException;
-use SimpleXMLElement;
-use stdClass;
 use function gettype;
 use function is_array;
 use function is_callable;
@@ -24,8 +18,15 @@ use function is_int;
 use function is_object;
 use function is_resource;
 use function is_string;
+use JsonException;
+use LaLit\Array2XML;
+use noirapi\helpers\RestMessage;
+use RuntimeException;
+use SimpleXMLElement;
+use stdClass;
 
-class Response {
+class Response
+{
 
     private int $status = 200;
     private int $csv_maxmem = 1024 * 1024; //1 MB
@@ -37,16 +38,16 @@ class Response {
     private array $headerCallback = [];
     private bool $csv_header = true;
 
-    public const TYPE_JSON  = 'application/json';
-    public const TYPE_XML   = 'text/xml';
-    public const TYPE_TEXT  = 'text/plain';
-    public const TYPE_HTML  = 'text/html; charset: utf-8';
-    public const TYPE_PDF   = 'application/pdf';
-    public const TYPE_CSV   = 'text/csv';
-    public const TYPE_CSS   = 'text/css';
-    public const TYPE_JS    = 'text/javascript';
-    public const TYPE_RAW   = 'application/octet-stream';
-    public const TYPE_ZIP   = 'application/zip';
+    public const TYPE_JSON = 'application/json';
+    public const TYPE_XML = 'text/xml';
+    public const TYPE_TEXT = 'text/plain';
+    public const TYPE_HTML = 'text/html; charset: utf-8';
+    public const TYPE_PDF = 'application/pdf';
+    public const TYPE_CSV = 'text/csv';
+    public const TYPE_CSS = 'text/css';
+    public const TYPE_JS = 'text/javascript';
+    public const TYPE_RAW = 'application/octet-stream';
+    public const TYPE_ZIP = 'application/zip';
 
     public ?string $initiator_class = null;
     public ?string $initiator_method = null;
@@ -56,7 +57,8 @@ class Response {
      * @param mixed $body
      * @return $this
      */
-    public function setBody(mixed $body): Response {
+    public function setBody(mixed $body): Response
+    {
         if($body === null) {
             $body = '';
         } elseif(is_float($body) || is_int($body)) {
@@ -72,6 +74,7 @@ class Response {
         }
 
         $this->body = $body;
+
         return $this;
     }
 
@@ -81,22 +84,26 @@ class Response {
      * @return $this
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function appendBody(mixed $body): Response {
+    public function appendBody(mixed $body): Response
+    {
         if(gettype($body) !== gettype($this->body)) {
             throw new RuntimeException('Invalid body type: ' . gettype($body) . ' for response->body type: ' . gettype($this->body));
         }
 
         if (is_array($this->body)) {
             $this->body += $body;
+
             return $this;
         }
 
         if(is_object($this->body)) {
             $this->body = $this->objectMerge($this->body, $body);
+
             return $this;
         }
 
         $this->body .= $body;
+
         return $this;
     }
 
@@ -107,7 +114,8 @@ class Response {
      * @throws Exception
      * @noinspection PhpUndefinedClassInspection
      */
-    public function getBody(): string {
+    public function getBody(): string
+    {
         if(is_string($this->body)) {
             return $this->body;
         }
@@ -133,7 +141,7 @@ class Response {
         }
 
         if($this->contentType === self::TYPE_JSON) {
-            return json_encode($this->body, JSON_THROW_ON_ERROR|JSON_PRETTY_PRINT);
+            return json_encode($this->body, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
         }
 
         if($this->contentType === self::TYPE_XML) {
@@ -155,7 +163,8 @@ class Response {
      * @return string|array|object
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getRawBody(): string|array|object {
+    public function getRawBody(): string|array|object
+    {
         return $this->body;
     }
 
@@ -163,7 +172,8 @@ class Response {
      * @return RestMessage
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getRestMessage(): RestMessage {
+    public function getRestMessage(): RestMessage
+    {
         if($this->body instanceof RestMessage) {
             return $this->body;
         }
@@ -175,7 +185,8 @@ class Response {
      * @param int $status
      * @return $this
      */
-    public function withStatus(int $status): Response {
+    public function withStatus(int $status): Response
+    {
         $this->status = $status;
 
         return $this;
@@ -184,7 +195,8 @@ class Response {
     /**
      * @return int
      */
-    public function getStatus(): int {
+    public function getStatus(): int
+    {
         return $this->status;
     }
 
@@ -192,9 +204,11 @@ class Response {
      * @param string $contentType
      * @return $this
      */
-    public function setContentType(string $contentType): Response {
+    public function setContentType(string $contentType): Response
+    {
         $this->contentType = $contentType;
         $this->addHeader('Content-Type', $contentType);
+
         return $this;
     }
 
@@ -202,7 +216,8 @@ class Response {
      * @return string
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getContentType(): string {
+    public function getContentType(): string
+    {
         return $this->contentType;
     }
 
@@ -210,8 +225,10 @@ class Response {
      * @param string $location
      * @return $this
      */
-    public function withLocation(string $location): Response {
+    public function withLocation(string $location): Response
+    {
         $this->headers['Location'] = $location;
+
         return $this;
     }
 
@@ -219,7 +236,8 @@ class Response {
      * @return string|null
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function getLocation(): ?string {
+    public function getLocation(): ?string
+    {
         return $this->headers['Location'] ?? null;
     }
 
@@ -229,8 +247,10 @@ class Response {
      * @return $this
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addHeader(string $key, string $value): Response {
+    public function addHeader(string $key, string $value): Response
+    {
         $this->headers[$key] = $value;
+
         return $this;
     }
 
@@ -239,15 +259,18 @@ class Response {
      * @return $this
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function removeHeader(string $key): Response {
+    public function removeHeader(string $key): Response
+    {
         unset($this->headers[$key]);
+
         return $this;
     }
 
     /**
      * @return array
      */
-    public function getHeaders(): array {
+    public function getHeaders(): array
+    {
         $headers = array_merge([], $this->headers);
 
         foreach($this->headerCallback as $callback) {
@@ -266,7 +289,8 @@ class Response {
      * @return $this
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function downloadFile(string $filename): Response {
+    public function downloadFile(string $filename): Response
+    {
         $this->addHeader('Content-Disposition', 'attachment; filename="' . $filename . '"');
 
         return $this;
@@ -277,7 +301,8 @@ class Response {
      * @return $this
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function inlineFile(string $filename): Response {
+    public function inlineFile(string $filename): Response
+    {
         $this->addHeader('Content-Disposition', 'inline; filename="' . $filename . '"');
         $this->addHeader('Content-Transfer-Encoding', 'binary');
 
@@ -292,14 +317,15 @@ class Response {
      * @return $this
      * $expire is max date in the future supported by php
      */
-    public function addCookie(string $key, string $value, int $expire = 2147483647): Response {
+    public function addCookie(string $key, string $value, int $expire = 2147483647): Response
+    {
         $this->cookies[$key] = [
-            'key'       => $key,
-            'value'     => $value,
-            'expire'    => $expire,
-            'secure'    => true,
-            'httponly'  => true,
-            'samesite'  => 'strict'
+            'key'      => $key,
+            'value'    => $value,
+            'expire'   => $expire,
+            'secure'   => true,
+            'httponly' => true,
+            'samesite' => 'strict',
         ];
 
         return $this;
@@ -310,15 +336,18 @@ class Response {
      * @return $this
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function clearCookie(string $key): Response {
+    public function clearCookie(string $key): Response
+    {
         $this->addCookie($key, '', 0);
+
         return $this;
     }
 
     /**
      * @return array
      */
-    public function getCookies(): array {
+    public function getCookies(): array
+    {
         return $this->cookies;
     }
 
@@ -327,8 +356,10 @@ class Response {
      * @return $this
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addHeaderCallback(callable $callback): Response {
+    public function addHeaderCallback(callable $callback): Response
+    {
         $this->headerCallback[] = $callback;
+
         return $this;
     }
 
@@ -337,16 +368,20 @@ class Response {
      * @return $this
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function setXmlRoot(string $root): Response {
+    public function setXmlRoot(string $root): Response
+    {
         $this->xml_root = $root;
+
         return $this;
     }
 
     /**
      * @return $this
      */
-    public function disableCsvHeader(): Response {
+    public function disableCsvHeader(): Response
+    {
         $this->csv_header = false;
+
         return $this;
     }
 
@@ -355,7 +390,8 @@ class Response {
      * @param object $class2
      * @return stdClass
      */
-    private function objectMerge(object $class1, object $class2): stdClass {
+    private function objectMerge(object $class1, object $class2): stdClass
+    {
         $object = new stdClass();
 
         foreach($class1 as $key => $value) {
@@ -381,7 +417,8 @@ class Response {
      * @param array|object $data
      * @return string
      */
-    private function toCsv(array|object $data): string {
+    private function toCsv(array|object $data): string
+    {
         $csv = '';
         $written = 0;
 
@@ -394,6 +431,7 @@ class Response {
             $w = fputcsv($fh, (array)$row);
             if($w === false) {
                 $error = error_get_last();
+
                 throw new RuntimeException('fputcsv failed on key: ' . $key . ' with error: ' . ($error === null ? 'unknown' : $error['message']));
             }
             $written += $w;
@@ -426,7 +464,8 @@ class Response {
      * @return SimpleXMLElement
      * @throws Exception
      */
-    private function array2xml(array $array, ?SimpleXMLElement $xml = null): SimpleXMLElement {
+    private function array2xml(array $array, ?SimpleXMLElement $xml = null): SimpleXMLElement
+    {
         $xml ?? ($xml = new SimpleXMLElement($this->xml_root));
 
         foreach ($array as $k => $v) {
@@ -442,7 +481,8 @@ class Response {
      * @param object|array $object
      * @return array
      */
-    private function object2array(object|array $object): array {
+    private function object2array(object|array $object): array
+    {
         $result = [];
 
         foreach ($object as $key => $value) {

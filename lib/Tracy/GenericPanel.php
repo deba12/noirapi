@@ -3,10 +3,11 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
-use Tracy\IBarPanel;
 use function count;
+use Tracy\IBarPanel;
 
-class GenericPanel implements IBarPanel{
+class GenericPanel implements IBarPanel
+{
 
     /**
      * Base64 icon for the Tracy panel.
@@ -44,7 +45,8 @@ class GenericPanel implements IBarPanel{
 
     public array $data;
 
-    public function __construct(string $title, array $data) {
+    public function __construct(string $title, array $data)
+    {
         $this->title = $title;
         $this->data = $data;
     }
@@ -52,7 +54,8 @@ class GenericPanel implements IBarPanel{
     /**
      * @return string
      */
-    public function getTab(): string {
+    public function getTab(): string
+    {
 
         $html = "<img src=\"$this->icon\" alt=\"$this->title\" />&nbsp";
         $html .= $this->title . ' (' . count($this->data) . ')';
@@ -64,7 +67,8 @@ class GenericPanel implements IBarPanel{
     /**
      * @return string
      */
-    public function getPanel(): string {
+    public function getPanel(): string
+    {
 
         $html = '<h1 ' . $this->title_attributes . '>' . $this->title . '</h1>';
         $html .= '<div class="tracy-inner tracy-InfoPanel">';

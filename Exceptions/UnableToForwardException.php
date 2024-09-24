@@ -5,4 +5,6 @@ namespace noirapi\Exceptions;
 
 use Exception;
 
-class UnableToForwardException extends Exception {}
+class UnableToForwardException extends Exception
+{
+}

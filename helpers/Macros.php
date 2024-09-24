@@ -15,20 +15,22 @@ use Latte\Compiler\Tag;
 use Latte\Extension;
 
 /** @psalm-api  */
-class Macros extends Extension {
+class Macros extends Extension
+{
 
-    public function getTags(): array {
+    public function getTags(): array
+    {
         return [
-            'pager'         => [$this, 'pager'],
-            'breadcrumb'    => [$this, 'breadCrumb'],
-            'topCss'        => [$this, 'topCss'],
-            'bottomCss'     => [$this, 'bottomCss'],
-            'topJs'         => [$this, 'topJs'],
-            'bottomJs'      => [$this, 'bottomJs'],
-            'active'        => [$this, 'active'],
-            'title'         => [$this, 'title'],
-            'message'       => [$this, 'message'],
-            'nonce'         => [$this, 'nonce'],
+            'pager'      => [$this, 'pager'],
+            'breadcrumb' => [$this, 'breadCrumb'],
+            'topCss'     => [$this, 'topCss'],
+            'bottomCss'  => [$this, 'bottomCss'],
+            'topJs'      => [$this, 'topJs'],
+            'bottomJs'   => [$this, 'bottomJs'],
+            'active'     => [$this, 'active'],
+            'title'      => [$this, 'title'],
+            'message'    => [$this, 'message'],
+            'nonce'      => [$this, 'nonce'],
         ];
     }
 
@@ -39,7 +41,8 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function title(Tag $tag): Node {
+    public function title(Tag $tag): Node
+    {
 
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
@@ -57,18 +60,20 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function pager(Tag $tag): Node {
+    public function pager(Tag $tag): Node
+    {
 
         /** @psalm-suppress UndefinedConstant */
         $file = ROOT . '/app/layouts/pager.latte';
 
-        if(!is_readable($file)) {
+        if(! is_readable($file)) {
             /** @psalm-suppress UndefinedConstant */
             $file = ROOT . '/noirapi/templates/pager.latte';
         }
 
         return new AuxiliaryNode(
-            fn(PrintContext $context) => $context->format('
+            fn (PrintContext $context) => $context->format(
+                '
                 if(empty($pager)) {
                     throw new RuntimeException("Pager is not setup");
                 }
@@ -101,19 +106,21 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function breadcrumb(Tag $tag): Node {
+    public function breadcrumb(Tag $tag): Node
+    {
 
         /** @psalm-suppress UndefinedConstant */
         $file = ROOT . '/app/layouts/BreadCrumbs.latte';
 
-        if(!is_readable($file)) {
+        if(! is_readable($file)) {
             /** @psalm-suppress UndefinedConstant */
             $file = ROOT . '/noirapi/templates/BreadCrumbs.latte';
         }
 
         return new AuxiliaryNode(
-            fn(PrintContext $context) => $context->format(
-                '$this->createTemplate(\'%raw\', [ \'breadcrumbs\' => $this->params[\'layout\']->breadcrumbs ], \'include\')->renderToContentType(\'html\');', $file
+            fn (PrintContext $context) => $context->format(
+                '$this->createTemplate(\'%raw\', [ \'breadcrumbs\' => $this->params[\'layout\']->breadcrumbs ], \'include\')->renderToContentType(\'html\');',
+                $file
             )
         );
 
@@ -126,7 +133,8 @@ class Macros extends Extension {
      * @noinspection HtmlUnknownTarget
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function topCss(Tag $tag): Node {
+    public function topCss(Tag $tag): Node
+    {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 foreach($layout->get(\'top-css\') as $css) {
@@ -143,7 +151,8 @@ class Macros extends Extension {
      * @noinspection HtmlUnknownTarget
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function bottomCss(Tag $tag): Node {
+    public function bottomCss(Tag $tag): Node
+    {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 foreach($layout->get(\'bottom-css\') as $css) {
@@ -161,7 +170,8 @@ class Macros extends Extension {
      * @noinspection JSUnresolvedVariable
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function topJs(Tag $tag): Node {
+    public function topJs(Tag $tag): Node
+    {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 foreach($layout->get(\'top-js\') as $js) {
@@ -183,7 +193,8 @@ class Macros extends Extension {
      * @noinspection JSUnresolvedVariable
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function bottomJs(Tag $tag): Node {
+    public function bottomJs(Tag $tag): Node
+    {
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format('
                 foreach($layout->get(\'bottom-js\') as $js) {
@@ -203,13 +214,15 @@ class Macros extends Extension {
      * @throws CompileException
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function active(Tag $tag): Node {
+    public function active(Tag $tag): Node
+    {
 
         $tag->expectArguments();
         $res = $tag->parser->parseArguments();
 
         return new AuxiliaryNode(
-            fn (PrintContext $context) => $context->format('
+            fn (PrintContext $context) => $context->format(
+                '
 
                 $active = %node;
 
@@ -234,18 +247,20 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function message(Tag $tag): AuxiliaryNode {
+    public function message(Tag $tag): AuxiliaryNode
+    {
 
         /** @psalm-suppress UndefinedConstant */
         $file = ROOT . '/app/layouts/message.latte';
 
-        if(!is_readable($file)) {
+        if(! is_readable($file)) {
             /** @psalm-suppress UndefinedConstant */
             $file = ROOT . '/noirapi/templates/message.latte';
         }
 
         return new AuxiliaryNode(
-            fn(PrintContext $context) => $context->format('
+            fn (PrintContext $context) => $context->format(
+                '
                 $this->createTemplate(\'%raw\', [
                     \'message\' => $message ?? null
                  ], \'include\')->renderToContentType(\'html\');',
@@ -261,9 +276,10 @@ class Macros extends Extension {
      * @noinspection PhpUnusedParameterInspection
      * @psalm-suppress PossiblyUnusedParam
      */
-    public function nonce(Tag $tag): AuxiliaryNode {
+    public function nonce(Tag $tag): AuxiliaryNode
+    {
         return new AuxiliaryNode(
-            fn(PrintContext $context) => $context->format('
+            fn (PrintContext $context) => $context->format('
                 $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
                 echo $nonce_inline;
             ')

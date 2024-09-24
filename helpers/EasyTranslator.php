@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
+use function array_map;
+use function is_string;
 use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use noirapi\interfaces\Translator;
-use function array_map;
-use function is_string;
 use function sprintf;
 use function str_contains;
 use function str_starts_with;
@@ -42,7 +42,8 @@ class EasyTranslator implements Translator
      * @param mixed ...$args
      * @return string
      */
-    public function translate(string $message, ?string $key = null, ...$args): string {
+    public function translate(string $message, ?string $key = null, mixed ...$args): string
+    {
         // Condition is like /en,
         if($message === '/') {
             return '/' . $this->language;
@@ -63,8 +64,9 @@ class EasyTranslator implements Translator
      * @param mixed ...$args
      * @return string
      */
-    private function lookup(array $translations, string $message, ?string $key = null, ...$args): string {
-        $args = array_map(fn($arg) => $this->urlTranslate($arg), $args);
+    private function lookup(array $translations, string $message, ?string $key = null, ...$args): string
+    {
+        $args = array_map(fn ($arg) => $this->urlTranslate($arg), $args);
 
         if($key !== null) {
 
@@ -99,7 +101,7 @@ class EasyTranslator implements Translator
 
         $lookup = strtolower($message);
 
-        if(!empty($translations['strings'][$lookup])) {
+        if(! empty($translations['strings'][$lookup])) {
             return str_contains($message, '%s') ? sprintf($translations['strings'][$lookup], ...$args) : $translations['strings'][$lookup];
         }
 
@@ -110,8 +112,9 @@ class EasyTranslator implements Translator
      * @param string $message
      * @return string
      */
-    private function urlTranslate(string $message): string {
-        if(!str_starts_with($message, '/')) {
+    private function urlTranslate(string $message): string
+    {
+        if(! str_starts_with($message, '/')) {
             return $message;
         }
 

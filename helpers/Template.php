@@ -6,19 +6,25 @@ namespace noirapi\helpers;
 use Latte;
 use noirapi\Exceptions\FileNotFoundException;
 
-/** @psalm-api  */
-class Template {
+/**
+ * @psalm-api
+ * @psalm-suppress PropertyNotSetInConstructor
+ */
+class Template
+{
 
     private string $template;
     private Latte\Engine $latte;
     private const latte_ext = '.latte';
 
-    public function __construct() {
+    public function __construct()
+    {
 
         $this->latte = new Latte\Engine;
         $this->latte->setAutoRefresh();
         /** @psalm-suppress UndefinedConstant */
         $this->latte->setTempDirectory(ROOT . '/temp');
+        /** @psalm-suppress UndefinedClass */
         $this->latte->addFilterLoader('\\noirapi\\helpers\\Filters::init');
 
     }
@@ -27,7 +33,8 @@ class Template {
      * @param array $params
      * @return string
      */
-    public function print(array $params = []): string {
+    public function print(array $params = []): string
+    {
         return $this->latte->renderToString($this->template, $params);
     }
 
@@ -37,12 +44,14 @@ class Template {
      * @throws FileNotFoundException
      * @noinspection PhpUnused
      */
-    public function setTemplate(string $template): Template {
+    public function setTemplate(string $template): Template
+    {
         /** @psalm-suppress UndefinedConstant */
         $file = PATH_TEMPLATES . DIRECTORY_SEPARATOR . $template . self::latte_ext;
 
         if(is_readable($file)) {
             $this->template = $file;
+
             return $this;
         }
 

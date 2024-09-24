@@ -16,7 +16,8 @@ use RuntimeException;
 /**
  * @psalm-consistent-constructor
  */
-class Model {
+class Model
+{
 
     public string $driver = 'mysql';
     public Database $db;
@@ -25,7 +26,8 @@ class Model {
     /**
      * @throws ConfigException
      */
-    public function __construct(array $params = []) {
+    public function __construct(array $params = [])
+    {
         if(empty($params)) {
 
             if(empty(self::$pdo[$this->driver])) {
@@ -62,8 +64,9 @@ class Model {
     /**
      * @return array
      */
-    public static function tracyGetPdo(): array {
-        if(!empty(self::$pdo)) {
+    public static function tracyGetPdo(): array
+    {
+        if(! empty(self::$pdo)) {
             return self::$pdo;
         }
 
@@ -75,14 +78,16 @@ class Model {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function clear(): void {
+    public function clear(): void
+    {
         unset(self::$pdo[$this->driver]);
     }
 
     /**
      * @return string
      */
-    public function lastId(): string {
+    public function lastId(): string
+    {
         return $this->db->getConnection()->getPDO()->lastInsertId();
     }
 
@@ -90,7 +95,8 @@ class Model {
      * @return bool
      * @noinspection PhpUnused
      */
-    public function in_transaction(): bool {
+    public function in_transaction(): bool
+    {
         return $this->db->getConnection()->getPDO()->inTransaction();
     }
 
@@ -98,7 +104,8 @@ class Model {
      * @return void
      * @noinspection PhpUnused
      */
-    public function begin(): void {
+    public function begin(): void
+    {
         if($this->driver === 'mysql') {
             $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 0);
         }
@@ -111,7 +118,8 @@ class Model {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function commit(): void {
+    public function commit(): void
+    {
         $this->db->getConnection()->getPDO()->commit();
 
         if($this->driver === 'mysql') {
@@ -123,7 +131,8 @@ class Model {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function rollback(): void {
+    public function rollback(): void
+    {
         $this->db->getConnection()->getPDO()->rollBack();
 
         if($this->driver === 'mysql') {
@@ -139,8 +148,9 @@ class Model {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function paginator(int $itemCount, int $itemsPerPage = 20, ?int $page = null): Paginator {
-        if(!class_exists(Paginator::class)) {
+    public function paginator(int $itemCount, int $itemsPerPage = 20, ?int $page = null): Paginator
+    {
+        if(! class_exists(Paginator::class)) {
             throw new RuntimeException('Unable to find nette/paginator');
         }
 
@@ -161,7 +171,8 @@ class Model {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function lock(string $table): void {
+    public function lock(string $table): void
+    {
         $this->db->getConnection()->query("LOCK TABLES $table WRITE");
     }
 
@@ -171,7 +182,8 @@ class Model {
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function unlock(): void {
+    public function unlock(): void
+    {
         $this->db->getConnection()->query('UNLOCK TABLES');
     }
 

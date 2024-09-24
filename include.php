@@ -20,6 +20,7 @@ const APPROOT = ROOT . '/app';
 const WWWROOT = ROOT . '/htdocs';
 
 if(file_exists(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php')) {
+    /** @psalm-suppress MissingFile */
     require_once(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 }
 
@@ -31,12 +32,12 @@ const PATH_LOGS = ROOT . '/logs/';
 
 $config = getenv('CONFIG');
 
-if(empty($config)) {
-    $config = $_SERVER['SERVER_NAME'] ?? null;
+if(! is_string($config)) {
+    $config = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'default';
 }
 
 if(empty($config)) {
-    if(!Config::defaultConfigAvailable()) {
+    if(! Config::defaultConfigAvailable()) {
         throw new RuntimeException('CONFIG environment must be set');
     }
     $config = 'default';
@@ -57,7 +58,7 @@ if(class_exists(GitVersionPanel::class)) {
 $dev = Config::get('dev');
 $dev_ips = Config::get('dev_ips');
 
-if($dev === true || (!empty($dev_ips) && isset($_SERVER['REMOTE_ADDR']) && in_array($_SERVER['REMOTE_ADDR'], $dev_ips, true))) {
+if($dev === true || (! empty($dev_ips) && isset($_SERVER['REMOTE_ADDR']) && in_array($_SERVER['REMOTE_ADDR'], $dev_ips, true))) {
     //we are missing some debug events in Tracy that's why we start session so early
     if(session_status() !== PHP_SESSION_ACTIVE) {
         session_start();

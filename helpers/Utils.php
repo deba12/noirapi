@@ -4,32 +4,32 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
+use function array_key_exists;
+use function array_pop;
+use function bin2hex;
+use function chr;
+use function count;
+use function defined;
 use Exception;
+use function get_class;
+use function is_array;
+use function is_object;
 use Nette\StaticClass;
+use function ord;
+use function proc_close;
+use function proc_open;
 use Random\Randomizer;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 use stdClass;
-use function array_key_exists;
-use function array_pop;
-use function array_splice;
-use function bin2hex;
-use function chr;
-use function count;
-use function defined;
-use function get_class;
-use function is_array;
-use function is_object;
-use function ord;
-use function proc_close;
-use function proc_open;
 use function str_split;
 use function strlen;
 use function vsprintf;
 
 /** @psalm-api  */
-class Utils {
+class Utils
+{
 
     use StaticClass;
 
@@ -38,13 +38,14 @@ class Utils {
      * @return string
      * @throws Exception
      */
-    public static function random(int $len = 16): string {
+    public static function random(int $len = 16): string
+    {
         /** @noinspection SpellCheckingInspection */
         $chars = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $res = '';
 
         for($i = 1; $i <= $len; $i++) {
-            $res .= $chars[random_int(1, strlen($chars)-1)];
+            $res .= $chars[random_int(1, strlen($chars) - 1)];
         }
 
         return $res;
@@ -55,7 +56,8 @@ class Utils {
      * @return string
      * @throws Exception
      */
-    public static function generateKey(bool $long = true): string {
+    public static function generateKey(bool $long = true): string
+    {
 
         $algo = $long ? 'sha256' : 'sha1';
 
@@ -69,8 +71,9 @@ class Utils {
      * @return float
      * @throws Exception
      */
-    public static function randomFloat(int $min = 0, int $max = PHP_INT_MAX): float {
-        return random_int($min, $max -1) / $max;
+    public static function randomFloat(int $min = 0, int $max = PHP_INT_MAX): float
+    {
+        return random_int($min, $max - 1) / $max;
     }
 
     /**
@@ -79,7 +82,8 @@ class Utils {
      * @return int
      * @throws Exception
      */
-    public static function randomInt(int $min = 0, int $max = PHP_INT_MAX): int {
+    public static function randomInt(int $min = 0, int $max = PHP_INT_MAX): int
+    {
         return random_int($min, $max);
     }
 
@@ -88,13 +92,14 @@ class Utils {
      * @return string
      * @throws Exception
      */
-    public static function randomString(int $len= 8): string {
+    public static function randomString(int $len = 8): string
+    {
         /** @noinspection SpellCheckingInspection */
         $chars = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $res = '';
 
         for($i = 1; $i <= $len; $i++) {
-            $res .= $chars[random_int(1, strlen($chars)-1)];
+            $res .= $chars[random_int(1, strlen($chars) - 1)];
         }
 
         return $res;
@@ -104,15 +109,17 @@ class Utils {
      * @param string $cmd
      * @return void
      */
-    public static function backgroundTask(string $cmd): void {
-        proc_close(proc_open( "$cmd &", [], $pipes ));
+    public static function backgroundTask(string $cmd): void
+    {
+        proc_close(proc_open("$cmd &", [], $pipes));
     }
 
     /**
      * @param mixed $object
      * @return mixed|null
      */
-    public static function returnNull(mixed $object): mixed {
+    public static function returnNull(mixed $object): mixed
+    {
 
         if(empty($object)) {
             return null;
@@ -126,7 +133,8 @@ class Utils {
      * @return string
      * @throws Exception
      */
-    public static function guidV4(): string {
+    public static function guidV4(): string
+    {
 
         $data = random_bytes(16);
 
@@ -144,13 +152,15 @@ class Utils {
      * @param string|object $class
      * @return string
      */
-    public static function getClassName(string|object $class): string {
+    public static function getClassName(string|object $class): string
+    {
 
         if(is_object($class)) {
             $class = get_class($class);
         }
 
         $path = explode('\\', $class);
+
         return array_pop($path);
 
     }
@@ -160,7 +170,8 @@ class Utils {
      * @return array
      * @throws Exception
      */
-    public static function array_shuffle(array $array): array {
+    public static function array_shuffle(array $array): array
+    {
 
         return (new Randomizer())->shuffleArray($array);
 
@@ -169,7 +180,8 @@ class Utils {
     /**
      * @return bool
      */
-    public static function is_tty(): bool {
+    public static function is_tty(): bool
+    {
         return defined('STDOUT') && posix_isatty(STDOUT);
     }
 
@@ -178,7 +190,8 @@ class Utils {
      * @return string
      * @noinspection SpellCheckingInspection
      */
-    public static function mb_ucfirst(string $string): string {
+    public static function mb_ucfirst(string $string): string
+    {
         return mb_strtoupper(mb_substr($string, 0, 1)).mb_substr($string, 1);
     }
 
@@ -188,7 +201,8 @@ class Utils {
      * @param bool $remove_missing
      * @return object
      */
-    public static function toObject(array|object $input, ?string $className = null, bool $remove_missing = true): object {
+    public static function toObject(array|object $input, ?string $className = null, bool $remove_missing = true): object
+    {
         if($className === null) {
 
             $class = new stdClass();
@@ -201,6 +215,7 @@ class Utils {
 
         }
 
+        /** @psalm-suppress InvalidStringClass */
         $class = new $className();
 
         try {
@@ -216,12 +231,12 @@ class Utils {
             if(is_array($input)) {
                 if(isset($input[$name])) {
                     $class->$name = $input[$name];
-                } else if($remove_missing) {
+                } elseif($remove_missing) {
                     unset($class->$name);
                 }
-            } else if(isset($input->$name)) {
+            } elseif(isset($input->$name)) {
                 $class->$name = $input->$name;
-            } else if($remove_missing) {
+            } elseif($remove_missing) {
                 unset($class->$name);
             }
 
@@ -236,7 +251,8 @@ class Utils {
      * @return array
      * @throws ReflectionException
      */
-    public static function getClassProperties(mixed $class, bool $public_only = true): array {
+    public static function getClassProperties(mixed $class, bool $public_only = true): array
+    {
         $result = [];
 
         $properties = (new ReflectionClass($class))->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
@@ -253,10 +269,10 @@ class Utils {
      * @param mixed $scope
      * @return int|string|void
      */
-    public static function var_name(mixed &$var, mixed $scope=false)
+    public static function var_name(mixed &$var, mixed $scope = false)
     {
         $old = $var;
-        if (($key = array_search($var = 'unique' . mt_rand() . 'value', !$scope ? $GLOBALS : $scope, true)) && $var = $old) {
+        if (($key = array_search($var = 'unique' . mt_rand() . 'value', ! $scope ? $GLOBALS : $scope, true)) && $var = $old) {
             return $key;
         }
 
@@ -268,7 +284,8 @@ class Utils {
      * @return array
      * @noinspection TypeUnsafeComparisonInspection
      */
-    public static function array_diff_recursive(array $a1, array $a2): array {
+    public static function array_diff_recursive(array $a1, array $a2): array
+    {
         $r = [];
 
         foreach ($a1 as $k => $v) {
@@ -281,7 +298,7 @@ class Utils {
                         $r[$k] = $rad;
                     }
 
-                } else if ($v != $a2[$k]) {
+                } elseif ($v != $a2[$k]) {
                     $r[$k] = $v;
                 }
             } else {

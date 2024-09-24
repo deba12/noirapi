@@ -2,10 +2,12 @@
 declare(strict_types=1);
 
 namespace noirapi\helpers;
+
 use Nette\Schema\ValidationException;
 
 /** @psalm-api  */
-class SchemaHelper {
+class SchemaHelper
+{
 
     public static array $messages;
 
@@ -13,7 +15,8 @@ class SchemaHelper {
      * @param array $messages
      * @return void
      */
-    public static function set(array $messages): void {
+    public static function set(array $messages): void
+    {
         self::$messages = $messages;
     }
 
@@ -24,7 +27,8 @@ class SchemaHelper {
      * @return void
      * @noinspection PhpUnused
      */
-    public static function addMessage(string $code, string $field, string $message): void {
+    public static function addMessage(string $code, string $field, string $message): void
+    {
         self::$messages[$code][$field] = $message;
     }
 
@@ -32,7 +36,8 @@ class SchemaHelper {
      * @param ValidationException $exceptions
      * @return string
      */
-    public static function message(ValidationException $exceptions): string {
+    public static function message(ValidationException $exceptions): string
+    {
         foreach($exceptions->getMessageObjects() as $exception) {
             $path = array_shift($exception->path);
             if(isset(self::$messages[$path])) {

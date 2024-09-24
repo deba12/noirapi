@@ -8,13 +8,13 @@ declare(strict_types=1);
 
 namespace noirapi\helpers\Schema;
 
-
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
 /** @psalm-api  */
-class Domain implements Schema {
+class Domain implements Schema
+{
 
     private bool $wildcard = false;
     private bool $required = false;
@@ -23,8 +23,10 @@ class Domain implements Schema {
      * @param bool $required
      * @return $this
      */
-    public function required(bool $required = true): Domain {
+    public function required(bool $required = true): Domain
+    {
         $this->required = $required;
+
         return $this;
     }
 
@@ -32,8 +34,10 @@ class Domain implements Schema {
      * @param bool $wildcard
      * @return $this
      */
-    public function wildcard(bool $wildcard = true): Domain {
+    public function wildcard(bool $wildcard = true): Domain
+    {
         $this->wildcard = $wildcard;
+
         return $this;
     }
 
@@ -43,7 +47,8 @@ class Domain implements Schema {
      * @return mixed|string|null
      * @psalm-suppress MissingParamType
      */
-    public function normalize($value, Context $context): mixed {
+    public function normalize($value, Context $context): mixed
+    {
 
         $value = trim($value);
 
@@ -53,6 +58,7 @@ class Domain implements Schema {
             if($res === false) {
                 /** @noinspection UnusedFunctionResultInspection */
                 $context->addError('The option %path% requires valid wildcard hostname', Message::PATTERN_MISMATCH);
+
                 return null;
             }
 
@@ -65,6 +71,7 @@ class Domain implements Schema {
         if($res === false) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The option %path% requires valid hostname', Message::PATTERN_MISMATCH);
+
             return null;
         }
 
@@ -78,7 +85,8 @@ class Domain implements Schema {
      * @return mixed
      * @psalm-suppress MissingParamType
      */
-    public function merge($value, $base): mixed {
+    public function merge($value, $base): mixed
+    {
         return $value;
     }
 
@@ -88,7 +96,8 @@ class Domain implements Schema {
      * @return mixed
      * @psalm-suppress MissingParamType
      */
-    public function complete($value, Context $context): mixed {
+    public function complete($value, Context $context): mixed
+    {
         return $value;
     }
 
@@ -102,6 +111,7 @@ class Domain implements Schema {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is missing.', Message::MISSING_ITEM);
         }
+
         return null;
     }
 
