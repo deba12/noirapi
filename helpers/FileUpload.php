@@ -255,6 +255,14 @@ class FileUpload
         return strtolower(pathinfo($this->file['name'], PATHINFO_EXTENSION));
     }
 
+    /**
+     * @return bool
+     */
+    public function isNoFile(): bool
+    {
+        return isset($this->file['error']) && $this->file['error'] === UPLOAD_ERR_NO_FILE;
+    }
+
     private function isImage(): bool
     {
         return in_array($this->file['type'], $this->image_types, true);
