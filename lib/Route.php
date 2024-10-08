@@ -8,12 +8,12 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
+use Throwable;
+use Tracy\ILogger;
 use function call_user_func_array;
 use FastRoute\Dispatcher;
 use function in_array;
-use Nette\Neon\Exception;
 use noirapi\Config;
-use noirapi\Exceptions\FileNotFoundException;
 use noirapi\Exceptions\InternalServerError;
 use noirapi\Exceptions\LoginException;
 use noirapi\Exceptions\MessageException;
@@ -183,29 +183,29 @@ class Route
                         ->setBody($exception->getMessage());
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (InternalServerError $exception) {
-                    self::handleErrors(500, $exception->getMessage() ?? 'Internal server error', $this);
+                    $this->response = self::handleErrors(500, $exception->getMessage() ?? 'Internal server error', $this);
                 } /** @noinspection PhpRedundantCatchClauseInspection */
                 catch (NotFoundException $exception) {
-                    self::handleErrors(404, $exception->getMessage() ?? '404 Not found', $this);
+                    $this->response = self::handleErrors(404, $exception->getMessage() ?? '404 Not found', $this);
                 }
 
                 break;
 
             case Dispatcher::NOT_FOUND:
 
-                self::handleErrors(404, '404 Not found', $this);
+                $this->response = self::handleErrors(404, '404 Not found', $this);
 
                 break;
 
             case Dispatcher::METHOD_NOT_ALLOWED:
 
-                self::handleErrors(405, '405 Method not allowed', $this);
+                $this->response = self::handleErrors(405, '405 Method not allowed', $this);
 
                 break;
 
             default:
 
-                self::handleErrors(500, 'Internal server error', $this);
+                $this->response = self::handleErrors(500, 'Internal server error', $this);
 
         }
 
@@ -217,36 +217,46 @@ class Route
      * @param int $status_code
      * @param string $defaultText
      * @param Route $instance
-     * @return void
-     * @noinspection PhpFullyQualifiedNameUsageInspection
+     * @return Response
      */
-    private static function handleErrors(int $status_code, string $defaultText, Route $instance): void
+    private static function handleErrors(int $status_code, string $defaultText, Route $instance): Response
     {
 
-        $res = false;
         /** @psalm-suppress UndefinedClass */
+        /** @noinspection PhpFullyQualifiedNameUsageInspection */
         if(class_exists(\app\lib\errorHandler::class)) {
-            $res = (bool)\app\lib\errorHandler::handle($status_code, $defaultText, $instance);
-        }
 
-        if(! $res) {
+            try {
+                /** @noinspection PhpFullyQualifiedNameUsageInspection */
+                return \app\lib\errorHandler::handle($status_code, $defaultText, $instance);
+            } catch (Throwable $e) {
+                Debugger::log($e, ILogger::EXCEPTION);
+            }
+
+        } else {
 
             $function = 'e' . $status_code;
 
             /** @psalm-suppress UndefinedClass */
-            if(class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
+            /** @noinspection PhpFullyQualifiedNameUsageInspection */
+            if (class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) {
                 $instance->request->controller = 'errors';
                 $instance->request->function = $function;
 
                 try {
-                    $instance->response = (new \app\controllers\errors($instance->request, $instance->response, $instance->server))->$function();
-                } catch (Exception | FileNotFoundException $e) {
-                    Debugger::log($e);
-                    die();
+                    /** @noinspection PhpFullyQualifiedNameUsageInspection */
+                    return (new \app\controllers\errors($instance->request, $instance->response, $instance->server))->$function();
+                } catch (Throwable $e) {
+                    Debugger::log($e, ILogger::EXCEPTION);
                 }
             }
 
         }
+
+        $response = new Response();
+        $response->setBody($defaultText);
+        $response->withStatus($status_code);
+        return $response;
 
     }
 
