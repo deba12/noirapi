@@ -150,9 +150,10 @@ class Layout
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addTopJS(string $js): void
-    {
-        $this->params['top-js'][] = $js;
+    public function addTopJS(string $js): void {
+        if(!in_array($js, $this->params['top-js'], true)) {
+            $this->params['top-js'][] = $js;
+        }
     }
 
     /**
@@ -161,9 +162,10 @@ class Layout
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addBottomJS(string $js): void
-    {
-        $this->params['bottom-js'][] = $js;
+    public function addBottomJS(string $js): void {
+        if(!in_array($js, $this->params['bottom-js'], true)) {
+            $this->params['bottom-js'][] = $js;
+        }
     }
 
     /**
@@ -172,9 +174,10 @@ class Layout
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addTopCss(string $css): void
-    {
-        $this->params['top-css'][] = $css;
+    public function addTopCss(string $css): void {
+        if(!in_array($css, $this->params['top-css'], true)) {
+            $this->params['top-css'][] = $css;
+        }
     }
 
     /**
@@ -183,9 +186,10 @@ class Layout
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function addBottomCss(string $css): void
-    {
-        $this->params['bottom-css'][] = $css;
+    public function addBottomCss(string $css): void {
+        if(!in_array($css, $this->params['bottom-css'], true)) {
+            $this->params['bottom-css'][] = $css;
+        }
     }
 
     /**

@@ -34,7 +34,7 @@ class Controller
     /** @var Model|null */
     public $model;
     public ?View $view = null;
-    public bool $dev;
+    public ?bool $dev = null;
     /** @var mixed|non-empty-array<array-key, true>|null */
     public static $panels;
 
@@ -53,10 +53,11 @@ class Controller
         $this->response = $response;
         $this->server = $server;
 
-        $db = Config::get('db');
-        $this->dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
+        if($this->dev === null) {
+            $this->dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
+        }
 
-        if($db) {
+        if(Config::get('db')) {
 
             if(empty($this->model)) {
 
