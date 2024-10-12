@@ -8,11 +8,7 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use Throwable;
-use Tracy\ILogger;
-use function call_user_func_array;
 use FastRoute\Dispatcher;
-use function in_array;
 use noirapi\Config;
 use noirapi\Exceptions\InternalServerError;
 use noirapi\Exceptions\LoginException;
@@ -21,9 +17,13 @@ use noirapi\Exceptions\NotFoundException;
 use noirapi\Exceptions\RestException;
 use noirapi\helpers\Utils;
 use noirapi\Tracy\GenericPanel;
-use function strlen;
 use Swoole\Http\Server;
+use Throwable;
 use Tracy\Debugger;
+use Tracy\ILogger;
+use function call_user_func_array;
+use function in_array;
+use function strlen;
 
 class Route
 {
@@ -246,6 +246,18 @@ class Route
                 try {
                     /** @noinspection PhpFullyQualifiedNameUsageInspection */
                     return (new \app\controllers\errors($instance->request, $instance->response, $instance->server))->$function();
+                } catch (LoginException $e) {
+
+                    $response = new Response();
+                    if($e->getCode() === 301) {
+                        $response->withStatus(301)
+                            ->withLocation($e->getMessage());
+                    } else {
+                        $response->withStatus(403)
+                            ->setBody($e->getMessage());
+                    }
+
+                    return $response;
                 } catch (Throwable $e) {
                     Debugger::log($e, ILogger::EXCEPTION);
                 }
@@ -256,6 +268,7 @@ class Route
         $response = new Response();
         $response->setBody($defaultText);
         $response->withStatus($status_code);
+
         return $response;
 
     }
