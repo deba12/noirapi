@@ -52,6 +52,12 @@ class Mail
     public function new(string|array $from, array|string $to, string $subject): Mail
     {
 
+        if(is_string($from)) {
+            $this->message->from($from);
+        } else {
+            $this->message->from(new Address($from[0], $from[1]));
+        }
+
         if(is_string($to)) {
 
             $this->message->to($to);
@@ -62,12 +68,6 @@ class Mail
                 $this->message->addTo($address);
             }
 
-        }
-
-        if(is_string($from)) {
-            $this->message->from($from);
-        } else {
-            $this->message->from(new Address($from[0], $from[1]));
         }
 
         $this->message->subject($subject);
@@ -122,6 +122,7 @@ class Mail
         }
 
         $latte = new Engine();
+
         /** @psalm-suppress UndefinedConstant */
         $latte->setTempDirectory(ROOT . '/temp');
         $this->body = $latte->renderToString($file, $params);
@@ -252,6 +253,7 @@ class Mail
 
         if($res === null) {
             $this->error = 'No response from server';
+
             return false;
         }
 
