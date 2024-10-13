@@ -11,6 +11,7 @@ namespace noirapi\helpers;
 
 use function is_string;
 use Latte\Engine;
+use noirapi\Config;
 use RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
@@ -33,6 +34,7 @@ class Mail
     private bool $debug;
     private string $debug_data;
     private Transport\TransportInterface $transport;
+    private string $dsn;
 
     public function __construct(string $dsn, bool $debug = false)
     {
@@ -40,6 +42,7 @@ class Mail
         $this->transport = Transport::fromDsn($dsn);
         $this->debug = $debug;
         $this->message = new Email();
+        $this->dsn = $dsn;
 
     }
 
@@ -241,6 +244,18 @@ class Mail
 
         $this->message->html($this->body);
         $this->message->text(strip_tags($this->body));
+
+        // This is used for testing!!!
+        if(str_starts_with($this->dsn, 'null://')) {
+            if(is_writable(Config::getTemp() . '/mail.txt')) {
+                unlink(Config::getTemp() . '/mail.txt');
+                file_put_contents(Config::getTemp() . '/mail.txt', $this->message->toString());
+            } else {
+                throw new RuntimeException('Unable to write to ' . Config::getTemp() . '/mail.txt');
+            }
+
+            return true;
+        }
 
         try {
             $res = $this->transport->send($this->message);
