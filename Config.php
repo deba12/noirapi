@@ -122,4 +122,54 @@ class Config
         return self::$options;
     }
 
+    /**
+     * @return string
+     * @noinspection PhpUnused
+     */
+    public static function getRoot(): string
+    {
+        /** @psalm-suppress UndefinedConstant */
+        return ROOT;
+    }
+
+    /**
+     * @return string
+     * @noinspection PhpUnused
+     */
+    public static function getTemp(): string
+    {
+        /** @psalm-suppress UndefinedConstant */
+        return ROOT . '/temp';
+    }
+
+    /**
+     * @return string
+     * @noinspection PhpUnused
+     */
+    public static function getLogs(): string
+    {
+        /** @psalm-suppress UndefinedConstant */
+        return ROOT . '/logs';
+    }
+
+    /**
+     * @return string
+     * @noinspection PhpUnused
+     */
+    public static function getWwwRoot(): string
+    {
+        /** @psalm-suppress UndefinedConstant */
+        return WWWROOT;
+    }
+
+    /**
+     * @return string
+     * @noinspection PhpUnused
+     */
+    public static function getAppRoot(): string
+    {
+        /** @psalm-suppress UndefinedConstant */
+        return APPROOT;
+    }
+
 }
