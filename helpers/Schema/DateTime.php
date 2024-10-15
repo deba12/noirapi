@@ -117,7 +117,7 @@ class DateTime implements Schema
             return null;
         }
 
-        if (! $this->nullable && $value !== '') {
+        if (! $this->nullable && $value === '') {
             $context->addError("The option %path% expects not-nullable $this->name, nothing given.", Message::PATTERN_MISMATCH);
 
             return null;
