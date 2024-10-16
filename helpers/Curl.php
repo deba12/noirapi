@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-use function is_object;
-use function is_string;
 use noirapi\lib\Controller;
 use noirapi\Tracy\CurlBarPanel;
 use Tracy\Debugger;
+use function is_object;
+use function is_string;
 
 /** @psalm-api  */
 class Curl extends \Curl\Curl

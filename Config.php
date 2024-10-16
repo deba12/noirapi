@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace noirapi;
 
-use function is_array;
 use Nette\Neon\Neon;
 use noirapi\Exceptions\ConfigException;
+use function is_array;
 
 class Config
 {

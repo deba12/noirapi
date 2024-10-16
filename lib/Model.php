@@ -10,7 +10,6 @@ use noirapi\Exceptions\ConfigException;
 use noirapi\PDO\PDO;
 use Opis\Database\Connection;
 use Opis\Database\Database;
-
 use RuntimeException;
 
 /**

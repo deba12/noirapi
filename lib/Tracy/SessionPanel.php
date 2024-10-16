@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
+use Tracy\IBarPanel;
 use function count;
 use function in_array;
 use function is_array;
 use function is_object;
 use function is_string;
-use Tracy\IBarPanel;
 
 class SessionPanel implements IBarPanel
 {

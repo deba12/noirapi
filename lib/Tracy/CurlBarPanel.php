@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
+use noirapi\helpers\Curl;
+use Tracy\Debugger;
+use Tracy\IBarPanel;
 use function count;
 use function gettype;
 use function is_array;
 use function is_object;
-use noirapi\helpers\Curl;
-use Tracy\Debugger;
-use Tracy\IBarPanel;
 
 /**
  * @codeCoverageIgnore

@@ -3,11 +3,11 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-use function array_map;
-use function is_string;
 use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use noirapi\interfaces\Translator;
+use function array_map;
+use function is_string;
 use function sprintf;
 use function str_contains;
 use function str_starts_with;
