@@ -9,6 +9,7 @@ declare(strict_types = 1);
 
 namespace noirapi\helpers;
 
+use Html2Text\Html2Text;
 use function is_string;
 use Latte\Engine;
 use noirapi\Config;
@@ -25,8 +26,6 @@ use Symfony\Component\Mime\Email;
  */
 class Mail
 {
-
-    public string $message_id;
 
     private Email $message;
     private string $body = '';
@@ -134,6 +133,10 @@ class Mail
 
     }
 
+    /**
+     * @param string $email
+     * @return $this
+     */
     public function setReplyTo(string $email): Mail
     {
         $this->message->replyTo($email);
@@ -238,23 +241,38 @@ class Mail
 
     /**
      * @return bool
+     * @throws TransportExceptionInterface
      */
     public function send(): bool
     {
 
         $this->message->html($this->body);
-        $this->message->text(strip_tags($this->body));
+        $text = new Html2Text($this->body);
+
+        $search = [
+            '/^\t+/m',
+            '/^\s+/m',
+        ];
+
+        $replace = [
+            '',
+            '',
+        ];
+
+        $this->message->text(preg_replace($search, $replace, $text->getText()));
 
         // This is used for testing!!!
         if(str_starts_with($this->dsn, 'null://')) {
-            if(is_writable(Config::getTemp() . '/mail.txt')) {
-                unlink(Config::getTemp() . '/mail.txt');
-                file_put_contents(Config::getTemp() . '/mail.txt', $this->message->toString());
-            } else {
-                throw new RuntimeException('Unable to write to ' . Config::getTemp() . '/mail.txt');
-            }
+
+            /** @noinspection PhpUnhandledExceptionInspection */
+            $res = $this->transport->send($this->message);
+            $message_id = $res->getMessageId();
+
+            file_put_contents(Config::getTemp() . "/mail-$message_id.eml", $this->message->toString());
+            file_put_contents(Config::getTemp() . "/mail-$message_id.txt", $this->message->getTextBody());
 
             return true;
+
         }
 
         try {
