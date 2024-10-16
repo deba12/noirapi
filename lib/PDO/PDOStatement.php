@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace noirapi\PDO;
 
+use PDOStatement as NativePdoStatement;
 use function is_array;
 use function is_string;
-use PDOStatement as NativePdoStatement;
 
 /** @psalm-suppress MissingTemplateParam */
 class PDOStatement extends NativePdoStatement

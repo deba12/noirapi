@@ -7,10 +7,10 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
-use function count;
 use noirapi\PDO\PDO;
 use SqlFormatter;
 use Tracy\IBarPanel;
+use function count;
 
 /**
  * @codeCoverageIgnore

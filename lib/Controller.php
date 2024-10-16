@@ -9,8 +9,6 @@ declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use function get_class;
-use function in_array;
 use Laminas\Permissions\Acl\Acl;
 use noirapi\Config;
 use noirapi\Exceptions\LoginException;
@@ -21,9 +19,11 @@ use noirapi\helpers\RestMessage;
 use noirapi\helpers\Session;
 use noirapi\helpers\Utils;
 use noirapi\Tracy\PDOBarPanel;
-use function strlen;
 use Throwable;
 use Tracy\Debugger;
+use function get_class;
+use function in_array;
+use function strlen;
 
 class Controller
 {

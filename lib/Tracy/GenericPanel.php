@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
-use function count;
 use Tracy\IBarPanel;
+use function count;
 
 class GenericPanel implements IBarPanel
 {

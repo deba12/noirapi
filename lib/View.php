@@ -1,10 +1,8 @@
 <?php
-/** @noinspection UnknownInspectionInspection */
 declare(strict_types = 1);
 
 namespace noirapi\lib;
 
-use function count;
 use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
@@ -20,6 +18,7 @@ use noirapi\interfaces\Translator;
 use noirapi\lib\View\Layout;
 use RuntimeException;
 use stdClass;
+use function count;
 
 class View
 {

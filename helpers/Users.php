@@ -6,9 +6,9 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
+use noirapi\lib\Model;
 use function call_user_func;
 use function is_string;
-use noirapi\lib\Model;
 
 /** @psalm-api  */
 class Users

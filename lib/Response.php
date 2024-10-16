@@ -10,6 +10,12 @@ declare(strict_types = 1);
 namespace noirapi\lib;
 
 use Exception;
+use JsonException;
+use LaLit\Array2XML;
+use noirapi\helpers\RestMessage;
+use RuntimeException;
+use SimpleXMLElement;
+use stdClass;
 use function gettype;
 use function is_array;
 use function is_callable;
@@ -18,12 +24,6 @@ use function is_int;
 use function is_object;
 use function is_resource;
 use function is_string;
-use JsonException;
-use LaLit\Array2XML;
-use noirapi\helpers\RestMessage;
-use RuntimeException;
-use SimpleXMLElement;
-use stdClass;
 
 class Response
 {

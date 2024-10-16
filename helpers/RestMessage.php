@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace noirapi\helpers;
 
-use function in_array;
 use InvalidArgumentException;
-use function is_string;
 use JsonException;
+use function in_array;
+use function is_string;
 
 /**
  * @property bool $ok

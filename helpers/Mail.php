@@ -9,15 +9,14 @@ declare(strict_types = 1);
 
 namespace noirapi\helpers;
 
-use function is_string;
 use Latte\Engine;
 use noirapi\Config;
 use RuntimeException;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
-
 use Symfony\Component\Mailer\Transport;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use function is_string;
 
 /**
  * @psalm-api
