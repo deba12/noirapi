@@ -42,9 +42,14 @@ trait LazyModelInit
             if($property->name === $name  && $property->getAttributes(LazyModel::class)) {
                 $instance = $property->getAttributes(LazyModel::class)[0]->newInstance();
                 $args = [];
+
                 foreach($instance->args as $arg) {
                     if(property_exists($this, $arg)) {
+                        if($this->$arg === null) {
+                            return null;
+                        }
                         $args[] = $this->$arg;
+                        break;
                     }
                 }
 
