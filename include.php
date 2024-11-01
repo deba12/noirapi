@@ -48,6 +48,8 @@ Config::init($config);
 
 define('SESSION_ROOT', Config::get('SESSION_ROOT') ?? (ROOT . '/sessions'));
 
+Config::set('is_https', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
+
 Debugger::$strictMode = E_ALL;
 
 /** @noinspection PhpUndefinedClassInspection */
