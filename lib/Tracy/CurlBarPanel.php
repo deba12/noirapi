@@ -3,13 +3,13 @@ declare(strict_types=1);
 
 namespace noirapi\Tracy;
 
-use noirapi\helpers\Curl;
-use Tracy\Debugger;
-use Tracy\IBarPanel;
 use function count;
 use function gettype;
 use function is_array;
 use function is_object;
+use noirapi\helpers\Curl;
+use Tracy\Debugger;
+use Tracy\IBarPanel;
 
 /**
  * @codeCoverageIgnore
@@ -98,7 +98,7 @@ class CurlBarPanel implements IBarPanel
                     $html .= '<a href="#" class="tracy-curl-click">Request...</a>' . PHP_EOL;
                     $html .= '<pre id="tracy-curl-request-element" style="display:none">';
                     if(is_array($request['request'])) {
-                        $html .= print_r($request[ 'request' ], true);
+                        $html .= print_r($request[ 'request' ], true); // @phpstan-ignore-line
                     } else {
                         $html .= $request['request'];
                     }
@@ -114,8 +114,8 @@ class CurlBarPanel implements IBarPanel
                 $html .= '<td>';
                 $html .= '<a href="#" class="tracy-curl-click">Response...</a>' . PHP_EOL;
                 $html .= '<pre id="tracy-curl-response-element" style="display:none">';
-                if(is_object($request['response'])) {
-                    $html .= print_r($request[ 'response' ], true);
+                if(is_object($request['response']) || is_array($request['response'])) {
+                    $html .= print_r($request[ 'response' ], true); // @phpstan-ignore-line
                 } else {
                     $html .= $request['response'];
                 }
@@ -132,7 +132,7 @@ class CurlBarPanel implements IBarPanel
 
         // Works only with a custom Tracy version
         /** @noinspection PhpUndefinedFieldInspection */
-        if(isset(Debugger::$nonce)) {
+        if(isset(Debugger::$nonce)) { // @phpstan-ignore-line
             /** @noinspection PhpUndefinedFieldInspection */
             $nonce = 'nonce-' . Debugger::$nonce;
         } else {

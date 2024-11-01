@@ -54,7 +54,7 @@ class Curl extends \Curl\Curl
             info: $info['http_code'] . ' ' . $info['content_type'],
             time: microtime(true) - $start,
             request: $post ?? [],
-            response: is_object($this->response) ? $this->response : substr((string)$this->response, 0, 128)
+            response: is_object($this->response) || is_array($this->response) ? $this->response : substr((string)$this->response, 0, 128)
         );
 
         return $res;
@@ -66,10 +66,10 @@ class Curl extends \Curl\Curl
      * @param string $info
      * @param float $time
      * @param array $request
-     * @param object|string|null $response
+     * @param object|array|string|null $response
      * @return void
      */
-    public function addLog(string $url, string $info, float $time, array $request, object|string $response = null): void
+    public function addLog(string $url, string $info, float $time, array $request, object|array|string $response = null): void
     {
 
         self::$requests[] = [
