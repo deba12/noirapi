@@ -1,10 +1,12 @@
 <?php
+
 /**
  * @noinspection PhpUnused
  * @noinspection UnknownInspectionInspection
  * @noinspection PhpUnhandledExceptionInspection
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 use noirapi\Config;
 use noirapi\lib\Route;
@@ -13,12 +15,12 @@ use noirapi\lib\Route;
 include(__DIR__ . '/include.php');
 
 // If the request is for the index.php, use the router
-if(isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
+if (isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
     $https = isset($_SERVER['HTTPS']);
     Config::set('https', $https);
     /** @noinspection HostnameSubstitutionInspection */
     $domain = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'default';
-    Config::set('domain',  $domain);
+    Config::set('domain', $domain);
     /**
      * @noinspection PhpUnhandledExceptionInspection
      * @psalm-suppress PossiblyInvalidArgument
@@ -29,8 +31,7 @@ if(isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
 
     $cookie_domain = Config::get('cookie_domain');
 
-    foreach($response->getCookies() as $cookie) {
-
+    foreach ($response->getCookies() as $cookie) {
         setcookie(
             $cookie['key'],
             $cookie['value'],
@@ -43,10 +44,9 @@ if(isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
                 'samesite' => $cookie['samesite'],
             ]
         );
-
     }
 
-    foreach($response->getHeaders() as $key => $value) {
+    foreach ($response->getHeaders() as $key => $value) {
         header(ucfirst($key) . ': ' . $value);
     }
 
@@ -54,5 +54,4 @@ if(isset($_SERVER['PHP_SELF']) && $_SERVER['PHP_SELF'] === '/index.php') {
 
     //Force calling destructors
     unset($response);
-
 }
