@@ -181,7 +181,10 @@ class Ip implements Schema
 
         }
 
-        /** @noinspection PhpUndefinedVariableInspection */
+        /**
+         * @noinspection PhpUndefinedVariableInspection
+         * @phpstan-ignore-next-line
+         */
         if(empty($to) && $to !== 0) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The option %path% unable to produce valid ip address', Message::TYPE_MISMATCH);

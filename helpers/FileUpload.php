@@ -1,13 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace noirapi\helpers;
 
 use noirapi\Exceptions\FileUploadValidation;
 
+/** @psalm-suppress MissingConstructor */
 class FileUpload
 {
-
     private array $file;
     private ?int $min = null;
     private ?int $max = null;
@@ -27,17 +28,16 @@ class FileUpload
 
     /**
      * @param array $file
-     * @return static
+     * @return self
      * @noinspection PhpUnused
      */
-    public static function validate(array $file): static
+    public static function validate(array $file): self
     {
 
-        $static = new static();
+        $static = new self();
         $static->file = $file;
 
         return $static;
-
     }
 
     public function min(int $min): self
@@ -73,7 +73,7 @@ class FileUpload
      */
     public function extension(string $extension): self
     {
-        if(str_starts_with($extension, '.')) {
+        if (str_starts_with($extension, '.')) {
             $extension = substr($extension, 1);
         }
         $this->extension = $extension;
@@ -116,33 +116,32 @@ class FileUpload
     public function process(): true
     {
 
-        if($this->file['error'] !== UPLOAD_ERR_OK) {
+        if ($this->file['error'] !== UPLOAD_ERR_OK) {
             throw new FileUploadValidation('File Upload error');
         }
 
-        if($this->min !== null && $this->file['size'] < $this->min) {
+        if ($this->min !== null && $this->file['size'] < $this->min) {
             throw new FileUploadValidation('File is too small');
         }
 
         /** @noinspection InsufficientTypesControlInspection */
-        if($this->max !== null && $this->file['size'] > $this->max) {
+        if ($this->max !== null && $this->file['size'] > $this->max) {
             throw new FileUploadValidation('File is too large');
         }
 
-        if(!empty($this->contentTypes) && !in_array($this->file['type'], $this->contentTypes, true)) {
+        if (! empty($this->contentTypes) && ! in_array($this->file['type'], $this->contentTypes, true)) {
             throw new FileUploadValidation('Invalid mime type');
         }
 
-        if($this->extension !== null && pathinfo($this->file['name'], PATHINFO_EXTENSION) !== $this->extension) {
+        if ($this->extension !== null && pathinfo($this->file['name'], PATHINFO_EXTENSION) !== $this->extension) {
             throw new FileUploadValidation('Invalid file extension');
         }
 
-        if(in_array($this->file['type'], $this->image_types, true)) {
-
-            if($this->minWidth !== null) {
-                if($this->isImage()) {
+        if (in_array($this->file['type'], $this->image_types, true)) {
+            if ($this->minWidth !== null) {
+                if ($this->isImage()) {
                     $image = getimagesize($this->file['tmp_name']);
-                    if($image[0] < $this->minWidth) {
+                    if ($image[0] < $this->minWidth) {
                         throw new FileUploadValidation('Image width too small');
                     }
                 } else {
@@ -150,10 +149,10 @@ class FileUpload
                 }
             }
 
-            if($this->minHeight !== null) {
-                if($this->isImage()) {
+            if ($this->minHeight !== null) {
+                if ($this->isImage()) {
                     $image = getimagesize($this->file['tmp_name']);
-                    if($image[1] < $this->minHeight) {
+                    if ($image[1] < $this->minHeight) {
                         throw new FileUploadValidation('Image width too small');
                     }
                 } else {
@@ -161,11 +160,11 @@ class FileUpload
                 }
             }
 
-            if($this->maxWidth !== null) {
-                if($this->isImage()) {
+            if ($this->maxWidth !== null) {
+                if ($this->isImage()) {
                     $image = getimagesize($this->file['tmp_name']);
                     /** @noinspection InsufficientTypesControlInspection */
-                    if($image[0] > $this->maxWidth) {
+                    if ($image[0] > $this->maxWidth) {
                         throw new FileUploadValidation('Image width too big');
                     }
                 } else {
@@ -173,22 +172,20 @@ class FileUpload
                 }
             }
 
-            if($this->maxHeight !== null) {
-                if($this->isImage()) {
+            if ($this->maxHeight !== null) {
+                if ($this->isImage()) {
                     $image = getimagesize($this->file['tmp_name']);
                     /** @noinspection InsufficientTypesControlInspection */
-                    if($image[1] > $this->maxHeight) {
+                    if ($image[1] > $this->maxHeight) {
                         throw new FileUploadValidation('Image width too big');
                     }
                 } else {
                     throw new FileUploadValidation('File is not an image');
                 }
             }
-
         }
 
         return true;
-
     }
 
     /**
@@ -214,7 +211,8 @@ class FileUpload
      * @return string
      * @noinspection PhpUnused
      */
-    public function getFile(): string {
+    public function getFile(): string
+    {
         return file_get_contents($this->file['tmp_name']);
     }
 
@@ -257,15 +255,18 @@ class FileUpload
 
     /**
      * @return bool
+     * @noinspection PhpUnused
      */
     public function isNoFile(): bool
     {
         return isset($this->file['error']) && $this->file['error'] === UPLOAD_ERR_NO_FILE;
     }
 
+    /**
+     * @return bool
+     */
     private function isImage(): bool
     {
         return in_array($this->file['type'], $this->image_types, true);
     }
-
 }
