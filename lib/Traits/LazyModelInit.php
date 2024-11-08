@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace noirapi\lib\Traits;
@@ -9,7 +10,6 @@ use ReflectionClass;
 
 trait LazyModelInit
 {
-
     use SmartObject;
 
     private ReflectionClass $reflection;
@@ -26,7 +26,6 @@ trait LazyModelInit
                 unset($this->$name);
             }
         }
-
     }
 
 
@@ -49,18 +48,13 @@ trait LazyModelInit
                             return null;
                         }
                         $args[] = $this->$arg;
-
-                        break;
                     }
                 }
 
                 return $instance->model->{$instance->method}(...$args);
-
             }
         }
 
         return $this->$name;
-
     }
-
 }
