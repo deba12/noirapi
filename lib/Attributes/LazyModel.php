@@ -11,21 +11,21 @@ use RuntimeException;
 class LazyModel
 {
 
-    public object $model;
-    public string $method;
+    public object $_class;
+    public string $_method;
     public mixed $args;
 
     public function __construct(string $class, string $method, ...$args)
     {
 
         if(class_exists($class)) {
-            $this->model = new $class;
+            $this->_class = new $class;
         } else {
             throw new RuntimeException("Class $class does not exist");
         }
 
-        if(method_exists($this->model, $method)) {
-            $this->method = $method;
+        if(method_exists($this->_class, $method)) {
+            $this->_method = $method;
         } else {
             throw new RuntimeException("Method $method does not exist in $class");
         }
