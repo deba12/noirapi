@@ -11,16 +11,21 @@ trait SmartObject
 {
     use \Nette\SmartObject;
 
-    private ReflectionClass $_reflection;
     /** @var string[] */
-    private array $_smartObjectAttributeClasses;
+    private array $__smartObjectAttributeClasses;
     /** @var ReflectionAttribute[] */
-    private array $_properties;
+    private array $__properties;
 
     public function __construct()
     {
 
-        $this->_reflection = new ReflectionClass($this);
+        $this->_SmartObjectInit();
+
+    }
+
+    private function _SmartObjectInit(): void {
+
+        $reflection = new ReflectionClass($this);
 
         // Get Composer class name
         foreach (get_declared_classes() as $className) {
@@ -29,29 +34,30 @@ trait SmartObject
 
                 /** @noinspection PhpUndefinedMethodInspection */
                 foreach($className::getLoader()->getClassMap() as $class => $path) {
+                    /** @noinspection SpellCheckingInspection */
                     if(str_starts_with($class, 'noirapi\lib\Attributes')) {
-                        $this->_smartObjectAttributeClasses[] = $class;
+                        $this->__smartObjectAttributeClasses[] = $class;
                     } elseif(str_starts_with($class, 'app\lib\Attributes')) {
-                        $this->_smartObjectAttributeClasses[] = $class;
+                        $this->__smartObjectAttributeClasses[] = $class;
                     }
                 }
             }
 
         }
 
-        foreach ($this->_reflection->getProperties() as $property) {
+        foreach ($reflection->getProperties() as $property) {
 
-            if(count($this->_smartObjectAttributeClasses) > 0) {
+            if(count($this->__smartObjectAttributeClasses) > 0) {
 
                 foreach ($property->getAttributes() as $attribute) {
 
                     $name = $attribute->getName();
-                    if(in_array($name, $this->_smartObjectAttributeClasses, true)) {
+                    if(in_array($name, $this->__smartObjectAttributeClasses, true)) {
 
                         $name = $property->getName();
                         unset($this->$name);
 
-                        $this->_properties[] = $property;
+                        $this->__properties[$name] = $property;
                     }
 
                 }
@@ -61,7 +67,6 @@ trait SmartObject
         }
 
     }
-
 
     /**
      * @param string $name
@@ -70,27 +75,25 @@ trait SmartObject
     public function __get(string $name)
     {
 
-        foreach($this->_properties as $property) {
+        if(isset($this->__properties[$name])) {
 
-            if($property === $name) {
+            foreach($this->__smartObjectAttributeClasses as $attributeClass) {
 
-                foreach($this->_smartObjectAttributeClasses as $attributeClass) {
+                if($this->__properties[$name]->getAttributes($attributeClass)) {
 
-                    if($property->getAttributes($attributeClass)) {
-                        $instance = $property->getAttributes($attributeClass)[0]->newInstance();
-                        $args = [];
+                    $instance = $this->__properties[$name]->getAttributes($attributeClass)[0]->newInstance();
+                    $args = [];
 
-                        foreach($instance->args as $arg) {
-                            if(property_exists($this, $arg)) {
-                                if($this->$arg === null) {
-                                    return null;
-                                }
-                                $args[] = $this->$arg;
+                    foreach($instance->args as $arg) {
+                        if(property_exists($this, $arg)) {
+                            if($this->$arg === null) {
+                                return null;
                             }
+                            $args[] = $this->$arg;
                         }
-
-                        return $instance->_class->{$instance->_method}(...$args);
                     }
+
+                    return $instance->_class->{$instance->_method}(...$args);
 
                 }
 
@@ -98,8 +101,9 @@ trait SmartObject
 
         }
 
-        // Fallthrough
+        // Fallthrough and handle it by Nette's SmartObject
         return $this->$name;
 
     }
+
 }
