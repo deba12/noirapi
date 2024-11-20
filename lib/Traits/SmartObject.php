@@ -11,10 +11,11 @@ trait SmartObject
 {
     use \Nette\SmartObject;
 
+    // We must use static objects to avoid messing with Model queries
     /** @var string[] */
-    private array $__smartObjectAttributeClasses;
+    private static array $__smartObjectAttributeClasses;
     /** @var ReflectionAttribute[] */
-    private array $__properties;
+    private static array $__properties;
 
     public function __construct()
     {
@@ -36,9 +37,9 @@ trait SmartObject
                 foreach($className::getLoader()->getClassMap() as $class => $path) {
                     /** @noinspection SpellCheckingInspection */
                     if(str_starts_with($class, 'noirapi\lib\Attributes')) {
-                        $this->__smartObjectAttributeClasses[] = $class;
+                        self::$__smartObjectAttributeClasses[] = $class;
                     } elseif(str_starts_with($class, 'app\lib\Attributes')) {
-                        $this->__smartObjectAttributeClasses[] = $class;
+                        self::$__smartObjectAttributeClasses[] = $class;
                     }
                 }
             }
@@ -47,17 +48,17 @@ trait SmartObject
 
         foreach ($reflection->getProperties() as $property) {
 
-            if(count($this->__smartObjectAttributeClasses) > 0) {
+            if(count(self::$__smartObjectAttributeClasses) > 0) {
 
                 foreach ($property->getAttributes() as $attribute) {
 
                     $name = $attribute->getName();
-                    if(in_array($name, $this->__smartObjectAttributeClasses, true)) {
+                    if(in_array($name, self::$__smartObjectAttributeClasses, true)) {
 
                         $name = $property->getName();
                         unset($this->$name);
 
-                        $this->__properties[$name] = $property;
+                        self::$__properties[$name] = $property;
                     }
 
                 }
@@ -75,13 +76,13 @@ trait SmartObject
     public function __get(string $name)
     {
 
-        if(isset($this->__properties[$name])) {
+        if(isset(self::$__properties[$name])) {
 
-            foreach($this->__smartObjectAttributeClasses as $attributeClass) {
+            foreach(self::$__smartObjectAttributeClasses as $attributeClass) {
 
-                if($this->__properties[$name]->getAttributes($attributeClass)) {
+                if(self::$__properties[$name]->getAttributes($attributeClass)) {
 
-                    $instance = $this->__properties[$name]->getAttributes($attributeClass)[0]->newInstance();
+                    $instance = self::$__properties[$name]->getAttributes($attributeClass)[0]->newInstance();
                     $args = [];
 
                     foreach($instance->args as $arg) {
