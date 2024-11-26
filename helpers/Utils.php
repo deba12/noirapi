@@ -1,5 +1,7 @@
 <?php
+
 /** @noinspection PhpUnused */
+
 declare(strict_types=1);
 
 namespace noirapi\helpers;
@@ -11,6 +13,7 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 use stdClass;
+
 use function array_key_exists;
 use function array_pop;
 use function bin2hex;
@@ -30,7 +33,6 @@ use function vsprintf;
 /** @psalm-api  */
 class Utils
 {
-
     use StaticClass;
 
     /**
@@ -44,7 +46,7 @@ class Utils
         $chars = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $res = '';
 
-        for($i = 1; $i <= $len; $i++) {
+        for ($i = 1; $i <= $len; $i++) {
             $res .= $chars[random_int(1, strlen($chars) - 1)];
         }
 
@@ -62,7 +64,6 @@ class Utils
         $algo = $long ? 'sha256' : 'sha1';
 
         return hash($algo, random_bytes(64));
-
     }
 
     /**
@@ -98,7 +99,7 @@ class Utils
         $chars = '23456789abcdefghijkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         $res = '';
 
-        for($i = 1; $i <= $len; $i++) {
+        for ($i = 1; $i <= $len; $i++) {
             $res .= $chars[random_int(1, strlen($chars) - 1)];
         }
 
@@ -121,12 +122,11 @@ class Utils
     public static function returnNull(mixed $object): mixed
     {
 
-        if(empty($object)) {
+        if (empty($object)) {
             return null;
         }
 
         return $object;
-
     }
 
     /**
@@ -145,7 +145,6 @@ class Utils
 
         // Output the 36-character UUID.
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
-
     }
 
     /**
@@ -155,14 +154,13 @@ class Utils
     public static function getClassName(string|object $class): string
     {
 
-        if(is_object($class)) {
+        if (is_object($class)) {
             $class = get_class($class);
         }
 
         $path = explode('\\', $class);
 
         return array_pop($path);
-
     }
 
     /**
@@ -174,7 +172,6 @@ class Utils
     {
 
         return (new Randomizer())->shuffleArray($array);
-
     }
 
     /**
@@ -192,7 +189,7 @@ class Utils
      */
     public static function mb_ucfirst(string $string): string
     {
-        return mb_strtoupper(mb_substr($string, 0, 1)).mb_substr($string, 1);
+        return mb_strtoupper(mb_substr($string, 0, 1)) . mb_substr($string, 1);
     }
 
     /**
@@ -203,16 +200,14 @@ class Utils
      */
     public static function toObject(array|object $input, ?string $className = null, bool $remove_missing = true): object
     {
-        if($className === null) {
-
+        if ($className === null) {
             $class = new stdClass();
 
-            foreach($input as $key => $value) {
+            foreach ($input as $key => $value) {
                 $class->$key = $value;
             }
 
             return $class;
-
         }
 
         /** @psalm-suppress InvalidStringClass */
@@ -224,22 +219,20 @@ class Utils
             return (object) $input;
         }
 
-        foreach($properties as $property) {
-
+        foreach ($properties as $property) {
             $name = $property->getName();
 
-            if(is_array($input)) {
-                if(isset($input[$name])) {
+            if (is_array($input)) {
+                if (isset($input[$name])) {
                     $class->$name = $input[$name];
-                } elseif($remove_missing) {
+                } elseif ($remove_missing) {
                     unset($class->$name);
                 }
-            } elseif(isset($input->$name)) {
+            } elseif (isset($input->$name)) {
                 $class->$name = $input->$name;
-            } elseif($remove_missing) {
+            } elseif ($remove_missing) {
                 unset($class->$name);
             }
-
         }
 
         return $class;
@@ -257,7 +250,7 @@ class Utils
 
         $properties = (new ReflectionClass($class))->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
 
-        foreach($properties as $property) {
+        foreach ($properties as $property) {
             $result[] = $property->getName();
         }
 
@@ -275,7 +268,6 @@ class Utils
         if (($key = array_search($var = 'unique' . mt_rand() . 'value', ! $scope ? $GLOBALS : $scope, true)) && $var = $old) {
             return $key;
         }
-
     }
 
     /**
@@ -289,26 +281,20 @@ class Utils
         $r = [];
 
         foreach ($a1 as $k => $v) {
-
             if (array_key_exists($k, $a2)) {
-
                 if (is_array($v)) {
                     $rad = self::array_diff_recursive($v, $a2[$k]);
                     if (count($rad)) {
                         $r[$k] = $rad;
                     }
-
                 } elseif ($v != $a2[$k]) {
                     $r[$k] = $v;
                 }
             } else {
                 $r[$k] = $v;
-
             }
-
         }
 
         return $r;
     }
-
 }
