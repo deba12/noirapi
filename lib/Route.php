@@ -229,15 +229,16 @@ class Route
 
             /** @psalm-suppress UndefinedClass */
             /** @noinspection PhpFullyQualifiedNameUsageInspection */
-            if (class_exists(\app\controllers\errors::class) && method_exists(\app\controllers\errors::class, $function)) { // phpcs:ignore
-                $instance->request->controller = 'errors';
+            if (class_exists(\app\controllers\Errors::class) && method_exists(\app\controllers\Errors::class, $function)) { // phpcs:ignore
+                $instance->request->controller = 'Errors';
                 $instance->request->function = $function;
 
                 try {
                     /** @noinspection PhpFullyQualifiedNameUsageInspection */
                     /** @noinspection PhpParenthesesCanBeOmittedForNewCallInspection */
-                    return (new \app\controllers\errors($instance->request, $instance->response, $instance->server))->$function(); // phpcs:ignore
+                    return (new \app\controllers\Errors($instance->request, $instance->response, $instance->server))->$function(); // phpcs:ignore
                 } catch (LoginException $e) {
+                    dump($e->getMessage());die();
                     $response = new Response();
                     if ($e->getCode() === 301) {
                         $response->withStatus(301)
