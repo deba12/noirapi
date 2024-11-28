@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace noirapi\lib;
 
@@ -18,14 +19,15 @@ use noirapi\interfaces\Translator;
 use noirapi\lib\View\Layout;
 use RuntimeException;
 use stdClass;
+
 use function count;
 
 class View
 {
-
     public Request $request;
     public Layout $layout;
     public Translator $translator;
+    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     public Response $response;
     public Engine $latte;
 
@@ -35,7 +37,7 @@ class View
     private ?string $template = null;
     private bool $dev;
     private ?string $layout_file = null;
-    private const latte_ext = '.latte';
+    private const string LATTE_EXT = '.latte';
 
     private static string $uri;
 
@@ -55,7 +57,7 @@ class View
         $this->params = new stdClass();
         $this->dev = $dev;
 
-        $this->latte = new Engine;
+        $this->latte = new Engine();
         /** @psalm-suppress UndefinedConstant */
         $this->latte->setTempDirectory(ROOT . '/temp');
 
@@ -69,7 +71,7 @@ class View
          * @noinspection PhpUndefinedClassInspection
          * @noinspection RedundantSuppression
          */
-        if(class_exists(\app\lib\Macros::class)) {
+        if (class_exists(\app\lib\Macros::class)) {
             /**
              * @noinspection PhpParamsInspection
              * @noinspection RedundantSuppression
@@ -78,11 +80,11 @@ class View
         }
 
         $languages = Config::get('languages') ?? [];
-        if(is_array($languages) && ! empty($languages)) {
-            if($this->request->language === null) {
+        if (is_array($languages) && ! empty($languages)) {
+            if ($this->request->language === null) {
                 $this->request->language = Config::get('default_language') ?? 'en';
             }
-            $this->translator = new EasyTranslator($this->request->language, $this->request->controller, $this->request->function);
+            $this->translator = new EasyTranslator($this->request->language, $this->request->controller, $this->request->function); //phpcs:ignore
         } else {
             $this->translator = new DummyTranslator();
         }
@@ -99,11 +101,11 @@ class View
 
         $layout_file = Config::get('layout');
 
-        if($layout_file) {
+        if ($layout_file) {
             $this->setLayout($layout_file);
         }
 
-        if($dev) {
+        if ($dev) {
             $this->latte->addExtension(new TracyExtension());
         }
 
@@ -121,18 +123,18 @@ class View
     public function display(array $params = []): Response
     {
 
-        if($this->dev) {
+        if ($this->dev) {
             $bt = debug_backtrace();
             $this->setFromBackTrace($bt);
         }
 
-        if($this->template === null) {
+        if ($this->template === null) {
             $this->setTemplate($this->request->function);
         }
 
-        $layout = $this->layout_file ?? $this->template ?? throw new RuntimeException('No layout|template set for display');
+        $layout = $this->layout_file ?? $this->template ?? throw new RuntimeException('No layout|template set for display'); //phpcs:ignore
 
-        if($this->request->ajax) {
+        if ($this->request->ajax) {
             $layout = $this->template ?? throw new RuntimeException('No template set for ajax request');
         }
 
@@ -142,7 +144,7 @@ class View
 
         $message = Session::get('message');
 
-        if(! empty($message)) {
+        if (! empty($message)) {
             $this->mergeParams(['message' => $message]);
             Session::remove('message');
         }
@@ -167,7 +169,7 @@ class View
     public function print(?string $layout, string $view, array $params = []): string
     {
 
-        if($this->dev) {
+        if ($this->dev) {
             $bt = debug_backtrace();
             $this->setFromBackTrace($bt);
         }
@@ -176,18 +178,18 @@ class View
         $params['template'] = $this->template;
         $this->mergeParams($params);
 
-        if($layout !== null) {
+        if ($layout !== null) {
             $this->setLayout($layout);
             $this->setTemplate($view);
 
-            $layout_file = $this->layout_file ?? $this->template ?? throw new RuntimeException('No layout|template set for display');
+            $layout_file = $this->layout_file ?? $this->template ?? throw new RuntimeException('No layout|template set for display'); //phpcs:ignore
 
             return $this->latte->renderToString($layout_file, $this->params);
         }
 
         $this->setTemplate($view);
 
-        if($this->template === null) {
+        if ($this->template === null) {
             throw new RuntimeException('No template set for display');
         }
 
@@ -202,15 +204,15 @@ class View
      * @throws FileNotFoundException
      * @psalm-suppress PossiblyUnusedReturnValue
      */
-    public function setTemplate(string $template, string $controller = null): self
+    public function setTemplate(string $template, ?string $controller = null): self
     {
-        if($controller === null) {
-            $controller = $this->request->controller;
+        if ($controller === null) {
+            $controller = strtolower($this->request->controller);
         }
         /** @psalm-suppress UndefinedConstant */
-        $file = PATH_VIEWS . $controller . self::$template_dir_prefix . $template . self::latte_ext;
+        $file = PATH_VIEWS . strtolower($controller) . self::$template_dir_prefix . $template . self::LATTE_EXT;
 
-        if(is_readable($file)) {
+        if (is_readable($file)) {
             $this->template = $file;
 
             return $this;
@@ -251,16 +253,16 @@ class View
      */
     public function setLayout(?string $layout_file = null): self
     {
-        if($layout_file === null) {
+        if ($layout_file === null) {
             $this->layout_file = null;
 
             return $this;
         }
 
         /** @psalm-suppress UndefinedConstant */
-        $file = PATH_LAYOUTS . $layout_file . self::latte_ext;
+        $file = PATH_LAYOUTS . $layout_file . self::LATTE_EXT;
 
-        if(is_readable($file)) {
+        if (is_readable($file)) {
             $this->layout_file = $file;
             $this->layout->setName($layout_file);
 
@@ -288,13 +290,13 @@ class View
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function templateExists(string $template, string $controller = null): bool
+    public function templateExists(string $template, ?string $controller = null): bool
     {
-        if($controller === null) {
-            $controller = $this->request->controller;
+        if ($controller === null) {
+            $controller = strtolower($this->request->controller);
         }
         /** @psalm-suppress UndefinedConstant */
-        $file = PATH_VIEWS . $controller . DIRECTORY_SEPARATOR . $template . self::latte_ext;
+        $file = PATH_VIEWS . strtolower($controller) . DIRECTORY_SEPARATOR . $template . self::LATTE_EXT;
 
         return is_readable($file);
     }
@@ -308,7 +310,7 @@ class View
     public function layoutExists(string $layout): bool
     {
         /** @psalm-suppress UndefinedConstant */
-        $file = PATH_LAYOUTS . $layout . self::latte_ext;
+        $file = PATH_LAYOUTS . $layout . self::LATTE_EXT;
 
         return is_readable($file);
     }
@@ -318,18 +320,18 @@ class View
      * @param int|float|string|null $value
      * @return string
      * @psalm-suppress PossiblyUnusedMethod
+     * @noinspection PhpUnused
      */
-    public static function add_url_var(string $key, int|float|string|null $value): string
+    public static function addUrlVar(string $key, int|float|string|null $value): string
     {
         $params = parse_url(self::$uri, PHP_URL_QUERY);
 
         $value = (string)$value;
 
-        if(is_string($params)) {
-
+        if (is_string($params)) {
             parse_str($params, $array);
 
-            if(count($array) > 0) {
+            if (count($array) > 0) {
                 $array[$key] = $value;
 
                 return '?' . http_build_query($array);
@@ -360,17 +362,15 @@ class View
      */
     public function mergeParams(array|object $params, ?string $namespace = null): void
     {
-        if($namespace === null) {
-
-            foreach($params as $key => $value) {
-                if(isset($this->params->$key)) {
+        if ($namespace === null) {
+            foreach ($params as $key => $value) {
+                if (isset($this->params->$key)) {
                     throw new RuntimeException("Duplicate key in view params: $key");
                 }
 
                 $this->params->$key = $value;
             }
-
-        } elseif(isset($this->params->$namespace)) {
+        } elseif (isset($this->params->$namespace)) {
             throw new RuntimeException("Duplicate key ain view params: $namespace");
         } else {
             $this->params->$namespace = $params;
@@ -409,7 +409,5 @@ class View
         $this->response->initiator_class = $caller['class'] ?? null;
         $this->response->initiator_method = $caller['function'] ?? null;
         $this->response->initiator_line = $caller['line'] ?? null;
-
     }
-
 }

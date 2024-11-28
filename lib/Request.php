@@ -1,5 +1,6 @@
 <?php
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace noirapi\lib;
 
@@ -11,7 +12,6 @@ use Nette\SmartObject;
  */
 class Request
 {
-
     use SmartObject;
 
     public array $headers;
@@ -59,7 +59,6 @@ class Request
      * @param array $files
      * @param array $cookies
      * @return self
-     * @noinspection SpellCheckingInspection
      */
     public static function fromSwoole(array $server, array $get, array $post, array $files, array $cookies): self
     {
@@ -77,14 +76,12 @@ class Request
     {
         $headers = [];
 
-        foreach($server as $name => $value) {
-
+        foreach ($server as $name => $value) {
             if (str_starts_with($name, 'HTTP_')) {
                 //get Header key w/o HTTP_
                 $key = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
                 $headers[$key] = $value;
             }
-
         }
 
         return $headers;
@@ -93,7 +90,6 @@ class Request
     /**
      * @param array $headers
      * @return array
-     * @noinspection SpellCheckingInspection
      */
     public static function swooleUpperCase(array $headers): array
     {
@@ -110,7 +106,7 @@ class Request
      * @param array $server
      * @return bool
      */
-    private static function is_https(array $server): bool
+    private static function isHttps(array $server): bool
     {
         if (isset($_SERVER['HTTPS'])) {
             if (strtolower($server['HTTPS']) === 'on') {
@@ -127,13 +123,13 @@ class Request
         return false;
     }
 
-    private static function is_ajax(array $server): bool
+    private static function isAjax(array $server): bool
     {
-        if(isset($server['HTTP_X_REQUESTED_WITH']) && strtolower($server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') {
+        if (isset($server['HTTP_X_REQUESTED_WITH']) && strtolower($server['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest') { //phpcs:ignore
             return true;
         }
 
-        if(isset($server['HTTP_SEC_FETCH_MODE']) && strtolower($server['HTTP_SEC_FETCH_MODE']) !== 'navigate') {
+        if (isset($server['HTTP_SEC_FETCH_MODE']) && strtolower($server['HTTP_SEC_FETCH_MODE']) !== 'navigate') {
             return true;
         }
 
@@ -186,10 +182,9 @@ class Request
         $self->files = $files;
         $self->cookies = $cookies;
 
-        $self->https = self::is_https($server);
-        $self->ajax = self::is_ajax($server);
+        $self->https = self::isHttps($server);
+        $self->ajax = self::isAjax($server);
 
         return $self;
     }
-
 }

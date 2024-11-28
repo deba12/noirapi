@@ -9,13 +9,13 @@
 
         <li class="page-item {if $pager->isFirst()}disabled{/if} d-none d-sm-none d-md-block">
 
-            <a class="page-link" aria-label="Previous" href="{\noirapi\lib\View::add_url_var('page', 1)}" data-page="1">&#x21E4;</a>
+            <a class="page-link" aria-label="Previous" href="{\noirapi\lib\View::addUrlVar('page', 1)}" data-page="1">&#x21E4;</a>
 
         </li>
 
         <li class="page-item {if $pager->isFirst()}disabled{/if}">
 
-            <a class="page-link page-prev" aria-label="Previous" href="{\noirapi\lib\View::add_url_var('page', $pager->getPage()-1)}" data-page="{=$pager->getPage()-1}">&#x2190;</a>
+            <a class="page-link page-prev" aria-label="Previous" href="{\noirapi\lib\View::addUrlVar('page', $pager->getPage()-1)}" data-page="{=$pager->getPage()-1}">&#x2190;</a>
 
         </li>
 
@@ -26,7 +26,7 @@
 
             <li class="page-item {if $pager->getPage() == $p}active{/if}">
 
-                <a class="page-link" href="{\noirapi\lib\View::add_url_var('page', $p)}" data-page="{=$p}">{=$p}</a>
+                <a class="page-link" href="{\noirapi\lib\View::addUrlVar('page', $p)}" data-page="{=$p}">{=$p}</a>
 
             </li>
 
@@ -35,13 +35,13 @@
 
         <li class="page-item {if $pager->isLast()}disabled{/if}">
 
-            <a class="page-link page-next" href="{\noirapi\lib\View::add_url_var('page', $pager->getPage()+1)}" data-page="{=$pager->getPage()+1}">&#x2192;</a>
+            <a class="page-link page-next" href="{\noirapi\lib\View::addUrlVar('page', $pager->getPage()+1)}" data-page="{=$pager->getPage()+1}">&#x2192;</a>
 
         </li>
 
         <li class="page-item {if $pager->isLast()}disabled{/if} d-none d-sm-none d-md-block">
 
-            <a class="page-link" href="{\noirapi\lib\View::add_url_var('page', $pager->getLastPage())}" data-page="{=$pager->getLastPage()}">&#x21E5;</a>
+            <a class="page-link" href="{\noirapi\lib\View::addUrlVar('page', $pager->getLastPage())}" data-page="{=$pager->getLastPage()}">&#x21E5;</a>
 
         </li>
 

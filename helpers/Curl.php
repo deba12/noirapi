@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace noirapi\helpers;
@@ -6,19 +7,19 @@ namespace noirapi\helpers;
 use noirapi\lib\Controller;
 use noirapi\Tracy\CurlBarPanel;
 use Tracy\Debugger;
+
 use function is_object;
 use function is_string;
 
 /** @psalm-api  */
 class Curl extends \Curl\Curl
 {
-
     private static array $requests = [];
 
     public function __construct()
     {
 
-        if(! isset(Controller::$panels['curl'])) {
+        if (! isset(Controller::$panels['curl'])) {
             Controller::$panels['curl'] = true;
 
             $panel = new CurlBarPanel();
@@ -28,7 +29,6 @@ class Curl extends \Curl\Curl
         }
 
         parent::__construct();
-
     }
 
     /**
@@ -46,7 +46,7 @@ class Curl extends \Curl\Curl
         $method = $this->getOpt(CURLOPT_CUSTOMREQUEST);
 
         $post_fields = $this->getOpt(CURLOPT_POSTFIELDS);
-        if(! empty($post_fields) && is_string($post_fields)) {
+        if (! empty($post_fields) && is_string($post_fields)) {
             parse_str($post_fields, $post);
         }
         $this->addLog(
@@ -54,11 +54,10 @@ class Curl extends \Curl\Curl
             info: $info['http_code'] . ' ' . $info['content_type'],
             time: microtime(true) - $start,
             request: $post ?? [],
-            response: is_object($this->response) || is_array($this->response) ? $this->response : substr((string)$this->response, 0, 128)
+            response: is_object($this->response) || is_array($this->response) ? $this->response : substr((string)$this->response, 0, 128), // phpcs:ignore
         );
 
         return $res;
-
     }
 
     /**
@@ -69,7 +68,7 @@ class Curl extends \Curl\Curl
      * @param object|array|string|null $response
      * @return void
      */
-    public function addLog(string $url, string $info, float $time, array $request, object|array|string $response = null): void
+    public function addLog(string $url, string $info, float $time, array $request, object|array|string|null $response = null): void //phpcs:ignore
     {
 
         self::$requests[] = [
@@ -79,7 +78,6 @@ class Curl extends \Curl\Curl
             'time'     => $time * 1000,
             'response' => $response,
         ];
-
     }
 
     /**
@@ -89,7 +87,5 @@ class Curl extends \Curl\Curl
     {
 
         return self::$requests;
-
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace noirapi\lib;
@@ -9,7 +10,6 @@ use Swoole\Http\Server;
 /** @psalm-api  */
 class Tasks
 {
-
     private array $tasks = [];
     /**
      * @var Server
@@ -37,7 +37,7 @@ class Tasks
     public function add(string $class, array $params): self
     {
         $task = 'app\\tasks\\' . $class;
-        if(! class_exists($task)) {
+        if (! class_exists($task)) {
             throw new RuntimeException("Task class $class not found");
         }
 
@@ -57,7 +57,5 @@ class Tasks
     {
 
         return $this->server->taskWaitMulti($this->tasks, $this->timeout);
-
     }
-
 }

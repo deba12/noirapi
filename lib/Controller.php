@@ -1,11 +1,13 @@
 <?php
+
 /**
  * @noinspection PhpUndefinedNamespaceInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpParamsInspection
  * @noinspection PhpMissingFieldTypeInspection
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace noirapi\lib;
 
@@ -21,13 +23,13 @@ use noirapi\helpers\Utils;
 use noirapi\Tracy\PDOBarPanel;
 use Throwable;
 use Tracy\Debugger;
+
 use function get_class;
 use function in_array;
 use function strlen;
 
 class Controller
 {
-
     public Request $request;
     public Response $response;
     public array $server;
@@ -53,58 +55,49 @@ class Controller
         $this->response = $response;
         $this->server = $server;
 
-        if($this->dev === null) {
-            $this->dev = Config::get('dev') || (Config::get('dev_ips') && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
+        if ($this->dev === null) {
+            $this->dev = Config::get('dev') || (Config::get('dev_ips')
+                    && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
         }
 
-        if(Config::get('db')) {
-
-            if(empty($this->model)) {
-
+        if (Config::get('db')) {
+            if (empty($this->model)) {
                 $model = self::$model_path . Utils::getClassName(get_class($this));
-                if(class_exists($model) && is_subclass_of($model, Model::class)) {
+                if (class_exists($model) && is_subclass_of($model, Model::class)) {
                     $this->model = new $model();
                 } else {
                     $this->model = new Model();
                 }
-
             }
 
             /**
              * Tracy debug bar
              */
-            if($this->dev) {
-
-                foreach($this->model::tracyGetPdo() as $driver => $pdo) {
-
-                    if(! isset(self::$panels[$driver])) {
+            if ($this->dev) {
+                foreach ($this->model::tracyGetPdo() as $driver => $pdo) {
+                    if (! isset(self::$panels[$driver])) {
                         self::$panels[$driver] = true;
 
                         $panel = new PDOBarPanel($pdo);
                         $panel->title = $driver;
                         Debugger::getBar()->addPanel($panel);
                     }
-
                 }
-
             }
-
         }
 
         // We need this when we are moving across domains
-        if(isset($this->request->get['message'], $this->request->get['type'])) {
+        if (isset($this->request->get['message'], $this->request->get['type'])) {
             $this->message($this->request->get['message'], $this->request->get['type']);
         }
-
     }
 
     public function __destruct()
     {
 
-        if($this->dev) {
+        if ($this->dev) {
             Route::handleRouteUrlDebugBar($this->request, $this->response, $this->server);
         }
-
     }
 
     /**
@@ -117,19 +110,19 @@ class Controller
     public function forward(?string $location = null, int $status = 302, bool $skip_lang = false): Response
     {
 
-        if($status !== 302 && $status !== 301) {
+        if ($status !== 302 && $status !== 301) {
             throw new UnableToForwardException('Unable to forward with status code: ' . $status);
         }
 
-        if($location === null) {
+        if ($location === null) {
             $location = $this->referer();
         }
 
-        if(! $skip_lang && $this->request->language !== null && str_starts_with($location, '/')) {
-            if($location === '/') {
+        if (! $skip_lang && $this->request->language !== null && str_starts_with($location, '/')) {
+            if ($location === '/') {
                 $location = '/' . $this->request->language;
             }
-            if($location !== '/' . $this->request->language) {
+            if ($location !== '/' . $this->request->language) {
                 $location = '/' . $this->request->language . $location;
             }
 
@@ -176,42 +169,41 @@ class Controller
      * @param mixed ...$translation_args
      * @return $this
      */
-    public function message(string|Message $text, ?string $type = null, ?string $translation_key = null, ...$translation_args): self
+    public function message(string|Message $text, ?string $type = null, ?string $translation_key = null, ...$translation_args): self //phpcs:ignore
     {
 
         Session::remove('message');
 
-        if($translation_key !== null) {
+        if ($translation_key !== null) {
             try {
-                if($text instanceof Message) {
-                    $text->message = $this->view?->translator->translate($text->message, $translation_key, $translation_args);
+                if ($text instanceof Message) {
+                    $text->message = $this->view?->translator
+                        ->translate($text->message, $translation_key, $translation_args);
                 } else {
-                    $text = Message::new($this->view?->translator->translate($text, $translation_key, $translation_args), $type ?? 'danger');
+                    $text = Message::new($this->view?->translator
+                        ->translate($text, $translation_key, $translation_args), $type ?? 'danger');
                 }
             } catch (Throwable) {
                 // Do nothing
             }
         }
 
-        if($text instanceof Message) {
+        if ($text instanceof Message) {
             Session::set('message', null, $text);
         } else {
             Session::set('message', null, Message::new($text, $type ?? 'danger'));
         }
 
-        if($this->dev) {
-
+        if ($this->dev) {
             $bt = debug_backtrace();
             $caller = array_shift($bt);
 
             $this->response->initiator_class = $caller['class'] ?? null;
             $this->response->initiator_method = $caller['function'] ?? null;
             $this->response->initiator_line = $caller['line'] ?? null;
-
         }
 
         return $this;
-
     }
 
     /**
@@ -222,78 +214,67 @@ class Controller
     public function referer(bool $same_domain = true): string
     {
 
-        if(isset($this->server['HTTP_REFERER'])) {
-
+        if (isset($this->server['HTTP_REFERER'])) {
             $url = str_replace('@', '', $this->server['HTTP_REFERER']);
-            if(empty($url)) {
+            if (empty($url)) {
                 return '/';
             }
 
             $orig_url = filter_var($url, FILTER_SANITIZE_URL);
-            if($orig_url === false) {
+            if ($orig_url === false) {
                 return '/';
             }
 
             /** @psalm-suppress PossiblyInvalidCast */
             $url = parse_url((string)preg_replace('/\s+/', '', $orig_url));
-            if($url === false) {
+            if ($url === false) {
                 return '/';
             }
 
-            if(! isset($url['host'])) {
+            if (! isset($url['host'])) {
                 return $orig_url;
             }
 
-            if($url['host'] === $this->server['HTTP_HOST']) {
-
+            if ($url['host'] === $this->server['HTTP_HOST']) {
                 $url['path'] = $url['path'] ?? '/';
 
-                foreach(Config::get('languages') ?? [] as $code => $_) {
-
+                foreach (Config::get('languages') ?? [] as $code => $_) {
                     // Condition like /en
-                    if($url['path'] === '/' . $code) {
+                    if ($url['path'] === '/' . $code) {
                         return '/' . $code;
                     }
                     // Condition like /en
-                    if(str_starts_with($url['path'], '/' . $code . '/')) {
+                    if (str_starts_with($url['path'], '/' . $code . '/')) {
                         $path = substr($url['path'], strlen($code) + 1);
 
                         return $path . (! isset($url['query']) ?  '' : '?' . ($url['query']));
                     }
-
                 }
 
-                return ($this->request->language === null  ? '' : '/' . $this->request->language) . $url['path'] . (! isset($url['query']) ?  '' : '?' . ($url['query']));
-
+                return ($this->request->language === null  ? '' : '/' . $this->request->language) . $url['path'] . (! isset($url['query']) ?  '' : '?' . ($url['query'])); //phpcs:ignore
             }
 
-            if($same_domain) {
+            if ($same_domain) {
                 return '/';
             }
 
-            if(isset($url['scheme']) && ($url['scheme'] === 'http' || $url['scheme'] === 'https')) {
-
+            if (isset($url['scheme']) && ($url['scheme'] === 'http' || $url['scheme'] === 'https')) {
                 $url['path'] = $url['path'] ?? '/';
 
                 /** @noinspection BypassedUrlValidationInspection */
-                if(filter_var($url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . ($url['query'] ?? ''), FILTER_VALIDATE_URL)) {
-
-                    if(isset($url['query'])) {
+                if (filter_var($url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . ($url['query'] ?? ''), FILTER_VALIDATE_URL)) { //phpcs:ignore
+                    if (isset($url['query'])) {
                         return $url['scheme'] . '://' . $url['host'] . $url['path'] . '?' . $url['query'];
                     }
 
                     return $url['scheme'] . '://' . $url['host'] . $url['path'];
-
                 }
-
             }
 
             return '/';
-
         }
 
         return '/';
-
     }
 
     /**
@@ -304,7 +285,7 @@ class Controller
      * @return Response
      * @noinspection PhpUnused
      */
-    public function restMessage(bool $status, object|array|string $message, ?string $next = null, ?string $message_tag = null): Response
+    public function restMessage(bool $status, object|array|string $message, ?string $next = null, ?string $message_tag = null): Response //phpcs:ignore
     {
 
         return $this->response->setBody(
@@ -315,7 +296,6 @@ class Controller
                 message_tag: $message_tag
             )
         );
-
     }
 
     /**
@@ -327,18 +307,15 @@ class Controller
     public function hasResource(Acl $acl): void
     {
 
-        if(! $acl->hasResource($this->request->controller)) {
-
-            if($this->request->ajax) {
+        if (! $acl->hasResource(strtolower($this->request->controller))) {
+            if ($this->request->ajax) {
                 throw new MessageException('Page not Found', 403);
             }
 
             $this->message('Page not found', 'danger');
 
             throw new LoginException('/');
-
         }
-
     }
 
     /**
@@ -350,13 +327,12 @@ class Controller
     public function isAllowed(Acl $acl): void
     {
 
-        if(! $acl->isAllowed($this->request->role, $this->request->controller)) {
-
-            if($this->request->ajax) {
+        if (! $acl->isAllowed($this->request->role, strtolower($this->request->controller))) {
+            if ($this->request->ajax) {
                 throw new MessageException('Please Login', 403);
             }
 
-            if($this->request->method === 'POST') {
+            if ($this->request->method === 'POST') {
                 $login = $this->referer();
             } else {
                 $login = $this->request->uri;
@@ -367,9 +343,6 @@ class Controller
             $this->message('Please login', 'success');
 
             throw new LoginException('/');
-
         }
-
     }
-
 }

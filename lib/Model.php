@@ -1,6 +1,8 @@
 <?php
+
 /** @noinspection UnknownInspectionInspection */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace noirapi\lib;
 
@@ -17,7 +19,6 @@ use RuntimeException;
  */
 class Model
 {
-
     public string $driver = 'mysql';
     public Database $db;
     protected static array $pdo;
@@ -27,27 +28,22 @@ class Model
      */
     public function __construct(array $params = [])
     {
-        if(empty($params)) {
-
-            if(empty(self::$pdo[$this->driver])) {
-
+        if (empty($params)) {
+            if (empty(self::$pdo[$this->driver])) {
                 $db = Config::get('db');
                 if (empty($db[$this->driver])) {
                     throw new ConfigException('Model: unable to find config for: ' . $this->driver);
                 }
 
-                self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null);
+                self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null); //phpcs:ignore
                 self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
                 self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
                 self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                 self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
-
             }
 
             $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
-
         } else {
-
             $pdo = new PDO($params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
 
             $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
@@ -56,7 +52,6 @@ class Model
             $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
 
             $this->db = new Database(Connection::fromPDO($pdo));
-
         }
     }
 
@@ -65,7 +60,7 @@ class Model
      */
     public static function tracyGetPdo(): array
     {
-        if(! empty(self::$pdo)) {
+        if (! empty(self::$pdo)) {
             return self::$pdo;
         }
 
@@ -94,7 +89,7 @@ class Model
      * @return bool
      * @noinspection PhpUnused
      */
-    public function in_transaction(): bool
+    public function inTransaction(): bool
     {
         return $this->db->getConnection()->getPDO()->inTransaction();
     }
@@ -105,7 +100,7 @@ class Model
      */
     public function begin(): void
     {
-        if($this->driver === 'mysql') {
+        if ($this->driver === 'mysql') {
             $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 0);
         }
 
@@ -121,7 +116,7 @@ class Model
     {
         $this->db->getConnection()->getPDO()->commit();
 
-        if($this->driver === 'mysql') {
+        if ($this->driver === 'mysql') {
             $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 1);
         }
     }
@@ -134,7 +129,7 @@ class Model
     {
         $this->db->getConnection()->getPDO()->rollBack();
 
-        if($this->driver === 'mysql') {
+        if ($this->driver === 'mysql') {
             $this->db->getConnection()->getPDO()->setAttribute(\PDO::ATTR_AUTOCOMMIT, 1);
         }
     }
@@ -149,14 +144,14 @@ class Model
      */
     public function paginator(int $itemCount, int $itemsPerPage = 20, ?int $page = null): Paginator
     {
-        if(! class_exists(Paginator::class)) {
+        if (! class_exists(Paginator::class)) {
             throw new RuntimeException('Unable to find nette/paginator');
         }
 
         $paginator = new Paginator();
         $paginator->setItemCount($itemCount);
         $paginator->setItemsPerPage($itemsPerPage);
-        if($page !== null) {
+        if ($page !== null) {
             $paginator->setPage($page);
         }
 
@@ -185,5 +180,4 @@ class Model
     {
         $this->db->getConnection()->query('UNLOCK TABLES');
     }
-
 }

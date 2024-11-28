@@ -1,11 +1,13 @@
 <?php
+
 /**
  * @noinspection UnknownInspectionInspection
  * @noinspection PhpUndefinedClassInspection
  * @noinspection PhpUndefinedNamespaceInspection
  * @noinspection PhpUnused
  */
-declare(strict_types = 1);
+
+declare(strict_types=1);
 
 namespace noirapi\lib;
 
@@ -16,6 +18,7 @@ use noirapi\helpers\RestMessage;
 use RuntimeException;
 use SimpleXMLElement;
 use stdClass;
+
 use function gettype;
 use function is_array;
 use function is_callable;
@@ -27,27 +30,28 @@ use function is_string;
 
 class Response
 {
-
+    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     private int $status = 200;
     private int $csv_maxmem = 1024 * 1024; //1 MB
     private string|array|object $body = '';
     private string $contentType = self::TYPE_HTML;
     private string $xml_root = '<root/>';
     private array $headers = [];
+    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     private array $cookies = [];
     private array $headerCallback = [];
     private bool $csv_header = true;
 
-    public const TYPE_JSON = 'application/json';
-    public const TYPE_XML = 'text/xml';
-    public const TYPE_TEXT = 'text/plain';
-    public const TYPE_HTML = 'text/html; charset: utf-8';
-    public const TYPE_PDF = 'application/pdf';
-    public const TYPE_CSV = 'text/csv';
-    public const TYPE_CSS = 'text/css';
-    public const TYPE_JS = 'text/javascript';
-    public const TYPE_RAW = 'application/octet-stream';
-    public const TYPE_ZIP = 'application/zip';
+    public const string TYPE_JSON = 'application/json';
+    public const string TYPE_XML = 'text/xml';
+    public const string TYPE_TEXT = 'text/plain';
+    public const string TYPE_HTML = 'text/html; charset: utf-8';
+    public const string TYPE_PDF = 'application/pdf';
+    public const string TYPE_CSV = 'text/csv';
+    public const string TYPE_CSS = 'text/css';
+    public const string TYPE_JS = 'text/javascript';
+    public const string TYPE_RAW = 'application/octet-stream';
+    public const string TYPE_ZIP = 'application/zip';
 
     public ?string $initiator_class = null;
     public ?string $initiator_method = null;
@@ -59,17 +63,17 @@ class Response
      */
     public function setBody(mixed $body): Response
     {
-        if($body === null) {
+        if ($body === null) {
             $body = '';
-        } elseif(is_float($body) || is_int($body)) {
+        } elseif (is_float($body) || is_int($body)) {
             $body = (string)$body;
-        } elseif($body === true) {
+        } elseif ($body === true) {
             $body = 'true';
-        } elseif($body === false) {
+        } elseif ($body === false) {
             $body = 'false';
-        } elseif(is_resource($body)) {
+        } elseif (is_resource($body)) {
             throw new RuntimeException('Invalid body type: resource');
-        } elseif(is_callable($body)) {
+        } elseif (is_callable($body)) {
             throw new RuntimeException('Invalid body type: callable');
         }
 
@@ -86,8 +90,8 @@ class Response
      */
     public function appendBody(mixed $body): Response
     {
-        if(gettype($body) !== gettype($this->body)) {
-            throw new RuntimeException('Invalid body type: ' . gettype($body) . ' for response->body type: ' . gettype($this->body));
+        if (gettype($body) !== gettype($this->body)) {
+            throw new RuntimeException('Invalid body type: ' . gettype($body) . ' for response->body type: ' . gettype($this->body)); //phpcs:ignore
         }
 
         if (is_array($this->body)) {
@@ -96,7 +100,7 @@ class Response
             return $this;
         }
 
-        if(is_object($this->body)) {
+        if (is_object($this->body)) {
             $this->body = $this->objectMerge($this->body, $body);
 
             return $this;
@@ -116,16 +120,16 @@ class Response
      */
     public function getBody(): string
     {
-        if(is_string($this->body)) {
+        if (is_string($this->body)) {
             return $this->body;
         }
 
-        if(is_object($this->body)) {
+        if (is_object($this->body)) {
             if (method_exists($this->body, '__toString')) {
                 return $this->body->__toString();
             }
 
-            if(method_exists($this->body, 'toJson')) {
+            if (method_exists($this->body, 'toJson')) {
                 return $this->body->toJson();
             }
 
@@ -136,27 +140,27 @@ class Response
             }
         }
 
-        if($this->contentType === self::TYPE_HTML && is_array($this->body)) {
+        if ($this->contentType === self::TYPE_HTML && is_array($this->body)) {
             return implode(PHP_EOL, $this->body);
         }
 
-        if($this->contentType === self::TYPE_JSON) {
+        if ($this->contentType === self::TYPE_JSON) {
             return json_encode($this->body, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
         }
 
-        if($this->contentType === self::TYPE_XML) {
-            if(class_exists(Array2XML::class)) {
+        if ($this->contentType === self::TYPE_XML) {
+            if (class_exists(Array2XML::class)) {
                 return Array2XML::createXML($this->xml_root, $this->body)->saveXML();
             }
 
             return $this->array2xml($this->body)->saveXML();
         }
 
-        if($this->contentType === self::TYPE_CSV) {
+        if ($this->contentType === self::TYPE_CSV) {
             return $this->toCsv($this->body);
         }
 
-        throw new RuntimeException('Invalid body type: ' . gettype($this->body) . ' for content type: ' . $this->contentType);
+        throw new RuntimeException('Invalid body type: ' . gettype($this->body) . ' for content type: ' . $this->contentType); //phpcs:ignore
     }
 
     /**
@@ -174,7 +178,7 @@ class Response
      */
     public function getRestMessage(): RestMessage
     {
-        if($this->body instanceof RestMessage) {
+        if ($this->body instanceof RestMessage) {
             return $this->body;
         }
 
@@ -273,9 +277,9 @@ class Response
     {
         $headers = array_merge([], $this->headers);
 
-        foreach($this->headerCallback as $callback) {
+        foreach ($this->headerCallback as $callback) {
             $res = $callback($this);
-            if(is_array($res)) {
+            if (is_array($res)) {
                 /** @noinspection SlowArrayOperationsInLoopInspection */
                 $headers = array_merge($headers, $res);
             }
@@ -394,16 +398,16 @@ class Response
     {
         $object = new stdClass();
 
-        foreach($class1 as $key => $value) {
-            if(is_object($value)) {
+        foreach ($class1 as $key => $value) {
+            if (is_object($value)) {
                 $object->$key = $this->objectMerge($object->$key, $value);
             } else {
                 $object->$key = $value;
             }
         }
 
-        foreach($class2 as $key => $value) {
-            if(is_object($value)) {
+        foreach ($class2 as $key => $value) {
+            if (is_object($value)) {
                 $object->$key = $this->objectMerge($object->$key, $value);
             } else {
                 $object->$key = $value;
@@ -423,19 +427,19 @@ class Response
         $written = 0;
 
         $fh = fopen('php://temp', 'rwb');
-        if($this->csv_header) {
+        if ($this->csv_header) {
             fputcsv($fh, array_keys(current((array)$data)));
         }
 
-        foreach($data as $key => $row) {
+        foreach ($data as $key => $row) {
             $w = fputcsv($fh, (array)$row);
-            if($w === false) {
+            if ($w === false) {
                 $error = error_get_last();
 
-                throw new RuntimeException('fputcsv failed on key: ' . $key . ' with error: ' . ($error === null ? 'unknown' : $error['message']));
+                throw new RuntimeException('fputcsv failed on key: ' . $key . ' with error: ' . ($error === null ? 'unknown' : $error['message'])); //phpcs:ignore
             }
             $written += $w;
-            if($written > $this->csv_maxmem) {
+            if ($written > $this->csv_maxmem) {
                 rewind($fh);
                 $csv .= stream_get_contents($fh);
                 $written = 0;
@@ -449,7 +453,7 @@ class Response
 
         $csv .= stream_get_contents($fh);
 
-        if(empty($csv)) {
+        if (empty($csv)) {
             throw new RuntimeException('no csv data found');
         }
 
@@ -483,13 +487,9 @@ class Response
      */
     private function object2array(object|array $object): array
     {
-        $result = [];
 
-        foreach ($object as $key => $value) {
-            $result[$key] = (is_array($value) || is_object($value)) ? $this->object2array($value) : $value;
-        }
-
-        return $result;
+        return array_map(function ($value) {
+            return (is_array($value) || is_object($value)) ? $this->object2array($value) : $value;
+        }, $object);
     }
-
 }

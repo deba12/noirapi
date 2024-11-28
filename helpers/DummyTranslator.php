@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace noirapi\helpers;
@@ -8,7 +9,6 @@ use noirapi\interfaces\Translator;
 /** @psalm-api  */
 class DummyTranslator implements Translator
 {
-
     /**
      * @param string $message
      * @param string|null $key
@@ -19,5 +19,4 @@ class DummyTranslator implements Translator
     {
         return str_contains($message, '%s') ? sprintf($message, ...$args) : $message;
     }
-
 }
