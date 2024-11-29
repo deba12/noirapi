@@ -8,8 +8,8 @@
 
 declare(strict_types=1);
 
-use noirapi\Config;
-use noirapi\lib\Route;
+use Noirapi\Config;
+use Noirapi\Lib\Route;
 
 /** @psalm-suppress MissingFile */
 include(__DIR__ . '/include.php');

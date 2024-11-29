@@ -1,13 +1,14 @@
-<?php
+<?php //phpcs:ignore
+
 /**
  * @noinspection PhpUnused
  * @noinspection PhpUndefinedNamespaceInspection
  * @noinspection PhpUndefinedClassInspection
  */
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
-use noirapi\Config;
+use Noirapi\Config;
 use SixtyEightPublishers\TracyGitVersion\Bridge\Tracy\GitVersionPanel;
 use Tracy\Debugger;
 
@@ -19,7 +20,7 @@ define('ROOT', dirname(__DIR__));
 const APPROOT = ROOT . '/app';
 const WWWROOT = ROOT . '/htdocs';
 
-if(file_exists(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php')) {
+if (file_exists(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php')) {
     /** @psalm-suppress MissingFile */
     require_once(ROOT . '/vendor' . DIRECTORY_SEPARATOR . 'autoload.php');
 }
@@ -32,12 +33,12 @@ const PATH_LOGS = ROOT . '/logs/';
 
 $config = getenv('CONFIG');
 
-if(! is_string($config)) {
+if (! is_string($config)) {
     $config = $_SERVER['SERVER_NAME'] ?? $_SERVER['HTTP_HOST'] ?? 'default';
 }
 
-if(empty($config)) {
-    if(! Config::defaultConfigAvailable()) {
+if (empty($config)) {
+    if (! Config::defaultConfigAvailable()) {
         throw new RuntimeException('CONFIG environment must be set');
     }
     $config = 'default';
@@ -53,16 +54,19 @@ Config::set('is_https', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
 Debugger::$strictMode = E_ALL;
 
 /** @noinspection PhpUndefinedClassInspection */
-if(class_exists(GitVersionPanel::class)) {
+if (class_exists(GitVersionPanel::class)) {
     Debugger::getBar()->addPanel(GitVersionPanel::createDefault());
 }
 
 $dev = Config::get('dev');
 $dev_ips = Config::get('dev_ips');
 
-if($dev === true || (! empty($dev_ips) && isset($_SERVER['REMOTE_ADDR']) && in_array($_SERVER['REMOTE_ADDR'], $dev_ips, true))) {
+if (
+    $dev === true || (! empty($dev_ips) && isset($_SERVER['REMOTE_ADDR'])
+        && in_array($_SERVER['REMOTE_ADDR'], $dev_ips, true))
+) {
     //we are missing some debug events in Tracy that's why we start session so early
-    if(session_status() !== PHP_SESSION_ACTIVE) {
+    if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
     }
     Debugger::enable(Debugger::Development, PATH_LOGS);

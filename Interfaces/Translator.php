@@ -1,11 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
-namespace noirapi\interfaces;
+namespace Noirapi\Interfaces;
 
 interface Translator
 {
-
     /**
      * @param string $message
      * @param string|null $key
@@ -13,5 +13,4 @@ interface Translator
      * @return string
      */
     public function translate(string $message, ?string $key = null, mixed ...$args): string;
-
 }

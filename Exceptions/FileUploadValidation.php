@@ -1,9 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
-namespace noirapi\Exceptions;
+namespace Noirapi\Exceptions;
 
-class FileUploadValidation extends \Exception
+use Exception;
+
+class FileUploadValidation extends Exception
 {
-
 }

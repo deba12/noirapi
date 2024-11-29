@@ -2,8 +2,8 @@
 /** @noinspection PhpUndefinedClassInspection */
 declare(strict_types=1);
 
-use noirapi\Config;
-use noirapi\lib\Route;
+use Noirapi\Config;
+use Noirapi\Lib\Route;
 use Swoole\Http\Server;
 
 /** @noinspection SpellCheckingInspection */
