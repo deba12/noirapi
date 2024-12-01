@@ -4,6 +4,8 @@
  * @noinspection TypoSafeNamingInspection
  * @noinspection TransitiveDependenciesUsageInspection
  * @noinspection PhpUnused
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpUndefinedNamespaceInspection
  */
 
 declare(strict_types=1);
@@ -29,6 +31,7 @@ class Mail
 {
     private Email $message;
     private string $body = '';
+    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     private string $error;
     private bool $debug;
     private string $debug_data;
@@ -232,6 +235,7 @@ class Mail
     {
 
         $this->message->html($this->body);
+        /** @noinspection PhpUndefinedClassInspection */
         $text = new Html2Text($this->body);
 
         $search = [
@@ -251,6 +255,7 @@ class Mail
 
             /** @noinspection PhpUnhandledExceptionInspection */
             $res = $this->transport->send($this->message);
+            /** @noinspection NullPointerExceptionInspection */
             $message_id = $res->getMessageId();
 
             file_put_contents(Config::getTemp() . "/mail-$message_id.eml", $this->message->toString());
