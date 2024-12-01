@@ -207,4 +207,14 @@ class Layout
     {
         return $this->params[$name] ?? null;
     }
+
+    /**
+     * @return bool
+     * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
+     */
+    public function hasTitle(): bool
+    {
+        return $this->title !== '';
+    }
 }
