@@ -20,15 +20,23 @@ class Layout
         'bottom-css' => [],
         'bottom-js'  => [],
     ];
+    public array $head = [];
+
     private Translator $translator;
 
-    /**
-     * @param Translator $translator
-     */
-    public function __construct(
-        Translator $translator
-    ) {
+    public function __construct(Translator $translator)
+    {
         $this->translator = $translator;
+    }
+
+    /**
+     * @param string $line
+     * @return void
+     * @noinspection PhpUnused
+     */
+    public function addToHead(string $line): void
+    {
+        $this->head[] = $line;
     }
 
     /**

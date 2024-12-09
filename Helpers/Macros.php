@@ -27,6 +27,7 @@ class Macros extends Extension
             'title'      => [$this, 'title'],
             'message'    => [$this, 'message'],
             'nonce'      => [$this, 'nonce'],
+            'head'       => [$this, 'head'],
         ];
     }
 
@@ -275,6 +276,25 @@ class Macros extends Extension
             fn (PrintContext $context) => $context->format('
                 $nonce_inline = !empty($nonce) ? " nonce=\"$nonce\"" : "";
                 echo $nonce_inline;
+            ')
+        );
+    }
+
+    /**
+     * @param Tag $tag
+     * @return Node
+     * @noinspection PhpUnusedParameterInspection
+     * @noinspection HtmlUnknownTarget
+     * @noinspection JSUnresolvedVariable
+     * @psalm-suppress PossiblyUnusedParam
+     */
+    public function head(Tag $tag): Node
+    {
+        return new AuxiliaryNode(
+            fn (PrintContext $context) => $context->format('
+                foreach($layout->head as $line) {
+                    echo $line;
+                }
             ')
         );
     }
