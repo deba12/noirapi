@@ -62,10 +62,6 @@ class Controller
 
         if (Config::get('db')) {
             if (empty($this->model)) {
-//                dump(get_class($this));
-//                dump(Utils::getClassName(get_class($this)));
-//                dump(self::$model_path . Utils::getClassName(get_class($this)));
-//                die();
                 $model = self::$model_path . Utils::getClassName(get_class($this));
                 if (class_exists($model) && is_subclass_of($model, Model::class)) {
                     $this->model = new $model();
@@ -311,7 +307,7 @@ class Controller
     public function hasResource(Acl $acl): void
     {
 
-        if (! $acl->hasResource(strtolower($this->request->controller))) {
+        if (! $acl->hasResource($this->request->controller)) {
             if ($this->request->ajax) {
                 throw new MessageException('Page not Found', 403);
             }
@@ -331,7 +327,7 @@ class Controller
     public function isAllowed(Acl $acl): void
     {
 
-        if (! $acl->isAllowed($this->request->role, strtolower($this->request->controller))) {
+        if (! $acl->isAllowed($this->request->role, $this->request->controller)) {
             if ($this->request->ajax) {
                 throw new MessageException('Please Login', 403);
             }

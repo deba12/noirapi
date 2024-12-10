@@ -206,11 +206,11 @@ class View
      */
     public function setTemplate(string $template, ?string $controller = null): self
     {
-        if ($controller === null) {
-            $controller = strtolower($this->request->controller);
-        }
+
+        $path = $controller === null ? lcfirst($this->request->controller) : lcfirst($controller);
+
         /** @psalm-suppress UndefinedConstant */
-        $file = PATH_VIEWS . strtolower($controller) . self::$template_dir_prefix . $template . self::LATTE_EXT;
+        $file = PATH_VIEWS . $path . self::$template_dir_prefix . $template . self::LATTE_EXT;
 
         if (is_readable($file)) {
             $this->template = $file;
