@@ -4,7 +4,7 @@
 
 declare(strict_types=1);
 
-namespace Noirapi\helpers\Schema;
+namespace Noirapi\Helpers\Schema;
 
 use DateTimeZone;
 use Exception;

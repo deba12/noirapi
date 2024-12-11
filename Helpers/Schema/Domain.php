@@ -8,7 +8,7 @@
 
 declare(strict_types=1);
 
-namespace Noirapi\helpers\Schema;
+namespace Noirapi\Helpers\Schema;
 
 use Nette\Schema\Context;
 use Nette\Schema\Message;
