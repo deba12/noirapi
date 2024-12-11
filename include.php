@@ -51,7 +51,9 @@ define('SESSION_ROOT', Config::get('SESSION_ROOT') ?? (ROOT . '/sessions'));
 
 Config::set('is_https', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on');
 
-Debugger::$strictMode = E_ALL;
+Debugger::$strictMode = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED; // all errors except deprecated notices
+Debugger::$showLocation = true;
+Debugger::$logSeverity = E_NOTICE | E_WARNING;
 
 /** @noinspection PhpUndefinedClassInspection */
 if (class_exists(GitVersionPanel::class)) {
