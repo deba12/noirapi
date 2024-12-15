@@ -171,7 +171,7 @@ class Utils
     public static function array_shuffle(array $array): array // phpcs:ignore
     {
 
-        return new Randomizer()->shuffleArray($array);
+        return (new Randomizer())->shuffleArray($array);
     }
 
     /**
@@ -214,7 +214,7 @@ class Utils
         $class = new $className();
 
         try {
-            $properties = new ReflectionClass($class)->getProperties(ReflectionProperty::IS_PUBLIC);
+            $properties = (new ReflectionClass($class))->getProperties(ReflectionProperty::IS_PUBLIC);
         } catch (ReflectionException) {
             return (object) $input;
         }
@@ -248,7 +248,7 @@ class Utils
     {
         $result = [];
 
-        $properties = new ReflectionClass($class)->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
+        $properties = (new ReflectionClass($class))->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
 
         foreach ($properties as $property) {
             $result[] = $property->getName();
