@@ -4,13 +4,12 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib\View;
 
-use Noirapi\interfaces\Translator;
+use Noirapi\Interfaces\Translator;
 
 use function is_string;
 
 class Layout
 {
-    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     public string $name = '';
     public string $title = '';
     public array $breadcrumbs = [];

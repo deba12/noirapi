@@ -90,7 +90,7 @@ class SessionPanel implements IBarPanel
 
         foreach ($data as $key => $value) {
             if (is_string($value) && in_array($key, $hidden, true)) {
-                $value = "<span $this->value_mod_attributes>" . substr($value, 0, 3) . '...' . substr($value, -3) . '</span>';
+                $value = "<span $this->value_mod_attributes>" . substr($value, 0, 3) . '...' . substr($value, -3) . '</span>'; //phpcs:ignore
             } elseif ($value === true) {
                 $value = "<span $this->value_mod_attributes>true</span>";
             } elseif ($value === false) {

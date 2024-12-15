@@ -6,6 +6,7 @@ namespace Noirapi\Lib\Traits;
 
 use ReflectionAttribute;
 use ReflectionClass;
+use ReflectionProperty;
 
 trait SmartObject
 {
@@ -14,7 +15,7 @@ trait SmartObject
     // We must use static objects to avoid messing with Model queries
     /** @var string[] */
     private static array $__smartObjectAttributeClasses; // phpcs:ignore
-    /** @var ReflectionAttribute[] */
+    /** @var ReflectionProperty [] */
     private static array $__properties; // phpcs:ignore
 
     public function __construct()
