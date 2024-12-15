@@ -303,4 +303,22 @@ class Utils
 
         return $r;
     }
+
+    /**
+     * @param string $data
+     * @return string
+     */
+    public static function base64UrlEncode(string $data): string
+    {
+        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+    }
+
+    /**
+     * @param string $data
+     * @return string
+     */
+    public static function base64UrlDecode(string $data): string
+    {
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='));
+    }
 }
