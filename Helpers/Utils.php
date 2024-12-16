@@ -15,7 +15,7 @@ use ReflectionProperty;
 use stdClass;
 
 use function array_key_exists;
-use function array_pop;
+use function array_slice;
 use function bin2hex;
 use function chr;
 use function count;
@@ -149,10 +149,13 @@ class Utils
 
     /**
      * @param string|object $class
+     * @param int|string $depth
      * @return string
      */
-    public static function getClassName(string|object $class): string
+    public static function getClassName(string|object $class, int|string $depth = 1): string
     {
+
+        $depth = (int) $depth;
 
         if (is_object($class)) {
             $class = get_class($class);
@@ -160,7 +163,11 @@ class Utils
 
         $path = explode('\\', $class);
 
-        return array_pop($path);
+        if ($depth > count($path)) {
+            $depth = count($path);
+        }
+
+        return implode('\\', array_slice($path, - $depth));
     }
 
     /**
