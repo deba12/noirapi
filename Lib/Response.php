@@ -30,14 +30,12 @@ use function is_string;
 
 class Response
 {
-    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     private int $status = 200;
     private int $csv_maxmem = 1024 * 1024; //1 MB
     private string|array|object $body = '';
     private string $contentType = self::TYPE_HTML;
     private string $xml_root = '<root/>';
     private array $headers = [];
-    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     private array $cookies = [];
     private array $headerCallback = [];
     private bool $csv_header = true;
@@ -482,14 +480,15 @@ class Response
     }
 
     /**
+     * At last this will return an array
      * @param object|array $object
      * @return array
      */
-    private function object2array(object|array $object): array
+    private function object2array(mixed $object): mixed
     {
 
-        return array_map(function ($value) {
-            return (is_array($value) || is_object($value)) ? $this->object2array($value) : $value;
-        }, $object);
+        return (is_scalar($object) || is_null($object))
+            ? $object
+            : array_map([$this, 'object2array'], (array)$object);
     }
 }
