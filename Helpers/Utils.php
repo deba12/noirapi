@@ -318,7 +318,11 @@ class Utils
      */
     public static function base64UrlEncode(string $data): string
     {
-        return rtrim(strtr(base64_encode($data), '+/', '-_'), '=');
+        return str_replace(
+            ['+', '/', '=', '_', '-'],
+            ['', '', '', '', ''],
+            base64_encode($data)
+        );
     }
 
     /**
