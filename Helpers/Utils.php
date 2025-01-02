@@ -8,6 +8,7 @@ namespace Noirapi\Helpers;
 
 use Exception;
 use Nette\StaticClass;
+use Noirapi\Config;
 use Random\Randomizer;
 use ReflectionClass;
 use ReflectionException;
@@ -327,6 +328,42 @@ class Utils
     public static function base64UrlDecode(string $data): string
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='));
+    }
+
+    /**
+     * @param string $remote_address
+     * @return bool
+     */
+    public static function isDev(string $remote_address): bool
+    {
+
+        $dev = Config::get('dev');
+
+        if($dev === true) {
+            return true;
+        }
+
+        $dev_ips = Config::get('dev_ips');
+
+        if(empty($dev_ips)) {
+            return false;
+        }
+
+        return in_array(self::getRealIp($remote_address), $dev_ips, true);
+
+    }
+
+    /**
+     * @param string $remote_address
+     * @return string
+     */
+    public static function getRealIp(string $remote_address): string
+    {
+        if (self::isCloudFlare($remote_address)) {
+            return $_SERVER['HTTP_CF_CONNECTING_IP'];
+        }
+
+        return $_SERVER['REMOTE_ADDR'];
     }
 
     /**
