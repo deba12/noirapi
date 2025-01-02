@@ -339,18 +339,17 @@ class Utils
 
         $dev = Config::get('dev');
 
-        if($dev === true) {
+        if ($dev === true) {
             return true;
         }
 
         $dev_ips = Config::get('dev_ips');
 
-        if(empty($dev_ips)) {
+        if (empty($dev_ips)) {
             return false;
         }
 
         return in_array(self::getRealIp($remote_address), $dev_ips, true);
-
     }
 
     /**
@@ -430,8 +429,8 @@ class Utils
         $range_bits = unpack('H*', $range_bin)[1];
         $ip_bits = unpack('H*', $ip_bin)[1];
 
-        $range_bits = str_pad(base_convert($range_bits, 16, 2), 128, '0', STR_PAD_LEFT);
-        $ip_bits = str_pad(base_convert($ip_bits, 16, 2), 128, '0', STR_PAD_LEFT);
+        $range_bits = str_pad(base_convert($range_bits, 16, 2), strlen($range_bin) * 8, '0', STR_PAD_LEFT);
+        $ip_bits = str_pad(base_convert($ip_bits, 16, 2), strlen($ip_bin) * 8, '0', STR_PAD_LEFT);
 
         return substr($range_bits, 0, $netmask) === substr($ip_bits, 0, $netmask);
     }
