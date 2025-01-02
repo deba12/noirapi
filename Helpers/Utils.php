@@ -328,4 +328,74 @@ class Utils
     {
         return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='));
     }
+
+    /**
+     * @param string $remote_address
+     * @return bool
+     */
+    public static function isCloudFlare(string $remote_address): bool
+    {
+        $cf_ranges = [
+            '173.245.48.0/20',
+            '103.21.244.0/22',
+            '103.22.200.0/22',
+            '103.31.4.0/22',
+            '141.101.64.0/18',
+            '108.162.192.0/18',
+            '190.93.240.0/20',
+            '188.114.96.0/20',
+            '197.234.240.0/22',
+            '198.41.128.0/17',
+            '162.158.0.0/15',
+            '104.16.0.0/13',
+            '104.24.0.0/14',
+            '172.64.0.0/13',
+            '131.0.72.0/22',
+            '2400:cb00::/32',
+            '2606:4700::/32',
+            '2803:f800::/32',
+            '2405:b500::/32',
+            '2405:8100::/32',
+            '2a06:98c0::/29',
+            '2c0f:f248::/32',
+        ];
+
+        foreach ($cf_ranges as $range) {
+            if (self::inRange($remote_address, $range)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param string $ip
+     * @param string $range
+     * @return bool
+     */
+    private static function inRange(string $ip, string $range): bool
+    {
+        if (!str_contains($range, '/')) {
+            $range .= '/32';
+        }
+
+        list($range, $netmask) = explode('/', $range, 2);
+        $netmask = (int)$netmask;
+
+        $range_bin = inet_pton($range);
+        $ip_bin = inet_pton($ip);
+
+        if ($range_bin === false || $ip_bin === false) {
+            return false;
+        }
+
+        $range_bits = unpack('H*', $range_bin)[1];
+        $ip_bits = unpack('H*', $ip_bin)[1];
+
+        $range_bits = str_pad(base_convert($range_bits, 16, 2), 128, '0', STR_PAD_LEFT);
+        $ip_bits = str_pad(base_convert($ip_bits, 16, 2), 128, '0', STR_PAD_LEFT);
+
+        return substr($range_bits, 0, $netmask) === substr($ip_bits, 0, $netmask);
+    }
 }

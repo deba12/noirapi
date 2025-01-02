@@ -9,6 +9,7 @@
 declare(strict_types=1);
 
 use Noirapi\Config;
+use Noirapi\Helpers\Utils;
 use SixtyEightPublishers\TracyGitVersion\Bridge\Tracy\GitVersionPanel;
 use Tracy\Debugger;
 
@@ -65,7 +66,7 @@ $dev_ips = Config::get('dev_ips');
 
 if (
     $dev === true || (! empty($dev_ips) && isset($_SERVER['REMOTE_ADDR'])
-        && in_array($_SERVER['REMOTE_ADDR'], $dev_ips, true))
+        && in_array(Utils::isCloudFlare($_SERVER['REMOTE_ADDR']), $dev_ips, true))
 ) {
     //we are missing some debug events in Tracy that's why we start session so early
     if (session_status() !== PHP_SESSION_ACTIVE) {
