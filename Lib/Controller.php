@@ -338,7 +338,7 @@ class Controller
                 $login = $this->request->uri;
             }
 
-            Session::set('login', null, $login);
+            Session::set('return', null, $login);
 
             $this->message('Please login', 'success');
 
