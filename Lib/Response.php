@@ -54,6 +54,7 @@ class Response
     public ?string $initiator_class = null;
     public ?string $initiator_method = null;
     public ?int $initiator_line = null;
+    public string $csv_separator = ',';
 
     /**
      * @param mixed $body
@@ -430,7 +431,7 @@ class Response
         }
 
         foreach ($data as $key => $row) {
-            $w = fputcsv($fh, (array)$row);
+            $w = fputcsv($fh, (array)$row, $this->csv_separator);
             if ($w === false) {
                 $error = error_get_last();
 
