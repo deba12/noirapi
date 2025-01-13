@@ -54,7 +54,10 @@ class Response
     public ?string $initiator_class = null;
     public ?string $initiator_method = null;
     public ?int $initiator_line = null;
-    public string $csv_separator = ',';
+    public string $csv_separator = ",";
+    public string $csv_enclosure = "\"";
+    public string $csv_escape = "\\";
+    public string $csv_eol = "\n";
 
     /**
      * @param mixed $body
@@ -427,11 +430,11 @@ class Response
 
         $fh = fopen('php://temp', 'rwb');
         if ($this->csv_header) {
-            fputcsv($fh, array_keys(current((array)$data)));
+            fputcsv($fh, array_keys(current((array)$data)), $this->csv_separator, $this->csv_enclosure, $this->csv_escape);
         }
 
         foreach ($data as $key => $row) {
-            $w = fputcsv($fh, (array)$row, $this->csv_separator);
+            $w = fputcsv($fh, (array)$row, $this->csv_separator, $this->csv_enclosure, $this->csv_escape);
             if ($w === false) {
                 $error = error_get_last();
 
