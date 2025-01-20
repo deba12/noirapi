@@ -15,6 +15,7 @@ use Noirapi\Helpers\EasyTranslator;
 use Noirapi\Helpers\Filters;
 use Noirapi\Helpers\Macros;
 use Noirapi\Helpers\Session;
+use Noirapi\Helpers\Template;
 use Noirapi\Interfaces\Translator;
 use Noirapi\Lib\View\Layout;
 use RuntimeException;
@@ -66,6 +67,14 @@ class View
 
         $this->latte->addFilterLoader(Filters::class . '::init');
         $this->latte->addExtension(new Macros());
+        $this->latte->addFunction('renderTemplate', static function ($template, array $data) {
+
+            $render = new Template();
+            $render->setTemplate($template);
+
+            return $render->print($data);
+
+        });
 
         /**
          * @noinspection PhpUndefinedClassInspection
