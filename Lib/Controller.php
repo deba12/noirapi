@@ -307,7 +307,7 @@ class Controller
     public function hasResource(Acl $acl): void
     {
 
-        if (! $acl->hasResource($this->request->controller)) {
+        if (! $acl->hasResource(get_called_class())) {
             if ($this->request->ajax) {
                 throw new MessageException('Page not Found', 403);
             }
@@ -327,7 +327,7 @@ class Controller
     public function isAllowed(Acl $acl): void
     {
 
-        if (! $acl->isAllowed($this->request->role, $this->request->controller)) {
+        if (! $acl->isAllowed($this->request->role, get_called_class())) {
             if ($this->request->ajax) {
                 throw new MessageException('Please Login', 403);
             }
