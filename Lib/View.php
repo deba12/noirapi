@@ -73,7 +73,6 @@ class View
             $render->setTemplate($template);
 
             return $render->print($data);
-
         });
 
         /**
