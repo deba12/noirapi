@@ -297,6 +297,13 @@ class Mail
         return $this;
     }
 
+    public function replyTo(string $email): Mail
+    {
+
+        $this->message->replyTo($email);
+
+        return $this;
+    }
     /**
      * @return string
      */
