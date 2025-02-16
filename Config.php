@@ -41,6 +41,10 @@ class Config
                 throw new ConfigException('Unable to parse config:' . $file);
             }
 
+            if (class_exists('\App\Lib\Config') && method_exists('\App\Lib\Config', 'validate')) {
+                \App\Lib\Config::validate($parsed);
+            }
+
             if (is_array($parsed)) {
                 foreach ($parsed as $key => $value) {
                     self::set($key, $value);
