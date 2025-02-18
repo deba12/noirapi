@@ -64,7 +64,7 @@ if (class_exists(GitVersionPanel::class)) {
 $dev = Config::get('dev');
 $dev_ips = Config::get('dev_ips');
 
-if (Utils::isDev($_SERVER["REMOTE_ADDR"])) {
+if (Utils::isDev($_SERVER["REMOTE_ADDR"] ?? "")) {
     //we are missing some debug events in Tracy that's why we start session so early
     if (session_status() !== PHP_SESSION_ACTIVE) {
         session_start();
