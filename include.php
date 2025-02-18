@@ -2,16 +2,16 @@
 
 /**
  * @noinspection PhpUnused
- * @noinspection PhpUndefinedNamespaceInspection
- * @noinspection PhpUndefinedClassInspection
+ * @noinspection SpellCheckingInspection
  */
 
 declare(strict_types=1);
 
 use Noirapi\Config;
+use Noirapi\Helpers\TracyFileSession;
 use Noirapi\Helpers\Utils;
-use SixtyEightPublishers\TracyGitVersion\Bridge\Tracy\GitVersionPanel;
 use Tracy\Debugger;
+use Tracy\NativeSession;
 
 mb_internal_encoding('UTF-8');
 error_reporting(E_ALL);
@@ -56,10 +56,14 @@ Debugger::$strictMode = E_ALL & ~E_DEPRECATED & ~E_USER_DEPRECATED; // all error
 Debugger::$showLocation = true;
 Debugger::$logSeverity = E_NOTICE | E_WARNING;
 
-/** @noinspection PhpUndefinedClassInspection */
-if (class_exists(GitVersionPanel::class)) {
-    Debugger::getBar()->addPanel(GitVersionPanel::createDefault());
-}
+// We have to use our own session storage because Tracy's default session storage is notcleaning up old sessions
+/** @noinspection PhpUnhandledExceptionInspection */
+Debugger::setSessionStorage((@is_dir($dir = session_save_path())
+    || @is_dir($dir = ini_get('upload_tmp_dir'))
+    || @is_dir($dir = sys_get_temp_dir())
+    || ($dir = PATH_LOGS))
+    ? new TracyFileSession($dir)
+    : new NativeSession());
 
 $dev = Config::get('dev');
 $dev_ips = Config::get('dev_ips');
