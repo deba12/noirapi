@@ -274,12 +274,11 @@ class Utils
     public static function var_name(mixed &$var, mixed $scope = false) // phpcs:ignore
     {
         $old = $var;
-        if (
-            ($key = array_search(
-                $var = 'unique' . mt_rand() . 'value',
-                ! $scope ? $GLOBALS : $scope,
-                true
-            )) && $var = $old
+        if (($key = array_search(
+            $var = 'unique' . mt_rand() . 'value',
+            ! $scope ? $GLOBALS : $scope,
+            true
+        )) && $var = $old
         ) {
             return $key;
         }
@@ -401,13 +400,7 @@ class Utils
             '2c0f:f248::/32',
         ];
 
-        foreach ($cf_ranges as $range) {
-            if (self::inRange($remote_address, $range)) {
-                return true;
-            }
-        }
-
-        return false;
+        return array_any($cf_ranges, fn($range) => self::inRange($remote_address, $range));
     }
 
     /**
