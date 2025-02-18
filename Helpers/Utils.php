@@ -109,11 +109,12 @@ class Utils
 
     /**
      * @param string $cmd
+     * @param array $env
      * @return void
      */
-    public static function backgroundTask(string $cmd): void
+    public static function backgroundTask(string $cmd, array $env = []): void
     {
-        proc_close(proc_open("$cmd &", [], $pipes));
+        proc_close(proc_open("$cmd &", [], $pipes, null, $env));
     }
 
     /**
