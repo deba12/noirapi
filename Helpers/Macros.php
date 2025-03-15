@@ -219,15 +219,14 @@ class Macros extends Extension
         return new AuxiliaryNode(
             fn (PrintContext $context) => $context->format(
                 '
-
                 $active = %node;
 
                 if(count($active) === 1) {
-                    if($request->controller === $active[0]) {
+                    if(strtolower($request->controller) === $active[0]) {
                         echo \'active\';
                     }
                 } else {
-                    if($request->controller === $active[0] && $request->function === $active[1]) {
+                    if(strtolower($request->controller) === $active[0] && strtolower($request->function) === $active[1]) { //phpcs:ignore
                         echo \'active\';
                     }
                 }',
