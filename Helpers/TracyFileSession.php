@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Noirapi\Helpers;
 
+use Override;
 use Random\RandomException;
 use RuntimeException;
 use Tracy\SessionStorage;
@@ -21,6 +22,7 @@ class TracyFileSession implements SessionStorage
 
     /** @var resource */
     private $file;
+    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     private array $data = [];
 
     public function __construct(string $dir)
@@ -33,6 +35,7 @@ class TracyFileSession implements SessionStorage
      * @return bool
      * @throws RandomException
      */
+    #[Override]
     public function isAvailable(): bool
     {
         if (!$this->file) {
@@ -64,11 +67,12 @@ class TracyFileSession implements SessionStorage
         }
 
         if (!@flock($file, LOCK_EX)) { // intentionally @
-            throw new RuntimeException("Unable to acquire exclusive lock on '$path'. ", error_get_last()['message']);
+            throw new RuntimeException("Unable to acquire exclusive lock on '$path'. " . error_get_last()['message']);
         }
 
         $this->file = $file;
-        $this->data = @unserialize(stream_get_contents($this->file)) ?: []; // @ - file may be empty
+        $data = @unserialize(stream_get_contents($this->file)); // @ - file may be empty
+        $this->data = empty($data) ? [] : $data;
 
         if (mt_rand() / mt_getrandmax() < $this->gcProbability) {
             $this->clean();
@@ -76,6 +80,7 @@ class TracyFileSession implements SessionStorage
     }
 
 
+    #[Override]
     public function &getData(): array
     {
         return $this->data;

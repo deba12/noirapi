@@ -33,7 +33,10 @@ class Session
         }
 
         if (is_object($_SESSION[$namespace])) {
-            /** @noinspection PhpExpressionAlwaysNullInspection */
+            /**
+             * @noinspection PhpExpressionAlwaysNullInspection
+             * @phpstan-ignore-next-line
+             */
             return $_SESSION[$namespace]->$key ?? null;
         }
 
@@ -53,6 +56,7 @@ class Session
         if ($key === null) {
             $_SESSION[$namespace] = $value;
         } elseif (isset($_SESSION[$namespace]) && is_object($_SESSION[$namespace])) {
+            // @phpstan-ignore-next-line
             $_SESSION[$namespace]->$key = $value;
         } else {
             $_SESSION[$namespace][$key] = $value;
@@ -79,7 +83,10 @@ class Session
         }
 
         if (is_object($_SESSION[$namespace])) {
-            /** @noinspection PhpExpressionAlwaysNullInspection */
+            /**
+             * @noinspection PhpExpressionAlwaysNullInspection
+             * @phpstan-ignore-next-line
+             */
             return isset($_SESSION[$namespace]->$key);
         }
 
@@ -98,7 +105,10 @@ class Session
         } elseif (isset($_SESSION[$namespace]) && is_array($_SESSION[$namespace])) {
             unset($_SESSION[$namespace][$key]);
         } elseif (isset($_SESSION[$namespace]) && is_object($_SESSION[$namespace])) {
-            /** @noinspection PhpExpressionAlwaysNullInspection */
+            /**
+             * @noinspection PhpExpressionAlwaysNullInspection
+             * @phpstan-ignore-next-line
+             */
             unset($_SESSION[$namespace]->$key);
         }
     }

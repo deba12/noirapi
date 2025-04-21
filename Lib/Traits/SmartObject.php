@@ -50,6 +50,7 @@ trait SmartObject
                     $name = $attribute->getName();
                     if (in_array($name, self::$__smartObjectAttributeClasses, true)) {
                         $name = $property->getName();
+                        /** @phpstan-ignore property.dynamicName */
                         unset($this->$name);
 
                         self::$__properties[$name] = $property;
@@ -74,19 +75,23 @@ trait SmartObject
 
                     foreach ($instance->args as $arg) {
                         if (property_exists($this, $arg)) {
+                            /** @phpstan-ignore property.dynamicName */
                             if ($this->$arg === null) {
                                 return null;
                             }
+                            /** @phpstan-ignore property.dynamicName */
                             $args[] = $this->$arg;
                         }
                     }
 
+                    /** @phpstan-ignore property.dynamicNam, method.dynamicName */
                     return $instance->_class->{$instance->_method}(...$args);
                 }
             }
         }
 
         // Fallthrough and handle it by Nette's SmartObject
+        /** @phpstan-ignore property.dynamicName */
         return $this->$name;
     }
 }

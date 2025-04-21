@@ -154,7 +154,7 @@ class Route
 
         switch ($this->request->route[0]) {
             case Dispatcher::FOUND:
-                $this->request->controller = Utils::getCLassName($this->request->route[1][0]);
+                $this->request->controller = Utils::getClassName($this->request->route[1][0]);
                 $this->request->function = $this->request->route[1][1];
 
                 try {
@@ -236,6 +236,7 @@ class Route
                 try {
                     /** @noinspection PhpFullyQualifiedNameUsageInspection */
                     /** @noinspection PhpParenthesesCanBeOmittedForNewCallInspection */
+                    /** @phpstan-ignore method.dynamicName */
                     return (new \App\Controllers\Errors($instance->request, $instance->response, $instance->server))->$function(); // phpcs:ignore
                 } catch (LoginException $e) {
                     $response = new Response();
