@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib\Tracy;
 
+use Override;
 use Tracy\IBarPanel;
 
 use function count;
@@ -56,6 +57,7 @@ class GenericPanel implements IBarPanel
     /**
      * @return string
      */
+    #[Override]
     public function getTab(): string
     {
 
@@ -68,6 +70,7 @@ class GenericPanel implements IBarPanel
     /**
      * @return string
      */
+    #[Override]
     public function getPanel(): string
     {
 

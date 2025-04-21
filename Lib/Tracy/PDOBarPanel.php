@@ -80,6 +80,7 @@ class PDOBarPanel implements IBarPanel
      * @return string
      * @noinspection TypeUnsafeComparisonInspection
      */
+    #[Override]
     public function getTab(): string
     {
 

@@ -6,9 +6,7 @@ use Noirapi\Config;
 use Noirapi\Lib\Route;
 use Swoole\Http\Server;
 
-/** @noinspection SpellCheckingInspection */
 if(! extension_loaded('swoole')) {
-    /** @noinspection SpellCheckingInspection */
     throw new RuntimeException('Swoole extension is mandatory');
 }
 
@@ -36,7 +34,6 @@ if(! empty($static_files)) {
 $server->on('start', function () use ($listen_ip, $listen_port) {
     /**
      * @noinspection HttpUrlsUsage
-     * @noinspection SpellCheckingInspection
      */
     echo "Swoole http server is started at http://$listen_ip:$listen_port\n";
 });
@@ -63,7 +60,6 @@ $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Respo
             name: $cookie['key'],
             value: $cookie['value'],
             expires: $cookie['expire'],
-            path: '/',
             domain: Config::$config,
             secure: $cookie['secure'],
             httponly: $cookie['httponly'],

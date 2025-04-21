@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib\Traits;
 
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -52,7 +51,7 @@ trait SmartObject
                         $name = $property->getName();
                         /** @phpstan-ignore property.dynamicName */
                         unset($this->$name);
-
+                        /** @psalm-suppress UndefinedMethod */
                         self::$__properties[$name] = $property;
                     }
                 }
@@ -63,10 +62,11 @@ trait SmartObject
     /**
      * @param string $name
      * @return void
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function __get(string $name)
     {
-
+        /** @psalm-suppress UndefinedMethod */
         if (isset(self::$__properties[$name])) {
             foreach (self::$__smartObjectAttributeClasses as $attributeClass) {
                 if (self::$__properties[$name]->getAttributes($attributeClass)) {
