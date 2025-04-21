@@ -76,16 +76,20 @@ trait SmartObject
                     foreach ($instance->args as $arg) {
                         if (property_exists($this, $arg)) {
                             /** @phpstan-ignore property.dynamicName */
-                            if ($this->$arg === null) {
+                            if ($this->{$arg} === null) {
                                 return null;
                             }
                             /** @phpstan-ignore property.dynamicName */
-                            $args[] = $this->$arg;
+                            $args[] = $this->{$arg};
                         }
                     }
 
-                    /** @phpstan-ignore property.dynamicNam, method.dynamicName */
-                    return $instance->_class->{$instance->_method}(...$args);
+                    if ($instance->isStatic) {
+                        /** @phpstan-ignore property.dynamicName */
+                        return $instance->className::{$instance->methodName}(...$args);
+                    }
+                    /** @phpstan-ignore property.dynamicName */
+                    return new $instance->className()->{$instance->methodName}(...$args);
                 }
             }
         }
