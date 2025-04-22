@@ -85,10 +85,10 @@ trait SmartObject
                     }
 
                     if ($instance->isStatic) {
-                        /** @phpstan-ignore property.dynamicName */
+                        /** @phpstan-ignore staticMethod.dynamicName */
                         return $instance->className::{$instance->methodName}(...$args);
                     }
-                    /** @phpstan-ignore property.dynamicName */
+                    /** @phpstan-ignore method.dynamicName */
                     return new $instance->className()->{$instance->methodName}(...$args);
                 }
             }
