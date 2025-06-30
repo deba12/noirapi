@@ -167,47 +167,47 @@ class Route
                     $method = $this->request->route[1][1];
                     $args = $this->request->route[2];
 
-                    /** @noinspection PhpUnhandledExceptionInspection */
-                    $reflection = new ReflectionMethod($controller, $method);
-                    $parameters = $reflection->getParameters();
                     $realArgs = [];
 
-                    foreach ($reflection->getAttributes(AutoWire::class) as $attribute) {
-                        /**
-                         * @var AutoWire $instance
-                         * @psalm-suppress UnnecessaryVarAnnotation
-                         */
-                        $instance = $attribute->newInstance();
-                        $param = array_shift($parameters);
+                    /** @noinspection PhpUnhandledExceptionInspection */
+                    $reflection = new ReflectionMethod($controller, $method);
+                    if(count($reflection->getAttributes()) > 0) {
+                        $parameters = $reflection->getParameters();
 
-                        foreach ($args as $key => $value) {
-                            // If the key is like "user_id", we want to match it with the "user" parameter
-                            if (str_ends_with($key, '_id')) {
-                                $key_modified = substr($key, 0, -3);
-                            } else {
-                                $key_modified = $key;
-                            }
-                            if ($param->getName() === $key_modified) {
-                                /** @phpstan-ignore-next-line */
-                                $result = $controller->model?->{$instance->getter_function}($value);
+                        foreach ($reflection->getAttributes(AutoWire::class) as $attribute) {
+                            /**
+                             * @var AutoWire $instance
+                             * @psalm-suppress UnnecessaryVarAnnotation
+                             */
+                            $instance = $attribute->newInstance();
+                            $param = array_shift($parameters);
 
-                                if ($result === null && ! $param->allowsNull()) {
-                                    $controller->message('Not found', 'danger');
-                                    $this->response->withStatus(301)
-                                        ->withLocation($controller->referer());
-                                    return $this->response;
+                            foreach ($args as $key => $value) {
+                                // If the key is like "user_id", we want to match it with the "user" parameter
+                                if (str_ends_with($key, '_id')) {
+                                    $key_modified = substr($key, 0, -3);
+                                } else {
+                                    $key_modified = $key;
                                 }
+                                if ($param->getName() === $key_modified) {
+                                    /** @phpstan-ignore-next-line */
+                                    $result = $controller->model?->{$instance->getter_function}($value);
 
-                                unset($args[$key]);
-                                $realArgs[$param->getName()] = $result;
+                                    if ($result === null && ! $param->allowsNull()) {
+                                        $controller->message('Not found', 'danger');
+                                        $this->response->withStatus(301)
+                                            ->withLocation($controller->referer());
+                                        return $this->response;
+                                    }
+
+                                    unset($args[$key]);
+                                    $realArgs[$param->getName()] = $result;
+                                }
                             }
                         }
                     }
 
-                    if (!empty($realArgs)) {
-                        $args = array_merge($args, $realArgs);
-                    }
-                    call_user_func_array([ $controller, $method ], $args);
+                    call_user_func_array([ $controller, $method ], array_merge($args, $realArgs));
                 } catch (LoginException $exception) {
                     if ($exception->getCode() === 403) {
                         $this->response->withStatus(403)
