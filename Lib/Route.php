@@ -171,7 +171,7 @@ class Route
 
                     /** @noinspection PhpUnhandledExceptionInspection */
                     $reflection = new ReflectionMethod($controller, $method);
-                    if(count($reflection->getAttributes()) > 0) {
+                    if (count($reflection->getAttributes()) > 0) {
                         $parameters = $reflection->getParameters();
 
                         foreach ($reflection->getAttributes(AutoWire::class) as $attribute) {
