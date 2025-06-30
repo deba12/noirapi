@@ -74,7 +74,7 @@ class PDO extends NativePdo
 
         $this->log[] = [
             'statement' => $statement,
-            'time'      => $time * 1000,
+            'time'      => $time * 1000.00, // Convert to milliseconds
         ];
     }
 
