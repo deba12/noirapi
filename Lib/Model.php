@@ -44,19 +44,17 @@ class Model
      */
     public function connect(): void
     {
-        if (isset($this->db)) {
-            $this->db->getConnection()->disconnect();
+        if(! isset(self::$pdo[$this->driver])) {
+            self::$pdo[$this->driver] = new PDO(
+                $this->driver . ':' . $this->params['dsn'],
+                $this->params['user'] ?? null,
+                $this->params['pass'] ?? null
+            );
+            self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+            self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+            self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
         }
-
-        self::$pdo[$this->driver] = new PDO(
-            $this->driver . ':' . $this->params['dsn'],
-            $this->params['user'] ?? null,
-            $this->params['pass'] ?? null
-        );
-        self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
-        self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-        self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
 
         $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
     }
