@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib;
 
+use BackedEnum;
 use FastRoute\Dispatcher;
 use Noirapi\Config;
 use Noirapi\Exceptions\InternalServerError;
@@ -203,7 +204,7 @@ class Route
                                         $key_modified = $key;
                                     }
                                     if ($param->getName() === $key_modified) {
-                                        if ($typeReflection->isEnum()) {
+                                        if ($typeReflection->isEnum() && $typeReflection->implementsInterface(BackedEnum::class)) { //phpcs:ignore
                                             $result = $type::tryFrom($value);
                                             if ($result === null) {
                                                 $controller->message('Not found', 'danger');
