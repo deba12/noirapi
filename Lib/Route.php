@@ -20,6 +20,7 @@ use Noirapi\Exceptions\RestException;
 use Noirapi\Helpers\Utils;
 use Noirapi\Lib\Attributes\AutoWire;
 use Noirapi\Lib\Tracy\GenericPanel;
+use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
 use Swoole\Http\Server;
@@ -182,26 +183,48 @@ class Route
                             $instance = $attribute->newInstance();
                             $param = array_shift($parameters);
 
-                            foreach ($args as $key => $value) {
-                                // If the key is like "user_id", we want to match it with the "user" parameter
-                                if (str_ends_with($key, '_id')) {
-                                    $key_modified = substr($key, 0, -3);
-                                } else {
-                                    $key_modified = $key;
-                                }
-                                if ($param->getName() === $key_modified) {
-                                    /** @phpstan-ignore-next-line */
-                                    $result = $controller->model?->{$instance->getter_function}($value);
-
-                                    if ($result === null && ! $param->allowsNull()) {
-                                        $controller->message('Not found', 'danger');
-                                        $this->response->withStatus(301)
-                                            ->withLocation($controller->referer());
-                                        return $this->response;
+                            // If the parameter is not a built-in type, we will try to resolve it
+                            /**
+                             * @psalm-suppress UndefinedMethod
+                             * @phpstan-ignore-next-line
+                             */
+                            if (! $param->getType()->isBuiltin()) {
+                                /**
+                                 * @psalm-suppress UndefinedMethod
+                                 * @phpstan-ignore-next-line
+                                 */
+                                $type = $param->getType()->getName();
+                                $typeReflection = new ReflectionClass($type);
+                                foreach ($args as $key => $value) {
+                                    // If the key is like "user_id", we want to match it with the "user" parameter
+                                    if (str_ends_with($key, '_id')) {
+                                        $key_modified = substr($key, 0, -3);
+                                    } else {
+                                        $key_modified = $key;
                                     }
+                                    if ($param->getName() === $key_modified) {
+                                        if ($typeReflection->isEnum()) {
+                                            $result = $type::tryFrom($value);
+                                            if ($result === null) {
+                                                $controller->message('Not found', 'danger');
+                                                $this->response->withStatus(301)
+                                                    ->withLocation($controller->referer());
+                                                return $this->response;
+                                            }
+                                        } else {
+                                            /** @phpstan-ignore-next-line */
+                                            $result = $controller->model?->{$instance->getter_function}($value);
 
-                                    unset($args[$key]);
-                                    $realArgs[$param->getName()] = $result;
+                                            if ($result === null && ! $param->allowsNull()) {
+                                                $controller->message('Not found', 'danger');
+                                                $this->response->withStatus(301)
+                                                    ->withLocation($controller->referer());
+                                                return $this->response;
+                                            }
+                                        }
+                                        unset($args[$key]);
+                                        $realArgs[$param->getName()] = $result;
+                                    }
                                 }
                             }
                         }
