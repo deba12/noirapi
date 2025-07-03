@@ -20,6 +20,7 @@ use Noirapi\Exceptions\NotFoundException;
 use Noirapi\Exceptions\RestException;
 use Noirapi\Helpers\Utils;
 use Noirapi\Lib\Attributes\AutoWire;
+use Noirapi\Lib\Attributes\NotFound;
 use Noirapi\Lib\Tracy\GenericPanel;
 use ReflectionClass;
 use ReflectionException;
@@ -176,6 +177,9 @@ class Route
                     if (count($reflection->getAttributes()) > 0) {
                         $parameters = $reflection->getParameters();
 
+                        /** @var NotFound $message */
+                        $message = $reflection->getAttributes(NotFound::class)[0]?->newInstance();
+
                         foreach ($reflection->getAttributes(AutoWire::class) as $attribute) {
                             /**
                              * @var AutoWire $instance
@@ -207,8 +211,8 @@ class Route
                                         if ($typeReflection->isEnum() && $typeReflection->implementsInterface(BackedEnum::class)) { //phpcs:ignore
                                             $result = $type::tryFrom($value);
                                             if ($result === null) {
-                                                $controller->message('Not found', 'danger');
-                                                $this->response->withStatus(301)
+                                                $controller->message($message !== null ? $message->message : 'Not Found', 'danger');
+                                                $this->response->withStatus($message !== null ? $message->status : 301)
                                                     ->withLocation($controller->referer());
                                                 return $this->response;
                                             }
@@ -217,8 +221,8 @@ class Route
                                             $result = $controller->model?->{$instance->getter_function}($value);
 
                                             if ($result === null && ! $param->allowsNull()) {
-                                                $controller->message('Not found', 'danger');
-                                                $this->response->withStatus(301)
+                                                $controller->message($message !== null ? $message->message : 'Not Found', 'danger');
+                                                $this->response->withStatus($message !== null ? $message->status : 301)
                                                     ->withLocation($controller->referer());
                                                 return $this->response;
                                             }
