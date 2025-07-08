@@ -25,6 +25,7 @@ use Noirapi\Lib\Tracy\GenericPanel;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
+use stdClass;
 use Swoole\Http\Server;
 use Throwable;
 use Tracy\Debugger;
@@ -178,7 +179,11 @@ class Route
                         $parameters = $reflection->getParameters();
 
                         /** @var NotFound $message */
-                        $message = $reflection->getAttributes(NotFound::class)[0]?->newInstance();
+                        if(isset($reflection->getAttributes(NotFound::class)[0])) {
+                            $message = $reflection->getAttributes(NotFound::class)[0]->newInstance();
+                        } else {
+                            $message = null;
+                        }
 
                         foreach ($reflection->getAttributes(AutoWire::class) as $attribute) {
                             /**
