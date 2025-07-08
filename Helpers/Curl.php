@@ -16,7 +16,7 @@ class Curl extends \Curl\Curl
 {
     private static array $requests = [];
 
-    public function __construct()
+    public function __construct(?string $base_url = null, array $options = [])
     {
 
         if (! isset(Controller::$panels['curl'])) {
@@ -28,7 +28,7 @@ class Curl extends \Curl\Curl
             Debugger::getBar()->addPanel($panel);
         }
 
-        parent::__construct();
+        parent::__construct($base_url, $options);
     }
 
     /**
