@@ -30,12 +30,14 @@ use function is_string;
 
 class Response
 {
+    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     private int $status = 200;
     private int $csv_maxmem = 1024 * 1024; //1 MB
     private string|array|object $body = '';
     private string $contentType = self::TYPE_HTML;
     private string $xml_root = '<root/>';
     private array $headers = [];
+    /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     private array $cookies = [];
     private array $headerCallback = [];
     private bool $csv_header = true;
@@ -321,7 +323,7 @@ class Response
      * @param string $value
      * @param int $expire
      * @return $this
-     * $expire is max date in the future supported by php
+     * $expire is the max date in the future supported by php
      */
     public function addCookie(string $key, string $value, int $expire = 2147483647): Response
     {
@@ -430,7 +432,7 @@ class Response
 
         $fh = fopen('php://temp', 'rwb');
         if ($this->csv_header) {
-            fputcsv($fh, array_keys(current((array)$data)), $this->csv_separator, $this->csv_enclosure, $this->csv_escape);
+            fputcsv($fh, array_keys(current((array)$data)), $this->csv_separator, $this->csv_enclosure, $this->csv_escape); //phpcs:ignore
         }
 
         foreach ($data as $key => $row) {

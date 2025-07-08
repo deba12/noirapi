@@ -64,11 +64,13 @@ class Numeric implements Schema
 
         /** @noinspection TypeUnsafeComparisonInspection */
         /** @noinspection DuplicatedCode */
+        /** @phpstan-ignore notEqual.notAllowed */
         if ($this->nullable && (empty($value) && $value != '0')) {
             return null;
         }
 
         /** @noinspection TypeUnsafeComparisonInspection */
+        /** @phpstan-ignore notEqual.notAllowed */
         if ($this->required && (empty($value) && $value != '0')) {
             /** @noinspection UnusedFunctionResultInspection */
             $context->addError('The mandatory option %path% is empty.', Message::MissingItem);

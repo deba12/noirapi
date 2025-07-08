@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib\PDO;
 
+use Override;
 use PDOStatement as NativePdoStatement;
+use RuntimeException;
 
 use function is_array;
 use function is_string;
@@ -37,6 +39,7 @@ class PDOStatement extends NativePdoStatement
      * @return bool
      * @psalm-suppress PossiblyNullArgument
      */
+    #[Override]
     public function bindParam(int|string $param, mixed &$var, int $type = \PDO::PARAM_STR, ?int $maxLength = null, mixed $driverOptions = null): bool //phpcs:ignore
     {
         $this->bindings[$param] = $var;
@@ -50,6 +53,7 @@ class PDOStatement extends NativePdoStatement
      * @param int $type
      * @return bool
      */
+    #[Override]
     public function bindValue(int|string $param, mixed $value, int $type = \PDO::PARAM_STR): bool
     {
         $this->bindings[$param] = $value;
@@ -61,6 +65,7 @@ class PDOStatement extends NativePdoStatement
      * @param array|null $params
      * @return bool
      */
+    #[Override]
     public function execute(?array $params = null): bool
     {
 
@@ -79,6 +84,11 @@ class PDOStatement extends NativePdoStatement
         return $result;
     }
 
+    /**
+     * @param array $bindings
+     * @param string $query
+     * @return string
+     */
     private function produceStatementWithBindingsInForLogging(array $bindings, string $query): string
     {
 
@@ -87,11 +97,19 @@ class PDOStatement extends NativePdoStatement
         foreach ($bindings as $value) {
             $valueForPresentation = $this->translateValueForPresentationInsideStatement($value);
             $result = preg_replace('/\?/', $valueForPresentation, $result, 1);
+
+            if ($result === null) {
+                throw new RuntimeException('Failed to replace placeholder with value');
+            }
         }
 
         return $result;
     }
 
+    /**
+     * @param mixed $value
+     * @return string
+     */
     private function translateValueForPresentationInsideStatement(mixed $value): string
     {
 

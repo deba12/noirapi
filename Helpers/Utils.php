@@ -233,13 +233,18 @@ class Utils
 
             if (is_array($input)) {
                 if (isset($input[$name])) {
+                    /** @phpstan-ignore property.dynamicName */
                     $class->$name = $input[$name];
                 } elseif ($remove_missing) {
+                    /** @phpstan-ignore property.dynamicName */
                     unset($class->$name);
                 }
+            /** @phpstan-ignore property.dynamicName */
             } elseif (isset($input->$name)) {
+                // @phpstan-ignore-next-line
                 $class->$name = $input->$name;
             } elseif ($remove_missing) {
+                /** @phpstan-ignore property.dynamicName */
                 unset($class->$name);
             }
         }
@@ -257,7 +262,7 @@ class Utils
     {
         $result = [];
 
-        $properties = (new ReflectionClass($class))->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
+        $properties = new ReflectionClass($class)->getProperties($public_only ? ReflectionProperty::IS_PUBLIC : null);
 
         foreach ($properties as $property) {
             $result[] = $property->getName();
@@ -301,6 +306,7 @@ class Utils
                     if (count($rad)) {
                         $r[$k] = $rad;
                     }
+                /** @phpstan-ignore notEqual.notAllowed */
                 } elseif ($v != $a2[$k]) {
                     $r[$k] = $v;
                 }
@@ -331,7 +337,7 @@ class Utils
      */
     public static function base64UrlDecode(string $data): string
     {
-        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='));
+        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='), true);
     }
 
     /**

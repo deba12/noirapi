@@ -10,6 +10,7 @@ declare(strict_types=1);
 namespace Noirapi\Lib\Tracy;
 
 use Noirapi\Lib\PDO\PDO;
+use Override;
 use SqlFormatter;
 use Tracy\IBarPanel;
 
@@ -79,18 +80,19 @@ class PDOBarPanel implements IBarPanel
      * @return string
      * @noinspection TypeUnsafeComparisonInspection
      */
+    #[Override]
     public function getTab(): string
     {
 
         $html = '<img src="' . $this->icon . '" alt="PDO queries logger" /> ';
         $queries = count($this->pdo->getLog());
-        if ($queries == 0) {
+        if ($queries === 0) {
             $html .= 'no queries!';
 
             return $html;
         }
 
-        if ($queries == 1) {
+        if ($queries === 1) {
             $html .= '1 query';
         } else {
             $html .= $queries . ' queries';
@@ -104,6 +106,7 @@ class PDOBarPanel implements IBarPanel
      * Renders HTML code for custom panel.
      * @return string
      */
+    #[Override]
     public function getPanel(): string
     {
 

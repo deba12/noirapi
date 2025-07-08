@@ -187,4 +187,25 @@ class Request
 
         return $self;
     }
+
+    /**
+     * @param string $name
+     * @return string|null
+     * @noinspection PhpUnused
+     */
+    public function getHeader(string $name): ?string
+    {
+        $name = str_replace('-', '_', strtoupper($name));
+        return $this->headers[$name] ?? null;
+    }
+
+    /**
+     * @param string $name
+     * @return string|null
+     * @noinspection PhpUnused
+     */
+    public function getCookie(string $name): ?string
+    {
+        return $this->cookies[$name] ?? null;
+    }
 }

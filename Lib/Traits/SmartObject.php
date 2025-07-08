@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib\Traits;
 
-use ReflectionAttribute;
 use ReflectionClass;
 use ReflectionProperty;
 
@@ -50,8 +49,9 @@ trait SmartObject
                     $name = $attribute->getName();
                     if (in_array($name, self::$__smartObjectAttributeClasses, true)) {
                         $name = $property->getName();
+                        /** @phpstan-ignore property.dynamicName */
                         unset($this->$name);
-
+                        /** @psalm-suppress UndefinedMethod */
                         self::$__properties[$name] = $property;
                     }
                 }
@@ -62,10 +62,11 @@ trait SmartObject
     /**
      * @param string $name
      * @return void
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function __get(string $name)
     {
-
+        /** @psalm-suppress UndefinedMethod */
         if (isset(self::$__properties[$name])) {
             foreach (self::$__smartObjectAttributeClasses as $attributeClass) {
                 if (self::$__properties[$name]->getAttributes($attributeClass)) {
@@ -74,19 +75,27 @@ trait SmartObject
 
                     foreach ($instance->args as $arg) {
                         if (property_exists($this, $arg)) {
-                            if ($this->$arg === null) {
+                            /** @phpstan-ignore property.dynamicName */
+                            if ($this->{$arg} === null) {
                                 return null;
                             }
-                            $args[] = $this->$arg;
+                            /** @phpstan-ignore property.dynamicName */
+                            $args[] = $this->{$arg};
                         }
                     }
 
-                    return $instance->_class->{$instance->_method}(...$args);
+                    if ($instance->isStatic) {
+                        /** @phpstan-ignore staticMethod.dynamicName */
+                        return $instance->className::{$instance->methodName}(...$args);
+                    }
+                    /** @phpstan-ignore method.dynamicName */
+                    return new $instance->className()->{$instance->methodName}(...$args);
                 }
             }
         }
 
         // Fallthrough and handle it by Nette's SmartObject
+        /** @phpstan-ignore property.dynamicName */
         return $this->$name;
     }
 }

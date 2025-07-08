@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Noirapi\Lib\Tracy;
 
 use Noirapi\Helpers\Curl;
+use Override;
 use Tracy\Debugger;
 use Tracy\IBarPanel;
 
@@ -44,6 +45,7 @@ class CurlBarPanel implements IBarPanel
     /**
      * @return string
      */
+    #[Override]
     public function getTab(): string
     {
 
@@ -71,6 +73,7 @@ class CurlBarPanel implements IBarPanel
      * Renders HTML code for custom panel.
      * @return string
      */
+    #[Override]
     public function getPanel(): string
     {
 

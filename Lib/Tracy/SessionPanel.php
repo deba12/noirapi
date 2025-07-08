@@ -6,6 +6,7 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib\Tracy;
 
+use Override;
 use Tracy\IBarPanel;
 
 use function count;
@@ -14,6 +15,7 @@ use function is_array;
 use function is_object;
 use function is_string;
 
+/** @psalm-suppress UnusedClass */
 class SessionPanel implements IBarPanel
 {
     /**
@@ -46,6 +48,7 @@ class SessionPanel implements IBarPanel
     /**
      * @return string
      */
+    #[Override]
     public function getTab(): string
     {
 
@@ -59,6 +62,10 @@ class SessionPanel implements IBarPanel
         return $html;
     }
 
+    /**
+     * @return string
+     */
+    #[Override]
     public function getPanel(): string
     {
 

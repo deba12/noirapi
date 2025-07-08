@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib\PDO;
 
+use Override;
 use PDO as NativePdo;
 
 class PDO extends NativePdo
@@ -30,6 +31,7 @@ class PDO extends NativePdo
      * @param string $statement
      * @return false|int
      */
+    #[Override]
     public function exec(string $statement): false|int
     {
 
@@ -46,6 +48,7 @@ class PDO extends NativePdo
      * @param mixed ...$fetch_mode_args
      * @return false|\PDOStatement
      */
+    #[Override]
     public function query(
         string $query,
         ?int $fetchMode = NativePdo::ATTR_DEFAULT_FETCH_MODE,
@@ -71,7 +74,7 @@ class PDO extends NativePdo
 
         $this->log[] = [
             'statement' => $statement,
-            'time'      => $time * 1000,
+            'time'      => $time * 1000.00, // Convert to milliseconds
         ];
     }
 

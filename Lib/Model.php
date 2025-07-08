@@ -8,7 +8,6 @@ namespace Noirapi\Lib;
 
 use Nette\Utils\Paginator;
 use Noirapi\Config;
-use Noirapi\Exceptions\ConfigException;
 use Noirapi\Lib\PDO\PDO;
 use Opis\Database\Connection;
 use Opis\Database\Database;
@@ -19,40 +18,45 @@ use RuntimeException;
  */
 class Model
 {
-    public string $driver = 'mysql';
+    public string $driver;
     public Database $db;
     protected static array $pdo;
+    private array $params;
 
     /**
-     * @throws ConfigException
+     * @param string $driver
+     * @param array $params
      */
-    public function __construct(array $params = [])
+    public function __construct(string $driver = 'mysql', array $params = [])
     {
         if (empty($params)) {
-            if (empty(self::$pdo[$this->driver])) {
-                $db = Config::get('db');
-                if (empty($db[$this->driver])) {
-                    throw new ConfigException('Model: unable to find config for: ' . $this->driver);
-                }
-
-                self::$pdo[$this->driver] = new PDO($this->driver . ':' . $db[$this->driver]['dsn'], $db[$this->driver]['user'] ?? null, $db[$this->driver]['pass'] ?? null); //phpcs:ignore
-                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
-                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
-            }
-
-            $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
+            $db = Config::get('db');
+            $this->params = $db[$driver];
         } else {
-            $pdo = new PDO($params['dsn'], $params['user'] ?? null, $params['pass'] ?? null);
-
-            $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
-            $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
-
-            $this->db = new Database(Connection::fromPDO($pdo));
+            $this->params = $params;
         }
+        $this->driver = $driver;
+        $this->connect();
+    }
+
+    /**
+     * @return void
+     */
+    public function connect(): void
+    {
+        if(! isset(self::$pdo[$this->driver])) {
+            self::$pdo[$this->driver] = new PDO(
+                $this->driver . ':' . $this->params['dsn'],
+                $this->params['user'] ?? null,
+                $this->params['pass'] ?? null
+            );
+            self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+            self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+            self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
+        }
+
+        $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
     }
 
     /**

@@ -10,6 +10,7 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib;
 
+use BackedEnum;
 use FastRoute\Dispatcher;
 use Noirapi\Config;
 use Noirapi\Exceptions\InternalServerError;
@@ -18,7 +19,12 @@ use Noirapi\Exceptions\MessageException;
 use Noirapi\Exceptions\NotFoundException;
 use Noirapi\Exceptions\RestException;
 use Noirapi\Helpers\Utils;
+use Noirapi\Lib\Attributes\AutoWire;
+use Noirapi\Lib\Attributes\NotFound;
 use Noirapi\Lib\Tracy\GenericPanel;
+use ReflectionClass;
+use ReflectionException;
+use ReflectionMethod;
 use Swoole\Http\Server;
 use Throwable;
 use Tracy\Debugger;
@@ -96,6 +102,7 @@ class Route
 
     /**
      * @return Response
+     * @throws ReflectionException
      */
     public function serve(): Response
     {
@@ -154,18 +161,82 @@ class Route
 
         switch ($this->request->route[0]) {
             case Dispatcher::FOUND:
-                $this->request->controller = Utils::getCLassName($this->request->route[1][0]);
+                $this->request->controller = Utils::getClassName($this->request->route[1][0]);
                 $this->request->function = $this->request->route[1][1];
 
                 try {
-                    call_user_func_array(
-                        [
-                            new $this->request->route[1][0]($this->request, $this->response, $this->server),
-                            $this->request->route[1][1],
-                        ],
-                        $this->request->route[2]
-                    );
-                } /** @noinspection PhpRedundantCatchClauseInspection */ catch (LoginException $exception) {
+                    /** @var Controller $controller */
+                    $controller = new $this->request->route[1][0]($this->request, $this->response, $this->server);
+                    $method = $this->request->route[1][1];
+                    $args = $this->request->route[2];
+
+                    $realArgs = [];
+
+                    /** @noinspection PhpUnhandledExceptionInspection */
+                    $reflection = new ReflectionMethod($controller, $method);
+                    if (count($reflection->getAttributes()) > 0) {
+                        $parameters = $reflection->getParameters();
+
+                        /** @var NotFound $message */
+                        $message = $reflection->getAttributes(NotFound::class)[0]?->newInstance();
+
+                        foreach ($reflection->getAttributes(AutoWire::class) as $attribute) {
+                            /**
+                             * @var AutoWire $instance
+                             * @psalm-suppress UnnecessaryVarAnnotation
+                             */
+                            $instance = $attribute->newInstance();
+                            $param = array_shift($parameters);
+
+                            // If the parameter is not a built-in type, we will try to resolve it
+                            /**
+                             * @psalm-suppress UndefinedMethod
+                             * @phpstan-ignore-next-line
+                             */
+                            if (! $param->getType()->isBuiltin()) {
+                                /**
+                                 * @psalm-suppress UndefinedMethod
+                                 * @phpstan-ignore-next-line
+                                 */
+                                $type = $param->getType()->getName();
+                                $typeReflection = new ReflectionClass($type);
+                                foreach ($args as $key => $value) {
+                                    // If the key is like "user_id", we want to match it with the "user" parameter
+                                    if (str_ends_with($key, '_id')) {
+                                        $key_modified = substr($key, 0, -3);
+                                    } else {
+                                        $key_modified = $key;
+                                    }
+                                    if ($param->getName() === $key_modified) {
+                                        if ($typeReflection->isEnum() && $typeReflection->implementsInterface(BackedEnum::class)) { //phpcs:ignore
+                                            $result = $type::tryFrom($value);
+                                            if ($result === null) {
+                                                $controller->message($message !== null ? $message->message : 'Not Found', 'danger');
+                                                $this->response->withStatus($message !== null ? $message->status : 301)
+                                                    ->withLocation($controller->referer());
+                                                return $this->response;
+                                            }
+                                        } else {
+                                            /** @phpstan-ignore-next-line */
+                                            $result = $controller->model?->{$instance->getter_function}($value);
+
+                                            if ($result === null && ! $param->allowsNull()) {
+                                                $controller->message($message !== null ? $message->message : 'Not Found', 'danger');
+                                                $this->response->withStatus($message !== null ? $message->status : 301)
+                                                    ->withLocation($controller->referer());
+                                                return $this->response;
+                                            }
+                                        }
+                                        unset($args[$key]);
+                                        $realArgs[$param->getName()] = $result;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    call_user_func_array([ $controller, $method ], array_merge($args, $realArgs));
+                } catch (LoginException $exception) {
                     if ($exception->getCode() === 403) {
                         $this->response->withStatus(403)
                             ->setContentType(Response::TYPE_JSON)
@@ -174,16 +245,16 @@ class Route
                         $this->response->withStatus($exception->getCode())
                             ->withLocation($exception->getMessage());
                     }
-                } /** @noinspection PhpRedundantCatchClauseInspection */ catch (RestException $exception) {
+                } catch (RestException $exception) {
                     $this->response->withStatus($exception->getCode())
                         ->setContentType(Response::TYPE_JSON)
                         ->setBody($exception->getMessage());
-                } /** @noinspection PhpRedundantCatchClauseInspection */ catch (MessageException $exception) {
+                } catch (MessageException $exception) {
                     $this->response->withStatus($exception->getCode())
                         ->setBody($exception->getMessage());
-                } /** @noinspection PhpRedundantCatchClauseInspection */ catch (InternalServerError $exception) {
+                } catch (InternalServerError $exception) {
                     $this->response = self::handleErrors(500, $exception->getMessage() ?? 'Internal server error', $this); //phpcs:ignore
-                } /** @noinspection PhpRedundantCatchClauseInspection */ catch (NotFoundException $exception) {
+                } catch (NotFoundException $exception) {
                     $this->response = self::handleErrors(404, $exception->getMessage() ?? '404 Not found', $this);
                 }
 
@@ -236,6 +307,7 @@ class Route
                 try {
                     /** @noinspection PhpFullyQualifiedNameUsageInspection */
                     /** @noinspection PhpParenthesesCanBeOmittedForNewCallInspection */
+                    /** @phpstan-ignore method.dynamicName */
                     return (new \App\Controllers\Errors($instance->request, $instance->response, $instance->server))->$function(); // phpcs:ignore
                 } catch (LoginException $e) {
                     $response = new Response();

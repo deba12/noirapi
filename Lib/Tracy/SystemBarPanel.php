@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Noirapi\Tracy;
 
 use Noirapi\Lib\View;
+use Override;
 use Tracy\IBarPanel;
 
 class SystemBarPanel implements IBarPanel
@@ -32,6 +33,7 @@ class SystemBarPanel implements IBarPanel
     /**
      * @return string
      */
+    #[Override]
     public function getTab(): string
     {
 
@@ -50,9 +52,13 @@ class SystemBarPanel implements IBarPanel
         return $html;
     }
 
-    public function getPanel(): null
+    /**
+     * @return string
+     */
+    #[Override]
+    public function getPanel(): string
     {
 
-        return null;
+        return '';
     }
 }
