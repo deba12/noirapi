@@ -42,6 +42,15 @@ class Model
     }
 
     /**
+     * @return static
+     * @noinspection PhpUnused
+     */
+    public static function getCachedInstance(): static
+    {
+        return new static();
+    }
+
+    /**
      * @param bool $new
      * @return void
      */
