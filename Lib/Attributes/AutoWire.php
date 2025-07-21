@@ -9,10 +9,10 @@ use Attribute;
 #[Attribute(Attribute::TARGET_METHOD | Attribute::IS_REPEATABLE)]
 class AutoWire
 {
-    public ?string $getter_function = null;
+    public string|array|null $callable = null;
 
-    public function __construct(string $getter_function = 'get')
+    public function __construct(string|array|null $callable)
     {
-        $this->getter_function = $getter_function;
+        $this->callable = $callable;
     }
 }

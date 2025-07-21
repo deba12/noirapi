@@ -25,7 +25,6 @@ use Noirapi\Lib\Tracy\GenericPanel;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionMethod;
-use stdClass;
 use Swoole\Http\Server;
 use Throwable;
 use Tracy\Debugger;
@@ -179,7 +178,7 @@ class Route
                         $parameters = $reflection->getParameters();
 
                         /** @var NotFound $message */
-                        if(isset($reflection->getAttributes(NotFound::class)[0])) {
+                        if (isset($reflection->getAttributes(NotFound::class)[0])) {
                             $message = $reflection->getAttributes(NotFound::class)[0]->newInstance();
                         } else {
                             $message = null;
@@ -216,17 +215,23 @@ class Route
                                         if ($typeReflection->isEnum() && $typeReflection->implementsInterface(BackedEnum::class)) { //phpcs:ignore
                                             $result = $type::tryFrom($value);
                                             if ($result === null) {
-                                                $controller->message($message !== null ? $message->message : 'Not Found', 'danger');
+                                                $controller->message($message !== null ? $message->message : 'Not Found', 'danger'); //phpcs:ignore
                                                 $this->response->withStatus($message !== null ? $message->status : 301)
                                                     ->withLocation($controller->referer());
                                                 return $this->response;
                                             }
                                         } else {
                                             /** @phpstan-ignore-next-line */
-                                            $result = $controller->model?->{$instance->getter_function}($value);
+                                            if (is_string($instance->callable)) {
+                                                $result = $controller->model?->{$instance->callable}($value);
+                                            } elseif (is_array($instance->callable)) {
+                                                $result = call_user_func($instance->callable, $value);
+                                            } else {
+                                                continue; // Skip if callable is not a string or array
+                                            }
 
                                             if ($result === null && ! $param->allowsNull()) {
-                                                $controller->message($message !== null ? $message->message : 'Not Found', 'danger');
+                                                $controller->message($message !== null ? $message->message : 'Not Found', 'danger'); //phpcs:ignore
                                                 $this->response->withStatus($message !== null ? $message->status : 301)
                                                     ->withLocation($controller->referer());
                                                 return $this->response;
