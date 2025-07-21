@@ -177,8 +177,8 @@ class Route
                     if (count($reflection->getAttributes()) > 0) {
                         $parameters = $reflection->getParameters();
 
-                        /** @var NotFound $message */
                         if (isset($reflection->getAttributes(NotFound::class)[0])) {
+                            /** @var NotFound $message */
                             $message = $reflection->getAttributes(NotFound::class)[0]->newInstance();
                         } else {
                             $message = null;
