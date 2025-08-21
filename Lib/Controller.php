@@ -314,7 +314,7 @@ class Controller
 
             $this->message('Page not found', 'danger');
 
-            throw new LoginException('/');
+            throw new LoginException('/', 301);
         }
     }
 
@@ -326,7 +326,6 @@ class Controller
      */
     public function isAllowed(Acl $acl): void
     {
-
         if (! $acl->isAllowed($this->request->role, get_called_class())) {
             if ($this->request->ajax) {
                 throw new MessageException('Please Login', 403);
