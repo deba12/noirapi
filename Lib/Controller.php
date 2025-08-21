@@ -342,7 +342,7 @@ class Controller
 
             $this->message('Please login', 'success');
 
-            throw new LoginException('/');
+            throw new LoginException('/', 301);
         }
     }
 }

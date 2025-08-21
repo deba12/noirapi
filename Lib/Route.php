@@ -163,8 +163,8 @@ class Route
             case Dispatcher::FOUND:
                 $this->request->controller = Utils::getClassName($this->request->route[1][0]);
                 $this->request->function = $this->request->route[1][1];
-
                 try {
+
                     /** @var Controller $controller */
                     $controller = new $this->request->route[1][0]($this->request, $this->response, $this->server);
                     $method = $this->request->route[1][1];
