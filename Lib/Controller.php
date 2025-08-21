@@ -60,7 +60,7 @@ class Controller
                     && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
         }
 
-        if (Config::get('db')) {
+        if (Config::get('db') !== null) {
             if (empty($this->model)) {
                 $model = self::$model_path . Utils::getClassName(get_class($this));
                 if (class_exists($model) && is_subclass_of($model, Model::class)) {
