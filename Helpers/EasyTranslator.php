@@ -8,6 +8,7 @@ use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use Noirapi\Interfaces\Translator;
 
+use Override;
 use function array_map;
 use function is_string;
 use function sprintf;
@@ -43,6 +44,7 @@ class EasyTranslator implements Translator
      * @param mixed ...$args
      * @return string
      */
+    #[Override]
     public function translate(string $message, ?string $key = null, mixed ...$args): string
     {
         // Condition is like /en,

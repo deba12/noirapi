@@ -9,6 +9,7 @@ use Noirapi\Exceptions\ConfigException;
 
 use function is_array;
 
+/** @psalm-api */
 class Config
 {
     private static array $options;

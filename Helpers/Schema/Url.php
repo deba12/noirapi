@@ -15,6 +15,7 @@ namespace Noirapi\Helpers\Schema;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
+use Override;
 
 /** @psalm-api  */
 class Url implements Schema
@@ -59,6 +60,7 @@ class Url implements Schema
      * @noinspection HttpUrlsUsage
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function normalize($value, Context $context)
     {
 
@@ -107,6 +109,7 @@ class Url implements Schema
      * @return mixed
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function merge($value, $base)
     {
         return $value;
@@ -118,12 +121,14 @@ class Url implements Schema
      * @return mixed
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function complete($value, Context $context)
     {
         return $value;
     }
 
     /** @noinspection ReturnTypeCanBeDeclaredInspection */
+    #[Override]
     public function completeDefault(Context $context)
     {
         if ($this->required) {

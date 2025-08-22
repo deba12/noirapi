@@ -16,6 +16,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+use Override;
 use function gettype;
 use function is_string;
 
@@ -104,6 +105,7 @@ class DateTime implements Schema
      * @return string|\DateTime|null
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function normalize(mixed $value, Context $context): string|null|\DateTime
     {
 
@@ -165,6 +167,7 @@ class DateTime implements Schema
      * @return mixed
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function merge($value, $base): mixed
     {
         return $value;
@@ -176,6 +179,7 @@ class DateTime implements Schema
      * @return mixed
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function complete($value, Context $context): mixed
     {
         return $value;
@@ -185,6 +189,7 @@ class DateTime implements Schema
      * @noinspection ReturnTypeCanBeDeclaredInspection
      * @noinspection PhpMissingReturnTypeInspection
      */
+    #[Override]
     public function completeDefault(Context $context)
     {
         if ($this->required) {

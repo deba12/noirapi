@@ -6,6 +6,7 @@ namespace Noirapi\Exceptions;
 
 use Exception;
 
+/** @psalm-api */
 class FileUploadValidation extends Exception
 {
 }

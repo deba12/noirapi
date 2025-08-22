@@ -9,6 +9,7 @@ namespace Noirapi\Helpers\Schema;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
+use Override;
 
 /** @psalm-api  */
 class Cidr implements Schema
@@ -41,6 +42,7 @@ class Cidr implements Schema
      * @param Context $context
      * @return mixed
      */
+    #[Override]
     public function normalize(mixed $value, Context $context): mixed
     {
 
@@ -90,6 +92,7 @@ class Cidr implements Schema
      * @param mixed $base
      * @return mixed
      */
+    #[Override]
     public function merge(mixed $value, mixed $base): mixed
     {
         return $value;
@@ -100,6 +103,7 @@ class Cidr implements Schema
      * @param Context $context
      * @return mixed
      */
+    #[Override]
     public function complete(mixed $value, Context $context): mixed
     {
         return $value;
@@ -110,6 +114,7 @@ class Cidr implements Schema
      * @param Context $context
      * @return null
      */
+    #[Override]
     public function completeDefault(Context $context): null
     {
         if ($this->required) {

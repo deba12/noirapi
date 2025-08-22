@@ -6,7 +6,10 @@ namespace Noirapi\Helpers;
 
 use Noirapi\Exceptions\FileUploadValidation;
 
-/** @psalm-suppress MissingConstructor */
+/**
+ * @psalm-suppress MissingConstructor
+ * @psalm-api
+ */
 class FileUpload
 {
     private array $file;
@@ -209,11 +212,12 @@ class FileUpload
 
     /**
      * @return string
-     * @noinspection PhpUnused
+     * @throws FileUploadValidation
      */
     public function getFile(): string
     {
-        return file_get_contents($this->file['tmp_name']);
+        $file = file_get_contents($this->file['tmp_name']);
+        return is_string($file) ? $file : throw new FileUploadValidation('File is not readable');
     }
 
     /**

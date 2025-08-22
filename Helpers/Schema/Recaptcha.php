@@ -13,6 +13,7 @@ use JsonException;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
+use Override;
 
 /**
  * @psalm-api
@@ -76,6 +77,7 @@ class Recaptcha implements Schema
      * @return bool|null
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function normalize($value, Context $context): ?bool
     {
 
@@ -113,6 +115,7 @@ class Recaptcha implements Schema
      * @return mixed
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function merge($value, $base): mixed
     {
 
@@ -125,6 +128,7 @@ class Recaptcha implements Schema
      * @return mixed
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function complete($value, Context $context): mixed
     {
 
@@ -135,6 +139,7 @@ class Recaptcha implements Schema
      * @param Context $context
      * @return null
      */
+    #[Override]
     public function completeDefault(Context $context): null
     {
 

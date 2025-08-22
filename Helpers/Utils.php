@@ -13,6 +13,7 @@ use Random\Randomizer;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
+use RuntimeException;
 use stdClass;
 
 use function array_key_exists;
@@ -339,7 +340,8 @@ class Utils
      */
     public static function base64UrlDecode(string $data): string
     {
-        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='), true);
+        $result = base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='), true);
+        return $result !== false ? $result : throw new RuntimeException('base64UrlDecode failed');
     }
 
     /**

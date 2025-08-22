@@ -10,10 +10,12 @@ use Latte\Compiler\Nodes\AuxiliaryNode;
 use Latte\Compiler\PrintContext;
 use Latte\Compiler\Tag;
 use Latte\Extension;
+use Override;
 
 /** @psalm-api  */
 class Macros extends Extension
 {
+    #[Override]
     public function getTags(): array
     {
         return [
