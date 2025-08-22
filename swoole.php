@@ -56,6 +56,10 @@ $server->on('request', function (Swoole\Http\Request $request, Swoole\Http\Respo
 
     foreach ($app->getCookies() as $cookie) {
 
+        /**
+         * @psalm-suppress InvalidNamedArgument
+         * @psalm-suppress TooFewArguments
+         */
         $response->setCookie(
             name: $cookie['key'],
             value: $cookie['value'],

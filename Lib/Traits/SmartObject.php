@@ -32,7 +32,10 @@ trait SmartObject
         foreach (get_declared_classes() as $className) {
             if (str_starts_with($className, 'ComposerAutoloaderInit')) {
 
-                /** @noinspection PhpUndefinedMethodInspection */
+                /**
+                 * @noinspection PhpUndefinedMethodInspection
+                 * @psalm-suppress UnusedForeachValue
+                 */
                 foreach ($className::getLoader()->getClassMap() as $class => $path) {
                     if (str_starts_with($class, 'Noirapi\Lib\Attributes')) {
                         self::$__smartObjectAttributeClasses[] = $class;

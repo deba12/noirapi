@@ -107,9 +107,9 @@ class Route
     public function serve(): Response
     {
 
-        if(Config::get('dev') !== null) {
+        if (Config::get('dev') !== null) {
             $dev = (bool)Config::get('dev');
-        } elseif(Config::get('dev_ips') !== null) {
+        } elseif (Config::get('dev_ips') !== null) {
             $dev = in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true);
         } else {
             $dev = false;
@@ -183,7 +183,6 @@ class Route
                         $parameters = $reflection->getParameters();
 
                         if (isset($reflection->getAttributes(NotFound::class)[0])) {
-                            /** @var NotFound $message */
                             $message = $reflection->getAttributes(NotFound::class)[0]->newInstance();
                         } else {
                             $message = null;
@@ -351,6 +350,7 @@ class Route
     /**
      * @return Response
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getResponse(): Response
     {
@@ -360,6 +360,7 @@ class Route
     /**
      * @return Request
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getRequest(): Request
     {
@@ -369,6 +370,7 @@ class Route
     /**
      * @return array
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getServer(): array
     {

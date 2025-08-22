@@ -124,6 +124,7 @@ class PDOBarPanel implements IBarPanel
             $html .= '</tr>';
             foreach ($queries as $query) {
                 $html .= '<tr>';
+                /** @psalm-suppress InvalidOperand */
                 $html .= '<td><span ' . $this->time_attributes . '>' . round($query['time'], 4) . '</span></td>';
                 if (class_exists(SqlFormatter::class)) {
                     $html .= '<td>' . SqlFormatter::highlight($query['statement']) . '</td>';

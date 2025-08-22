@@ -24,9 +24,9 @@ class PDOStatement extends NativePdoStatement
      */
     protected array $bindings = [];
 
+    /** @psalm-suppress PossiblyUnusedMethod */
     protected function __construct(PDO $pdo)
     {
-
         $this->pdo = $pdo;
     }
 

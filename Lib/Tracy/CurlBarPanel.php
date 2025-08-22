@@ -88,6 +88,7 @@ class CurlBarPanel implements IBarPanel
             $html .= '</tr>';
             foreach (Curl::getLog() as $request) {
                 $html .= '<tr>';
+                /** @psalm-suppress InvalidOperand */
                 $html .= '<td><span ' . $this->time_attributes . '>' . round($request['time'], 4) . '</span></td>';
                 $html .= '<td><i class="fa fa-chevron-right"></i> ' . $request['url'] . ' <i class="fa fa-chevron-left"></i> ' . $request['info'] . '</td>'; //phpcs:ignore
                 $html .= '</tr>';
