@@ -56,7 +56,7 @@ class Controller
         $this->server = $server;
 
         if ($this->dev === null) {
-            $this->dev = Config::get('dev') || (Config::get('dev_ips')
+            $this->dev = is_bool(Config::get('dev')) || (Config::get('dev_ips') !== null
                     && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
         }
 

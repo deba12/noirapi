@@ -107,8 +107,13 @@ class Route
     public function serve(): Response
     {
 
-        $dev = Config::get('dev') || (Config::get('dev_ips')
-                && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
+        if(Config::get('dev') !== null) {
+            $dev = (bool)Config::get('dev');
+        } elseif(Config::get('dev_ips') !== null) {
+            $dev = in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true);
+        } else {
+            $dev = false;
+        }
 
         $this->response = new Response();
 
@@ -221,8 +226,8 @@ class Route
                                                 return $this->response;
                                             }
                                         } else {
-                                            /** @phpstan-ignore-next-line */
                                             if (is_string($instance->callable)) {
+                                                //* @phpstan-ignore-next-line
                                                 $result = $controller->model?->{$instance->callable}($value);
                                             } elseif (is_array($instance->callable)) {
                                                 $result = call_user_func($instance->callable, $value);

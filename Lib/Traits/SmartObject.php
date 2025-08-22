@@ -69,7 +69,7 @@ trait SmartObject
         /** @psalm-suppress UndefinedMethod */
         if (isset(self::$__properties[$name])) {
             foreach (self::$__smartObjectAttributeClasses as $attributeClass) {
-                if (self::$__properties[$name]->getAttributes($attributeClass)) {
+                if (self::$__properties[$name]->getAttributes($attributeClass) !== null) {
                     $instance = self::$__properties[$name]->getAttributes($attributeClass)[0]->newInstance();
                     $args = [];
 

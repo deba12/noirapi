@@ -38,7 +38,7 @@ class TracyFileSession implements SessionStorage
     #[Override]
     public function isAvailable(): bool
     {
-        if (!$this->file) {
+        if (! is_resource($this->file)) {
             $this->open();
         }
 
@@ -97,10 +97,9 @@ class TracyFileSession implements SessionStorage
         }
     }
 
-
     public function __destruct()
     {
-        if (!$this->file) {
+        if (! is_resource($this->file)) {
             return;
         }
 
