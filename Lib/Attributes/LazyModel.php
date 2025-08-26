@@ -10,6 +10,7 @@ use Attribute;
 use ReflectionMethod;
 use RuntimeException;
 
+/** @psalm-api */
 #[Attribute(Attribute::TARGET_PROPERTY)]
 class LazyModel
 {

@@ -56,11 +56,11 @@ class Controller
         $this->server = $server;
 
         if ($this->dev === null) {
-            $this->dev = Config::get('dev') || (Config::get('dev_ips')
+            $this->dev = is_bool(Config::get('dev')) || (Config::get('dev_ips') !== null
                     && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
         }
 
-        if (Config::get('db')) {
+        if (Config::get('db') !== null) {
             if (empty($this->model)) {
                 $model = self::$model_path . Utils::getClassName(get_class($this));
                 if (class_exists($model) && is_subclass_of($model, Model::class)) {
@@ -314,7 +314,7 @@ class Controller
 
             $this->message('Page not found', 'danger');
 
-            throw new LoginException('/');
+            throw new LoginException('/', 301);
         }
     }
 
@@ -326,7 +326,6 @@ class Controller
      */
     public function isAllowed(Acl $acl): void
     {
-
         if (! $acl->isAllowed($this->request->role, get_called_class())) {
             if ($this->request->ajax) {
                 throw new MessageException('Please Login', 403);
@@ -342,7 +341,7 @@ class Controller
 
             $this->message('Please login', 'success');
 
-            throw new LoginException('/');
+            throw new LoginException('/', 301);
         }
     }
 }

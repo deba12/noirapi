@@ -15,6 +15,7 @@ namespace Noirapi\Helpers\Schema;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
+use Override;
 
 /** @psalm-api  */
 class Ip implements Schema
@@ -88,6 +89,7 @@ class Ip implements Schema
      * @param Context $context
      * @return int|string|null
      */
+    #[Override]
     public function normalize(mixed $value, Context $context)
     {
 
@@ -196,17 +198,30 @@ class Ip implements Schema
         return is_string($to) || is_int($to) ? $to : null;
     }
 
+    /**
+     * @param mixed $value
+     * @param mixed $base
+     * @return mixed
+     */
+    #[Override]
     public function merge(mixed $value, mixed $base): mixed
     {
         return $value;
     }
 
+    /**
+     * @param mixed $value
+     * @param Context $context
+     * @return mixed
+     */
+    #[Override]
     public function complete(mixed $value, Context $context): mixed
     {
         return $value;
     }
 
     /** @noinspection ReturnTypeCanBeDeclaredInspection */
+    #[Override]
     public function completeDefault(Context $context)
     {
         if ($this->required) {

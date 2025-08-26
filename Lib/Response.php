@@ -53,12 +53,15 @@ class Response
     public const string TYPE_RAW = 'application/octet-stream';
     public const string TYPE_ZIP = 'application/zip';
 
+    /** @psalm-suppress PossiblyUnusedProperty */
     public ?string $initiator_class = null;
+    /** @psalm-suppress PossiblyUnusedProperty */
     public ?string $initiator_method = null;
     public ?int $initiator_line = null;
     public string $csv_separator = ",";
     public string $csv_enclosure = "\"";
     public string $csv_escape = "\\";
+    /** @psalm-suppress PossiblyUnusedProperty */
     public string $csv_eol = "\n";
 
     /**
@@ -385,6 +388,7 @@ class Response
 
     /**
      * @return $this
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function disableCsvHeader(): Response
     {

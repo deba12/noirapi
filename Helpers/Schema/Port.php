@@ -10,6 +10,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+use Override;
 use function is_string;
 
 /** @psalm-api  */
@@ -61,6 +62,7 @@ class Port implements Schema
      * @inheritDoc
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function normalize($value, Context $context)
     {
 
@@ -106,6 +108,7 @@ class Port implements Schema
      * @inheritDoc
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function merge($value, $base)
     {
         return $value;
@@ -115,6 +118,7 @@ class Port implements Schema
      * @inheritDoc
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function complete($value, Context $context)
     {
         return $value;
@@ -124,6 +128,7 @@ class Port implements Schema
      * @inheritDoc
      *
      */
+    #[Override]
     public function completeDefault(Context $context)
     {
         if ($this->required) {

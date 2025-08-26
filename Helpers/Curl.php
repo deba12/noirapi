@@ -6,6 +6,7 @@ namespace Noirapi\Helpers;
 
 use Noirapi\Lib\Controller;
 use Noirapi\Lib\Tracy\CurlBarPanel;
+use Override;
 use Tracy\Debugger;
 
 use function is_object;
@@ -35,6 +36,7 @@ class Curl extends \Curl\Curl
      * @param mixed $ch
      * @return mixed
      */
+    #[Override]
     public function exec($ch = null): mixed
     {
 
@@ -75,7 +77,7 @@ class Curl extends \Curl\Curl
             'url'      => $url,
             'request'  => $request,
             'info'     => $info,
-            'time'     => $time * 1000,
+            'time'     => $time * 1000.0,
             'response' => $response,
         ];
     }

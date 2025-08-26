@@ -109,7 +109,7 @@ class View
 
         $layout_file = Config::get('layout');
 
-        if ($layout_file) {
+        if ($layout_file !== null) {
             $this->setLayout($layout_file);
         }
 
@@ -356,7 +356,7 @@ class View
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      *
-     * this is used by system panel
+     * this is used by the system panel
      */
     public function getParams(): array
     {

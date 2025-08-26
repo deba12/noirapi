@@ -107,8 +107,13 @@ class Route
     public function serve(): Response
     {
 
-        $dev = Config::get('dev') || (Config::get('dev_ips')
-                && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
+        if (Config::get('dev') !== null) {
+            $dev = (bool)Config::get('dev');
+        } elseif (Config::get('dev_ips') !== null) {
+            $dev = in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true);
+        } else {
+            $dev = false;
+        }
 
         $this->response = new Response();
 
@@ -163,8 +168,8 @@ class Route
             case Dispatcher::FOUND:
                 $this->request->controller = Utils::getClassName($this->request->route[1][0]);
                 $this->request->function = $this->request->route[1][1];
-
                 try {
+
                     /** @var Controller $controller */
                     $controller = new $this->request->route[1][0]($this->request, $this->response, $this->server);
                     $method = $this->request->route[1][1];
@@ -178,7 +183,6 @@ class Route
                         $parameters = $reflection->getParameters();
 
                         if (isset($reflection->getAttributes(NotFound::class)[0])) {
-                            /** @var NotFound $message */
                             $message = $reflection->getAttributes(NotFound::class)[0]->newInstance();
                         } else {
                             $message = null;
@@ -221,8 +225,8 @@ class Route
                                                 return $this->response;
                                             }
                                         } else {
-                                            /** @phpstan-ignore-next-line */
                                             if (is_string($instance->callable)) {
+                                                //* @phpstan-ignore-next-line
                                                 $result = $controller->model?->{$instance->callable}($value);
                                             } elseif (is_array($instance->callable)) {
                                                 $result = call_user_func($instance->callable, $value);
@@ -346,6 +350,7 @@ class Route
     /**
      * @return Response
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getResponse(): Response
     {
@@ -355,6 +360,7 @@ class Route
     /**
      * @return Request
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getRequest(): Request
     {
@@ -364,6 +370,7 @@ class Route
     /**
      * @return array
      * @noinspection PhpUnused
+     * @psalm-suppress PossiblyUnusedMethod
      */
     public function getServer(): array
     {

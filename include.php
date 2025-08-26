@@ -58,12 +58,20 @@ Debugger::$logSeverity = E_NOTICE | E_WARNING;
 
 // We have to use our own session storage because Tracy's default session storage is notcleaning up old sessions
 /** @noinspection PhpUnhandledExceptionInspection */
-Debugger::setSessionStorage((@is_dir($dir = session_save_path())
-    || @is_dir($dir = ini_get('upload_tmp_dir'))
-    || @is_dir($dir = sys_get_temp_dir())
-    || ($dir = PATH_LOGS))
-    ? new TracyFileSession($dir)
-    : new NativeSession());
+
+if (is_dir(session_save_path())) {
+    $session = new TracyFileSession(session_save_path());
+} elseif(is_dir(PATH_TEMP)) {
+    $session = new TracyFileSession(PATH_TEMP);
+} elseif (is_dir(ini_get('upload_tmp_dir'))) {
+    $session = new TracyFileSession(ini_get('upload_tmp_dir'));
+} elseif (is_dir(sys_get_temp_dir())) {
+    $session = new TracyFileSession(sys_get_temp_dir());
+} else {
+    $session = new NativeSession();
+}
+
+Debugger::setSessionStorage($session);
 
 if (Utils::isDev($_SERVER["REMOTE_ADDR"] ?? "")) {
     //we are missing some debug events in Tracy, that's why we start session so early

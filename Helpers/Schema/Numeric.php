@@ -10,6 +10,7 @@ use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
 
+use Override;
 use function is_string;
 
 /** @psalm-api  */
@@ -59,6 +60,7 @@ class Numeric implements Schema
     /**
      * @inheritDoc
      */
+    #[Override]
     public function normalize(mixed $value, Context $context): int|null|false
     {
 
@@ -103,6 +105,7 @@ class Numeric implements Schema
     /**
      * @inheritDoc
      */
+    #[Override]
     public function merge(mixed $value, mixed $base): mixed
     {
         return $value;
@@ -111,6 +114,7 @@ class Numeric implements Schema
     /**
      * @inheritDoc
      */
+    #[Override]
     public function complete(mixed $value, Context $context)
     {
         return $value;
@@ -119,6 +123,7 @@ class Numeric implements Schema
     /**
      * @inheritDoc
      */
+    #[Override]
     public function completeDefault(Context $context)
     {
         if ($this->required) {

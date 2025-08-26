@@ -13,6 +13,7 @@ use Random\Randomizer;
 use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
+use RuntimeException;
 use stdClass;
 
 use function array_key_exists;
@@ -180,7 +181,7 @@ class Utils
     public static function array_shuffle(array $array): array // phpcs:ignore
     {
 
-        return (new Randomizer())->shuffleArray($array);
+        return new Randomizer()->shuffleArray($array);
     }
 
     /**
@@ -223,7 +224,7 @@ class Utils
         $class = new $className();
 
         try {
-            $properties = (new ReflectionClass($class))->getProperties(ReflectionProperty::IS_PUBLIC);
+            $properties = new ReflectionClass($class)->getProperties(ReflectionProperty::IS_PUBLIC);
         } catch (ReflectionException) {
             return (object) $input;
         }
@@ -279,11 +280,13 @@ class Utils
     public static function var_name(mixed &$var, mixed $scope = false) // phpcs:ignore
     {
         $old = $var;
-        if (($key = array_search(
-            $var = 'unique' . mt_rand() . 'value',
-            ! $scope ? $GLOBALS : $scope,
-            true
-        )) && $var = $old
+        if (
+            //* @phpstan-ignore-next-line */
+            ($key = array_search(
+                $var = 'unique' . mt_rand() . 'value',
+                $scope === false ? $GLOBALS : $scope,
+                true
+            )) && $var = $old
         ) {
             return $key;
         }
@@ -303,7 +306,7 @@ class Utils
             if (array_key_exists($k, $a2)) {
                 if (is_array($v)) {
                     $rad = self::array_diff_recursive($v, $a2[$k]);
-                    if (count($rad)) {
+                    if (count($rad) > 0) {
                         $r[$k] = $rad;
                     }
                 /** @phpstan-ignore notEqual.notAllowed */
@@ -337,7 +340,8 @@ class Utils
      */
     public static function base64UrlDecode(string $data): string
     {
-        return base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='), true);
+        $result = base64_decode(str_pad(strtr($data, '-_', '+/'), strlen($data) % 4, '='), true);
+        return $result !== false ? $result : throw new RuntimeException('base64UrlDecode failed');
     }
 
     /**

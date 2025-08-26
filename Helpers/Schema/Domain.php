@@ -13,6 +13,7 @@ namespace Noirapi\Helpers\Schema;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
+use Override;
 
 /** @psalm-api  */
 class Domain implements Schema
@@ -48,6 +49,7 @@ class Domain implements Schema
      * @return mixed|string|null
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function normalize($value, Context $context): mixed
     {
 
@@ -84,6 +86,7 @@ class Domain implements Schema
      * @return mixed
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function merge($value, $base): mixed
     {
         return $value;
@@ -95,6 +98,7 @@ class Domain implements Schema
      * @return mixed
      * @psalm-suppress MissingParamType
      */
+    #[Override]
     public function complete($value, Context $context): mixed
     {
         return $value;
@@ -104,6 +108,7 @@ class Domain implements Schema
      * @noinspection ReturnTypeCanBeDeclaredInspection
      * @noinspection PhpMissingReturnTypeInspection
      */
+    #[Override]
     public function completeDefault(Context $context)
     {
         if ($this->required) {
