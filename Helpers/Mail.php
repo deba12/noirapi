@@ -253,7 +253,6 @@ class Mail
         // This is used for testing!!!
         if (str_starts_with($this->dsn, 'null://')) {
 
-            /** @noinspection PhpUnhandledExceptionInspection */
             $res = $this->transport->send($this->message);
             /** @noinspection NullPointerExceptionInspection */
             $message_id = $res->getMessageId();
@@ -268,7 +267,7 @@ class Mail
             $res = $this->transport->send($this->message);
         } catch (TransportExceptionInterface $e) {
             $this->error = $e->getMessage();
-            $this->debug_data = $e->getDebug();
+            $this->debug_data = $this->getDebug();
 
             return false;
         }
