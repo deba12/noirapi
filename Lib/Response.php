@@ -63,6 +63,7 @@ class Response
     public string $csv_escape = "\\";
     /** @psalm-suppress PossiblyUnusedProperty */
     public string $csv_eol = "\n";
+    public string $csv_utf8_bom = "\xEF\xBB\xBF";
 
     /**
      * @param mixed $body
@@ -431,7 +432,7 @@ class Response
      */
     private function toCsv(array|object $data): string
     {
-        $csv = '';
+        $csv = $this->csv_utf8_bom;
         $written = 0;
 
         $fh = fopen('php://temp', 'rwb');
