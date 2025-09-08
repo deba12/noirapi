@@ -309,7 +309,7 @@ class Controller
 
         if (! $acl->hasResource(get_called_class())) {
             if ($this->request->ajax) {
-                throw new MessageException('Page not Found', 403);
+                throw new MessageException('Page not Found', 404);
             }
 
             $this->message('Page not found', 'danger');
