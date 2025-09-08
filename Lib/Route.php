@@ -117,7 +117,7 @@ class Route
 
         $this->response = new Response();
 
-        $route = new \App\Route($dev);
+        $route = new \App\Route();
 
         $pos = strpos($this->request->uri, '?');
 
