@@ -15,8 +15,8 @@ use Exception;
 use Nette\Schema\Context;
 use Nette\Schema\Message;
 use Nette\Schema\Schema;
-
 use Override;
+
 use function gettype;
 use function is_string;
 
