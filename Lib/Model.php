@@ -1,7 +1,5 @@
 <?php
 
-/** @noinspection UnknownInspectionInspection */
-
 declare(strict_types=1);
 
 namespace Noirapi\Lib;
@@ -72,7 +70,7 @@ class Model
             $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
 
-            $this->db = new Database(Connection::fromPDO($pdo));
+            self::$pdo[$this->driver] = $pdo;
         } else {
             if (! isset(self::$pdo[$this->driver])) {
                 self::$pdo[$this->driver] = new PDO(
@@ -85,9 +83,8 @@ class Model
                 self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
                 self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
             }
-
-            $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
         }
+        $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
     }
 
     /**

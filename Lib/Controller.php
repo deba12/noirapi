@@ -50,7 +50,6 @@ class Controller
      */
     public function __construct(Request $request, Response $response, array $server)
     {
-
         $this->request = $request;
         $this->response = $response;
         $this->server = $server;
@@ -62,8 +61,8 @@ class Controller
 
         $db = Config::get('db');
 
+        //automatic model loading only for the first driver
         if ($db !== null) {
-
             $driver = array_key_first($db);
             $params = $db[$driver];
 
@@ -80,12 +79,12 @@ class Controller
              * Tracy debug bar
              */
             if ($this->dev) {
-                foreach ($this->model::tracyGetPdo() as $driver => $pdo) {
-                    if (! isset(self::$panels[$driver])) {
-                        self::$panels[$driver] = true;
+                foreach ($this->model::tracyGetPdo() as $drv => $pdo) {
+                    if (! isset(self::$panels[$drv])) {
+                        self::$panels[$drv] = true;
 
                         $panel = new PDOBarPanel($pdo);
-                        $panel->title = $driver;
+                        $panel->title = $drv;
                         Debugger::getBar()->addPanel($panel);
                     }
                 }
