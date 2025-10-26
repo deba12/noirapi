@@ -66,7 +66,7 @@ class Controller
             $driver = array_key_first($db);
             $params = $db[$driver];
 
-            if (empty($this->model)) {
+            if ($this->model === null) {
                 $model = self::$model_path . Utils::getClassName(get_class($this));
                 if (class_exists($model) && is_subclass_of($model, Model::class)) {
                     $this->model = new $model($driver, $params);

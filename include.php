@@ -59,11 +59,11 @@ Debugger::$logSeverity = E_NOTICE | E_WARNING;
 // We have to use our own session storage because Tracy's default session storage is notcleaning up old sessions
 /** @noinspection PhpUnhandledExceptionInspection */
 
-if (is_dir(session_save_path())) {
+if (session_save_path() !== false && is_dir(session_save_path())) {
     $session = new TracyFileSession(session_save_path());
-} elseif(is_dir(PATH_TEMP)) {
+} elseif (is_dir(PATH_TEMP)) {
     $session = new TracyFileSession(PATH_TEMP);
-} elseif (is_dir(ini_get('upload_tmp_dir'))) {
+} elseif (ini_get('upload_tmp_dir') !== false && is_dir(ini_get('upload_tmp_dir'))) {
     $session = new TracyFileSession(ini_get('upload_tmp_dir'));
 } elseif (is_dir(sys_get_temp_dir())) {
     $session = new TracyFileSession(sys_get_temp_dir());

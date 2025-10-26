@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Noirapi;
 
+use Nette\Neon\Exception;
 use Nette\Neon\Neon;
 use Noirapi\Exceptions\ConfigException;
 
+use Tracy\Debugger;
 use function is_array;
 
 /** @psalm-api */
@@ -36,13 +38,18 @@ class Config
 
         //TODO cache config in json with expiration
         if (is_readable($file)) {
-            $parsed = Neon::decode(file_get_contents($file));
+            try {
+                $parsed = Neon::decodeFile($file);
+            } catch (Exception $e) {
+                Debugger::log($e, Debugger::ERROR);
+            }
 
             if (empty($parsed)) {
                 throw new ConfigException('Unable to parse config:' . $file);
             }
 
             if (class_exists('\App\Lib\Config') && method_exists('\App\Lib\Config', 'validate')) {
+                /** @psalm-suppress UndefinedClass */
                 \App\Lib\Config::validate($parsed);
             }
 
