@@ -56,6 +56,11 @@ class Model
      */
     public function connect(bool $new): void
     {
+        if (str_starts_with($this->driver, 'sqlite') && (! str_starts_with($this->params['dsn'], '/') &&
+                ! str_contains($this->params['dsn'], 'memory'))) {
+            $this->params['dsn'] = Config::getRoot() . '/data/' . $this->params['dsn'];
+        }
+
         if ($new) {
             $pdo = new PDO(
                 $this->driver . ':' . $this->params['dsn'],

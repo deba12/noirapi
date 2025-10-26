@@ -11,6 +11,8 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib;
 
+use function get_class;
+use function in_array;
 use Laminas\Permissions\Acl\Acl;
 use Noirapi\Config;
 use Noirapi\Exceptions\LoginException;
@@ -21,12 +23,10 @@ use Noirapi\Helpers\RestMessage;
 use Noirapi\Helpers\Session;
 use Noirapi\Helpers\Utils;
 use Noirapi\Lib\Tracy\PDOBarPanel;
+
+use function strlen;
 use Throwable;
 use Tracy\Debugger;
-
-use function get_class;
-use function in_array;
-use function strlen;
 
 class Controller
 {
@@ -60,13 +60,19 @@ class Controller
                     && in_array($this->server[ 'REMOTE_ADDR' ], Config::get('dev_ips'), true));
         }
 
-        if (Config::get('db') !== null) {
+        $db = Config::get('db');
+
+        if ($db !== null) {
+
+            $driver = array_key_first($db);
+            $params = $db[$driver];
+
             if (empty($this->model)) {
                 $model = self::$model_path . Utils::getClassName(get_class($this));
                 if (class_exists($model) && is_subclass_of($model, Model::class)) {
-                    $this->model = new $model();
+                    $this->model = new $model($driver, $params);
                 } else {
-                    $this->model = new Model();
+                    $this->model = new Model($driver, $params);
                 }
             }
 
