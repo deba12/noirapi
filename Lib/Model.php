@@ -22,20 +22,25 @@ class Model
     private array $params;
 
     /**
-     * @param string $driver
+     * @param string|null $driver
      * @param array $params
      */
-    public function __construct(string $driver = 'mysql', array $params = [])
+    public function __construct(?string $driver = null, array $params = [])
     {
+        $db = Config::get('db');
+        if ($driver === null) {
+            $this->driver = array_key_first($db);
+        } else {
+            $this->driver = $driver;
+        }
+
         if (empty($params)) {
-            $db = Config::get('db');
-            $this->params = $db[$driver];
+            $this->params = $db[$this->driver];
             $new = false;
         } else {
             $this->params = $params;
             $new = true;
         }
-        $this->driver = $driver;
         $this->connect($new);
     }
 
