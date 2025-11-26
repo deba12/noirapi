@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib;
 
+use function count;
 use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
@@ -12,16 +13,15 @@ use Noirapi\Config;
 use Noirapi\Exceptions\FileNotFoundException;
 use Noirapi\Helpers\DummyTranslator;
 use Noirapi\Helpers\EasyTranslator;
-use Noirapi\Helpers\Filters;
 use Noirapi\Helpers\Macros;
 use Noirapi\Helpers\Session;
 use Noirapi\Helpers\Template;
 use Noirapi\Interfaces\Translator;
+use Noirapi\Lib\View\FilterExtension;
 use Noirapi\Lib\View\Layout;
 use RuntimeException;
-use stdClass;
 
-use function count;
+use stdClass;
 
 class View
 {
@@ -65,7 +65,7 @@ class View
         //enable regeneration of the template files
         $this->latte->setAutoRefresh();
 
-        $this->latte->addFilterLoader(Filters::class . '::init');
+        $this->latte->addExtension(new FilterExtension());
         $this->latte->addExtension(new Macros());
         $this->latte->addFunction('renderTemplate', static function ($template, array $data) {
 
@@ -78,6 +78,7 @@ class View
         /**
          * @noinspection PhpUndefinedClassInspection
          * @noinspection RedundantSuppression
+         * @noinspection PhpUndefinedNamespaceInspection
          */
         if (class_exists(\App\Lib\Macros::class)) {
             /**

@@ -1,34 +1,37 @@
 <?php
-
-/** @noinspection PhpUnused */
+/**
+ * @noinspection PhpUndefinedClassInspection
+ * @noinspection PhpUnused
+ */
 
 declare(strict_types=1);
 
-namespace Noirapi\Helpers;
+namespace Noirapi\Lib\View;
 
+use App\Lib\Filters;
 use JsonException;
-use Noirapi\Exceptions\FilterNotFoundException;
+use Latte\Extension;
+use Override;
+use ReflectionClass;
+use ReflectionException;
 
 /** @psalm-api  */
-class Filters
+class FilterExtension extends Extension
 {
     /**
-     * @param string $filter
-     * @return array
-     * @throws FilterNotFoundException
+     * @return array[]
+     * @throws ReflectionException
      */
-    public static function init(string $filter): array
+    #[Override]
+    public function getFilters(): array
     {
+        $res = $this->getMethods(__CLASS__);
 
-        if (class_exists(\App\Lib\Filters::class) && method_exists(\App\Lib\Filters::class, $filter)) {
-            return [\App\Lib\Filters::class, $filter];
+        if (class_exists(Filters::class)) {
+            $res = array_merge($res, $this->getMethods(Filters::class));
         }
 
-        if (method_exists(__CLASS__, $filter)) {
-            return [__CLASS__, $filter];
-        }
-
-        throw new FilterNotFoundException('Filter: ' . $filter . ' does not exists');
+        return $res;
     }
 
     /**
@@ -99,5 +102,23 @@ class Filters
     public static function json_prettify(object|array $data): string //phpcs:ignore
     {
         return json_encode($data, JSON_THROW_ON_ERROR | JSON_PRETTY_PRINT);
+    }
+
+    /**
+     * @psalm-return array<int, array{0:string, 1:array{0:class-string, 1:string}}>
+     * @return array<int, array{0:string, 1:array{0:class-string, 1:string}}>
+     * @throws ReflectionException
+     */
+    private function getMethods(string $class): array
+    {
+        $ref = new ReflectionClass($class);
+        $methods = array_filter(
+            $ref->getMethods(),
+            static fn ($m) => $m->getDeclaringClass()->getName() === $class && $m->isPublic() && $m->isStatic()
+        );
+
+        return array_map(static function ($method) use ($class) {
+            return [$method->name, [$class, $method->name]];
+        }, $methods);
     }
 }
