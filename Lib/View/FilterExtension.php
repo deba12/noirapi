@@ -105,8 +105,8 @@ class FilterExtension extends Extension
     }
 
     /**
-     * @psalm-return array<int, array{0:string, 1:array{0:class-string, 1:string}}>
-     * @return array<int, array{0:string, 1:array{0:class-string, 1:string}}>
+     * @psalm-return array<string, array{0:class-string, 1:string}>
+     * @return array<string, array{0:class-string, 1:string}>
      * @throws ReflectionException
      */
     private function getMethods(string $class): array
@@ -117,8 +117,12 @@ class FilterExtension extends Extension
             static fn ($m) => $m->getDeclaringClass()->getName() === $class && $m->isPublic() && $m->isStatic()
         );
 
-        return array_map(static function ($method) use ($class) {
-            return [$method->name, [$class, $method->name]];
-        }, $methods);
+        $res = [];
+
+        array_walk($methods, static function ($method) use (&$res, $class) {
+            $res[$method->getName()] = [$class, $method->getName()];
+        });
+
+        return $res;
     }
 }
