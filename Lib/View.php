@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib;
 
-use function count;
 use Latte\Bridges\Tracy\TracyExtension;
 use Latte\Engine;
 use Latte\Essential\TranslatorExtension;
@@ -20,8 +19,8 @@ use Noirapi\Interfaces\Translator;
 use Noirapi\Lib\View\FilterExtension;
 use Noirapi\Lib\View\Layout;
 use RuntimeException;
-
 use stdClass;
+use function count;
 
 class View
 {
