@@ -9,6 +9,7 @@ use Noirapi\Config;
 use Noirapi\Lib\PDO\PDO;
 use Opis\Database\Connection;
 use Opis\Database\Database;
+use Random\RandomException;
 use RuntimeException;
 
 /**
@@ -18,7 +19,8 @@ class Model
 {
     public string $driver;
     public Database $db;
-    protected static array $pdo;
+    /** @var PDO[] */
+    protected static array $pdo = [];
     private array $params;
 
     /**
@@ -36,12 +38,10 @@ class Model
 
         if (empty($params)) {
             $this->params = $db[$this->driver];
-            $new = false;
         } else {
             $this->params = $params;
-            $new = true;
         }
-        $this->connect($new);
+        $this->connect(false);
     }
 
     /**
@@ -54,54 +54,53 @@ class Model
     }
 
     /**
+     * @return static
+     */
+    public static function getNewInstance(): static
+    {
+        $static = new static();
+        $static->connect(true);
+        return $static;
+    }
+
+    /**
      * @param bool $new
      * @return void
      */
     public function connect(bool $new): void
     {
-        if (str_starts_with($this->driver, 'sqlite') && (! str_starts_with($this->params['dsn'], '/') &&
-                ! str_contains($this->params['dsn'], 'memory'))) {
+        if (
+            str_starts_with($this->driver, 'sqlite') && (! str_starts_with($this->params['dsn'], '/') &&
+                ! str_contains($this->params['dsn'], 'memory'))
+        ) {
             $this->params['dsn'] = Config::getRoot() . '/data/' . $this->params['dsn'];
         }
 
         if ($new) {
-            $pdo = new PDO(
-                $this->driver . ':' . $this->params['dsn'],
-                $this->params['user'] ?? null,
-                $this->params['pass'] ?? null
-            );
-            $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
-            $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-            $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-            $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
-
+            $pdo = $this->newPdo();
+            $idx = count(self::$pdo) + 1;
+            self::$pdo["$this->driver:$idx"] = $pdo;
+        } elseif (! isset(self::$pdo[$this->driver])) {
+            $pdo = $this->newPdo();
             self::$pdo[$this->driver] = $pdo;
         } else {
-            if (! isset(self::$pdo[$this->driver])) {
-                self::$pdo[$this->driver] = new PDO(
-                    $this->driver . ':' . $this->params['dsn'],
-                    $this->params['user'] ?? null,
-                    $this->params['pass'] ?? null
-                );
-                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
-                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
-                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-                self::$pdo[$this->driver]->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
-            }
+            $pdo = self::$pdo[$this->driver];
         }
-        $this->db = new Database(Connection::fromPDO(self::$pdo[$this->driver]));
+
+        $this->db = new Database(Connection::fromPDO($pdo));
     }
 
     /**
-     * @return array
+     * @return PDO[]
      */
     public static function tracyGetPdo(): array
     {
-        if (! empty(self::$pdo)) {
-            return self::$pdo;
-        }
+        return self::$pdo;
+    }
 
-        return [];
+    public static function flushPdoCache(): void
+    {
+        self::$pdo = [];
     }
 
     /**
@@ -216,5 +215,22 @@ class Model
     public function unlock(): void
     {
         $this->db->getConnection()->query('UNLOCK TABLES');
+    }
+
+    /**
+     * @return PDO
+     */
+    private function newPdo(): PDO
+    {
+        $pdo = new PDO(
+            $this->driver . ':' . $this->params['dsn'],
+            $this->params['user'] ?? null,
+            $this->params['pass'] ?? null
+        );
+        $pdo->setAttribute(\PDO::ATTR_STRINGIFY_FETCHES, false);
+        $pdo->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+        $pdo->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+        $pdo->setAttribute(\PDO::ATTR_DEFAULT_FETCH_MODE, \PDO::FETCH_OBJ);
+        return $pdo;
     }
 }

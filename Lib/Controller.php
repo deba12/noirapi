@@ -11,8 +11,6 @@ declare(strict_types=1);
 
 namespace Noirapi\Lib;
 
-use function get_class;
-use function in_array;
 use Laminas\Permissions\Acl\Acl;
 use Noirapi\Config;
 use Noirapi\Exceptions\LoginException;
@@ -23,10 +21,12 @@ use Noirapi\Helpers\RestMessage;
 use Noirapi\Helpers\Session;
 use Noirapi\Helpers\Utils;
 use Noirapi\Lib\Tracy\PDOBarPanel;
-
-use function strlen;
 use Throwable;
 use Tracy\Debugger;
+
+use function get_class;
+use function in_array;
+use function strlen;
 
 class Controller
 {
@@ -74,21 +74,6 @@ class Controller
                     $this->model = new Model($driver, $params);
                 }
             }
-
-            /**
-             * Tracy debug bar
-             */
-            if ($this->dev) {
-                foreach ($this->model::tracyGetPdo() as $drv => $pdo) {
-                    if (! isset(self::$panels[$drv])) {
-                        self::$panels[$drv] = true;
-
-                        $panel = new PDOBarPanel($pdo);
-                        $panel->title = $drv;
-                        Debugger::getBar()->addPanel($panel);
-                    }
-                }
-            }
         }
 
         // We need this when we are moving across domains
@@ -99,8 +84,14 @@ class Controller
 
     public function __destruct()
     {
-
         if ($this->dev) {
+            //PDO Panel must take into account all the created PDO connections, this can be done at destruction time
+            $data = Model::tracyGetPdo();
+            if(count($data) > 0) {
+                $panel = new PDOBarPanel($data);
+                Model::flushPdoCache();
+                Debugger::getBar()->addPanel($panel);
+            }
             Route::handleRouteUrlDebugBar($this->request, $this->response, $this->server);
         }
     }
@@ -114,7 +105,6 @@ class Controller
      */
     public function forward(?string $location = null, int $status = 302, bool $skip_lang = false): Response
     {
-
         if ($status !== 302 && $status !== 301) {
             throw new UnableToForwardException('Unable to forward with status code: ' . $status);
         }
@@ -176,7 +166,6 @@ class Controller
      */
     public function message(string|Message $text, ?string $type = null, ?string $translation_key = null, ...$translation_args): self //phpcs:ignore
     {
-
         Session::remove('message');
 
         if ($translation_key !== null) {
@@ -218,7 +207,6 @@ class Controller
      */
     public function referer(bool $same_domain = true): string
     {
-
         if (isset($this->server['HTTP_REFERER'])) {
             $url = str_replace('@', '', $this->server['HTTP_REFERER']);
             if (empty($url)) {
@@ -252,11 +240,11 @@ class Controller
                     if (str_starts_with($url['path'], '/' . $code . '/')) {
                         $path = substr($url['path'], strlen($code) + 1);
 
-                        return $path . (! isset($url['query']) ?  '' : '?' . ($url['query']));
+                        return $path . (! isset($url['query']) ? '' : '?' . ($url['query']));
                     }
                 }
 
-                return ($this->request->language === null  ? '' : '/' . $this->request->language) . $url['path'] . (! isset($url['query']) ?  '' : '?' . ($url['query'])); //phpcs:ignore
+                return ($this->request->language === null ? '' : '/' . $this->request->language) . $url['path'] . (! isset($url['query']) ? '' : '?' . ($url['query'])); //phpcs:ignore
             }
 
             if ($same_domain) {
@@ -292,7 +280,6 @@ class Controller
      */
     public function restMessage(bool $status, object|array|string $message, ?string $next = null, ?string $message_tag = null): Response //phpcs:ignore
     {
-
         return $this->response->setBody(
             RestMessage::new(
                 ok: $status,
@@ -311,8 +298,7 @@ class Controller
      */
     public function hasResource(Acl $acl): void
     {
-
-        if (! $acl->hasResource(get_called_class())) {
+        if (! $acl->hasResource(static::class)) {
             if ($this->request->ajax) {
                 throw new MessageException('Page not Found', 404);
             }
@@ -331,7 +317,7 @@ class Controller
      */
     public function isAllowed(Acl $acl): void
     {
-        if (! $acl->isAllowed($this->request->role, get_called_class())) {
+        if (! $acl->isAllowed($this->request->role, static::class)) {
             if ($this->request->ajax) {
                 throw new MessageException('Please Login', 403);
             }

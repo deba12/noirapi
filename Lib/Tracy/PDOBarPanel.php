@@ -56,23 +56,22 @@ class PDOBarPanel implements IBarPanel
      */
     public string $query_attributes = '';
 
-    /**
-     * @var PDO
-     */
-    private PDO $pdo;
+    /** @var PDO[] */
+    private array $pdo;
 
-    public function __construct(PDO $pdo)
+    public function __construct(array $pdo)
     {
         $this->pdo = $pdo;
     }
 
     /**
      * Get total queries execution time
+     * @param string $idx
      * @return string
      */
-    protected function getTotalTime(): string
+    protected function getTotalTime(string $idx): string
     {
-        return (string) round(array_sum(array_column($this->pdo->getLog(), 'time')), 4);
+        return (string) round(array_sum(array_column($this->pdo[$idx]->getLog(), 'time')), 2);
     }
 
     /**
@@ -83,21 +82,22 @@ class PDOBarPanel implements IBarPanel
     #[Override]
     public function getTab(): string
     {
-
         $html = '<img src="' . $this->icon . '" alt="PDO queries logger" /> ';
-        $queries = count($this->pdo->getLog());
-        if ($queries === 0) {
-            $html .= 'no queries!';
+        foreach ($this->pdo as $idx => $pdo) {
+            $queries = count($pdo->getLog());
+            if ($queries === 0) {
+                $html .= 'No queries! <i class="bi bi-three-dots-vertical mx-1"></i>';
+            } elseif ($queries === 1) {
+                $html .= '1 query';
+                $html .= ' / ' . $this->getTotalTime($idx) . ' ms';
+                $html .= "<i class='bi bi-three-dots-vertical  mx-1'></i>";
+            } else {
+                $html .= $queries . ' queries';
+                $html .= ' / ' . $this->getTotalTime($idx) . ' ms';
+                $html .= "<i class='bi bi-three-dots-vertical  mx-1'></i>";
+            }
 
-            return $html;
         }
-
-        if ($queries === 1) {
-            $html .= '1 query';
-        } else {
-            $html .= $queries . ' queries';
-        }
-        $html .= ' / ' . $this->getTotalTime() . ' ms';
 
         return $html;
     }
@@ -113,31 +113,37 @@ class PDOBarPanel implements IBarPanel
         if (class_exists(SqlFormatter::class)) {
             SqlFormatter::$pre_attributes = 'style="color: black;"';
         }
-        $queries = $this->pdo->getLog();
+
         $html = '<h1 ' . $this->title_attributes . '>' . $this->title . '</h1>';
-        $html .= '<div class="tracy-inner tracy-InfoPanel">';
-        if (count($queries) > 0) {
-            $html .= '<table class="tracy-sortable">';
-            $html .= '<tr>';
-            $html .= '<th>Time(ms)</td>';
-            $html .= '<th>Statement</td>';
-            $html .= '</tr>';
-            foreach ($queries as $query) {
+
+        foreach ($this->pdo as $idx => $pdo) {
+            $queries = $pdo->getLog();
+            $html .= '<h4>Database Connection #' . $idx . '</h4>';
+            $html .= '<div class="tracy-inner tracy-InfoPanel">';
+            if (count($queries) > 0) {
+                $html .= '<table class="tracy-sortable">';
                 $html .= '<tr>';
-                /** @psalm-suppress InvalidOperand */
-                $html .= '<td><span ' . $this->time_attributes . '>' . round($query['time'], 4) . '</span></td>';
-                if (class_exists(SqlFormatter::class)) {
-                    $html .= '<td>' . SqlFormatter::highlight($query['statement']) . '</td>';
-                } else {
-                    $html .= '<td ' . $this->query_attributes . '>' . $query['statement'] . '</td>';
-                }
+                $html .= '<th>Time(ms)</td>';
+                $html .= '<th>Statement</td>';
                 $html .= '</tr>';
+                foreach ($queries as $query) {
+                    $html .= '<tr>';
+                    /** @psalm-suppress InvalidOperand */
+                    $html .= '<td><span ' . $this->time_attributes . '>' . round($query['time'], 2) . '</span></td>';
+                    if (class_exists(SqlFormatter::class)) {
+                        $html .= '<td>' . SqlFormatter::highlight($query['statement']) . '</td>';
+                    } else {
+                        $html .= '<td ' . $this->query_attributes . '>' . $query['statement'] . '</td>';
+                    }
+                    $html .= '</tr>';
+                }
+                $html .= '</table>';
+            } else {
+                $html .= '<p style="font-size:1.2em;font-weight:bold;padding:10px">No queries were executed!</p>';
             }
-            $html .= '</table>';
-        } else {
-            $html .= '<p style="font-size:1.2em;font-weight:bold;padding:10px">No queries were executed!</p>';
+            $html .= '</div>';
         }
-        $html .= '</div>';
+
 
         return $html;
     }
