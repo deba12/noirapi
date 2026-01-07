@@ -87,7 +87,7 @@ class Controller
         if ($this->dev) {
             //PDO Panel must take into account all the created PDO connections, this can be done at destruction time
             $data = Model::tracyGetPdo();
-            if(count($data) > 0) {
+            if (count($data) > 0) {
                 $panel = new PDOBarPanel($data);
                 Model::flushPdoCache();
                 Debugger::getBar()->addPanel($panel);
