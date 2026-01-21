@@ -373,7 +373,7 @@ class Utils
     public static function getRealIp(string $remote_address): string
     {
         if (self::isCloudFlare($remote_address)) {
-            return $_SERVER['HTTP_CF_CONNECTING_IP'];
+            return $_SERVER['HTTP_CF_CONNECTING_IP'] ?? $remote_address;
         }
 
         return $remote_address;
@@ -410,7 +410,7 @@ class Utils
             '2c0f:f248::/32',
         ];
 
-        return array_any($cf_ranges, fn($range) => self::inRange($remote_address, $range));
+        return array_any($cf_ranges, static fn($range) => self::inRange($remote_address, $range));
     }
 
     /**
@@ -424,7 +424,7 @@ class Utils
             $range .= '/32';
         }
 
-        list($range, $netmask) = explode('/', $range, 2);
+        [$range, $netmask] = explode('/', $range, 2);
         $netmask = (int)$netmask;
 
         $range_bin = inet_pton($range);
@@ -440,6 +440,6 @@ class Utils
         $range_bits = str_pad(base_convert($range_bits, 16, 2), strlen($range_bin) * 8, '0', STR_PAD_LEFT);
         $ip_bits = str_pad(base_convert($ip_bits, 16, 2), strlen($ip_bin) * 8, '0', STR_PAD_LEFT);
 
-        return substr($range_bits, 0, $netmask) === substr($ip_bits, 0, $netmask);
+        return str_starts_with($range_bits, substr($ip_bits, 0, $netmask));
     }
 }
