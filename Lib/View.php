@@ -17,6 +17,7 @@ use Noirapi\Helpers\Session;
 use Noirapi\Helpers\Template;
 use Noirapi\Interfaces\Translator;
 use Noirapi\Lib\View\FilterExtension;
+use Noirapi\Lib\View\LatteLoader;
 use Noirapi\Lib\View\Layout;
 use RuntimeException;
 use stdClass;
@@ -30,7 +31,6 @@ class View
     /** @noinspection PhpGetterAndSetterCanBeReplacedWithPropertyHooksInspection */
     public Response $response;
     public Engine $latte;
-
     public static string $template_dir_prefix = '/';
 
     private stdClass $params;
@@ -38,9 +38,7 @@ class View
     private bool $dev;
     private ?string $layout_file = null;
     private const string LATTE_EXT = '.latte';
-
     private static string $uri;
-
 
     /**
      * View constructor.
@@ -67,12 +65,14 @@ class View
         $this->latte->addExtension(new FilterExtension());
         $this->latte->addExtension(new Macros());
         $this->latte->addFunction('renderTemplate', static function ($template, array $data) {
-
             $render = new Template();
             $render->setTemplate($template);
 
             return $render->print($data);
         });
+
+        //Handle the case where the template name is double underscore, search for it in the layouts
+        $this->latte->setLoader(new LatteLoader());
 
         /**
          * @noinspection PhpUndefinedClassInspection
@@ -244,7 +244,7 @@ class View
      * @noinspection PhpUnused
      * @psalm-suppress PossiblyUnusedMethod
      */
-    public function noLayout(): View
+    public function noLayout(): self
     {
         $this->layout_file = null;
 
