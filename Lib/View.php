@@ -219,7 +219,7 @@ class View
         $path = $controller === null ? lcfirst($this->request->controller) : lcfirst($controller);
 
         /** @psalm-suppress UndefinedConstant */
-        $file = PATH_VIEWS . $path . self::$template_dir_prefix . $template . self::LATTE_EXT;
+        $file = PATH_VIEWS . self::$template_dir_prefix . $path . DIRECTORY_SEPARATOR .  $template . self::LATTE_EXT;
 
         if (is_readable($file)) {
             $this->template = $file;
