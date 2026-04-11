@@ -21,6 +21,7 @@ use Noirapi\Lib\View\LatteLoader;
 use Noirapi\Lib\View\Layout;
 use RuntimeException;
 use stdClass;
+
 use function count;
 
 class View
