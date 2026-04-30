@@ -234,18 +234,13 @@ class Utils
 
             if (is_array($input)) {
                 if (isset($input[$name])) {
-                    /** @phpstan-ignore property.dynamicName */
                     $class->$name = $input[$name];
                 } elseif ($remove_missing) {
-                    /** @phpstan-ignore property.dynamicName */
                     unset($class->$name);
                 }
-            /** @phpstan-ignore property.dynamicName */
             } elseif (isset($input->$name)) {
-                // @phpstan-ignore-next-line
                 $class->$name = $input->$name;
             } elseif ($remove_missing) {
-                /** @phpstan-ignore property.dynamicName */
                 unset($class->$name);
             }
         }
@@ -281,7 +276,6 @@ class Utils
     {
         $old = $var;
         if (
-            //* @phpstan-ignore-next-line */
             ($key = array_search(
                 $var = 'unique' . mt_rand() . 'value',
                 $scope === false ? $GLOBALS : $scope,
@@ -309,7 +303,6 @@ class Utils
                     if (count($rad) > 0) {
                         $r[$k] = $rad;
                     }
-                /** @phpstan-ignore notEqual.notAllowed */
                 } elseif ($v != $a2[$k]) {
                     $r[$k] = $v;
                 }

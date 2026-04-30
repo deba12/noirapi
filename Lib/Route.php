@@ -226,7 +226,6 @@ class Route
                                             }
                                         } else {
                                             if (is_string($instance->callable)) {
-                                                //* @phpstan-ignore-next-line
                                                 $result = $controller->model?->{$instance->callable}($value);
                                             } elseif (is_array($instance->callable)) {
                                                 $result = call_user_func($instance->callable, $value);
@@ -321,7 +320,6 @@ class Route
                 try {
                     /** @noinspection PhpFullyQualifiedNameUsageInspection */
                     /** @noinspection PhpParenthesesCanBeOmittedForNewCallInspection */
-                    /** @phpstan-ignore method.dynamicName */
                     return (new \App\Controllers\Errors($instance->request, $instance->response, $instance->server))->$function(); // phpcs:ignore
                 } catch (LoginException $e) {
                     $response = new Response();

@@ -6,7 +6,7 @@ declare(strict_types=1);
 namespace Noirapi\Helpers;
 
 use Latte;
-use noirapi\Config;
+use Noirapi\Config;
 use Noirapi\Lib\View\FilterExtension;
 
 class StringTemplate
