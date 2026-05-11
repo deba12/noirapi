@@ -78,7 +78,12 @@ class Controller
 
         // We need this when we are moving across domains
         if (isset($this->request->get['message'], $this->request->get['type'])) {
-            $this->message($this->request->get['message'], $this->request->get['type']);
+            $allowedTypes = ['success', 'danger', 'warning', 'info', 'primary', 'secondary', 'light', 'dark'];
+            $type    = in_array($this->request->get['type'], $allowedTypes, true) ? $this->request->get['type'] : 'info';
+            $message = strip_tags((string) $this->request->get['message']);
+            if ($message !== '') {
+                $this->message($message, $type);
+            }
         }
     }
 
