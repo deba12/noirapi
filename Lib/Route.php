@@ -23,7 +23,6 @@ use Noirapi\Lib\Attributes\AutoWire;
 use Noirapi\Lib\Attributes\NotFound;
 use Noirapi\Lib\Tracy\GenericPanel;
 use ReflectionClass;
-use ReflectionException;
 use ReflectionMethod;
 use Swoole\Http\Server;
 use Throwable;
@@ -102,7 +101,7 @@ class Route
 
     /**
      * @return Response
-     * @throws ReflectionException
+     * @throws Throwable
      */
     public function serve(): Response
     {
@@ -269,6 +268,8 @@ class Route
                     $this->response = self::handleErrors(500, $exception->getMessage() ?? 'Internal server error', $this); //phpcs:ignore
                 } catch (NotFoundException $exception) {
                     $this->response = self::handleErrors(404, $exception->getMessage() ?? '404 Not found', $this);
+                } catch (Throwable $exception) {
+                    $this->response = ExceptionRenderer::render($exception, $this->response);
                 }
 
                 break;
@@ -296,7 +297,7 @@ class Route
      * @param Route $instance
      * @return Response
      */
-    private static function handleErrors(int $status_code, string $defaultText, Route $instance): Response
+    private static function handleErrors(int $status_code, string $defaultText, self $instance): Response
     {
 
         /** @psalm-suppress UndefinedClass */
