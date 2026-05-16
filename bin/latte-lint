@@ -1,0 +1,63 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$root = dirname(__DIR__, 2);
+
+if (!is_file($autoload = $root . '/vendor/autoload.php')) {
+    fwrite(STDERR, "Cannot find vendor/autoload.php. Run 'composer install' first.\n");
+    exit(2);
+}
+require $autoload;
+
+defined('ROOT')       || define('ROOT',       $root);
+defined('APPROOT')    || define('APPROOT',    ROOT . '/app/');
+defined('WWWROOT')    || define('WWWROOT',    ROOT . '/htdocs/');
+defined('PATH_VIEWS') || define('PATH_VIEWS', APPROOT . 'views');
+defined('PATH_TEMP')  || define('PATH_TEMP',  ROOT . '/temp');
+defined('PATH_LOGS')  || define('PATH_LOGS',  ROOT . '/logs');
+
+use Latte\Engine;
+use Latte\Essential\TranslatorExtension;
+use Latte\Tools\Linter;
+use Latte\Tools\LinterExtension;
+use Noirapi\Helpers\Macros;
+use Noirapi\Lib\View\FilterExtension;
+
+$engine = new Engine();
+$engine->enablePhpLinter(PHP_BINARY);
+$engine->addExtension(new FilterExtension());
+$engine->addExtension(new Macros());
+$engine->addExtension(new TranslatorExtension(null));
+if (class_exists(\App\Lib\Macros::class)) {
+    $engine->addExtension(new \App\Lib\Macros());
+}
+$engine->addExtension(new LinterExtension());
+
+// PHP built-ins used as Latte filters throughout templates
+$engine->addFilter('number_format', 'number_format');
+$engine->addFilter('nl2br',         'nl2br');
+$engine->addFilter('json',          'json_encode');
+// nocheck is a Latte compile-time modifier consumed by Passes; register as passthrough
+// so LinterExtension doesn't flag it as unknown
+$engine->addFilter('nocheck', static fn (mixed $v): mixed => $v);
+
+$args  = array_slice($argv, 1);
+$debug = in_array('--debug', $args, true);
+$args  = array_filter($args, static fn($a) => $a !== '--debug');
+
+if (empty($args)) {
+    echo "Usage: noirapi/bin/latte-lint <path> [<path>...]\n";
+    exit(1);
+}
+
+echo "\nLatte linter\n------------\n";
+
+$linter = new Linter(engine: $engine, debug: $debug);
+$ok     = true;
+foreach ($args as $path) {
+    $ok = $linter->scanDirectory($path) && $ok;
+}
+
+exit($ok ? 0 : 1);
